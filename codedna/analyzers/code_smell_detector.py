@@ -1,0 +1,169 @@
+"""Code Smell Detector — identifies structural design problems in codebases."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from .language_detector import IGNORE_DIRS
+
+# Thresholds
+MAX_FILE_LINES = 500
+MAX_FUNCTION_LINES = 80
+GOD_CLASS_METHODS = 15
+LARGE_MODULE_FILES = 20
+
+
+class CodeSmellDetector:
+    """Detects common code smells and structural issues."""
+
+    def detect(self, repo_path: Path) -> dict:
+        """Scan for code smells in the repository.
+
+        Returns:
+            Dict with categorized smells and severity ratings.
+        """
+        smells: list[dict] = []
+
+        for file_path in self._walk_source(repo_path):
+            try:
+                content = file_path.read_text(encoding="utf-8", errors="ignore")
+                lines = content.splitlines()
+                relative = str(file_path.relative_to(repo_path))
+            except (OSError, ValueError):
+                continue
+
+            # ── Large File ──
+            if len(lines) > MAX_FILE_LINES:
+                smells.append({
+                    "type": "Large File",
+                    "severity": "warning" if len(lines) < 1000 else "critical",
+                    "file": relative,
+                    "detail": f"{len(lines)} lines (threshold: {MAX_FILE_LINES})",
+                })
+
+            # ── God Class ──
+            if file_path.suffix in (".py", ".java", ".ts", ".js"):
+                method_count = self._count_methods(content, file_path.suffix)
+                if method_count > GOD_CLASS_METHODS:
+                    smells.append({
+                        "type": "God Class",
+                        "severity": "critical",
+                        "file": relative,
+                        "detail": f"{method_count} methods detected (threshold: {GOD_CLASS_METHODS})",
+                    })
+
+            # ── Long Functions ──
+            long_funcs = self._detect_long_functions(content, file_path.suffix)
+            for func_name, length in long_funcs:
+                smells.append({
+                    "type": "Long Function",
+                    "severity": "warning",
+                    "file": relative,
+                    "detail": f"'{func_name}' has {length} lines (threshold: {MAX_FUNCTION_LINES})",
+                })
+
+            # ── TODO/FIXME/HACK markers ──
+            for i, line in enumerate(lines, 1):
+                upper = line.upper()
+                for marker in ("TODO", "FIXME", "HACK", "XXX"):
+                    if marker in upper:
+                        smells.append({
+                            "type": "Code Marker",
+                            "severity": "info",
+                            "file": f"{relative}:{i}",
+                            "detail": f"{marker} found: {line.strip()[:80]}",
+                        })
+                        break  # One marker per line
+
+        # ── Large Modules ──
+        modules = self._detect_large_modules(repo_path)
+        for mod_path, count in modules:
+            smells.append({
+                "type": "Large Module",
+                "severity": "warning",
+                "file": mod_path,
+                "detail": f"{count} files in module (threshold: {LARGE_MODULE_FILES})",
+            })
+
+        # Summary
+        severity_counts = {"critical": 0, "warning": 0, "info": 0}
+        for smell in smells:
+            severity_counts[smell["severity"]] += 1
+
+        return {
+            "smells": smells,
+            "total": len(smells),
+            "severity_counts": severity_counts,
+            "health_score": self._compute_health(severity_counts),
+        }
+
+    def _count_methods(self, content: str, ext: str) -> int:
+        """Count method/function definitions in a file."""
+        import re
+        if ext == ".py":
+            return len(re.findall(r"^\s+def\s+\w+", content, re.MULTILINE))
+        elif ext in (".js", ".ts", ".jsx", ".tsx"):
+            return len(re.findall(r"(function\s+\w+|=>\s*\{|\w+\s*\([^)]*\)\s*\{)", content))
+        elif ext == ".java":
+            return len(re.findall(r"(public|private|protected)\s+\w+\s+\w+\s*\(", content))
+        return 0
+
+    def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int]]:
+        """Detect functions exceeding the line threshold."""
+        import re
+        results = []
+
+        if ext == ".py":
+            pattern = re.compile(r"^(\s*)def\s+(\w+)", re.MULTILINE)
+            lines = content.splitlines()
+            for match in pattern.finditer(content):
+                indent = len(match.group(1))
+                name = match.group(2)
+                start_line = content[:match.start()].count("\n")
+                # Count lines until next function or class at same/lower indent
+                func_lines = 0
+                for line in lines[start_line + 1:]:
+                    stripped = line.lstrip()
+                    if stripped and len(line) - len(stripped) <= indent and (
+                        stripped.startswith("def ") or stripped.startswith("class ")
+                    ):
+                        break
+                    func_lines += 1
+                if func_lines > MAX_FUNCTION_LINES:
+                    results.append((name, func_lines))
+
+        return results
+
+    def _detect_large_modules(self, repo_path: Path) -> list[tuple[str, int]]:
+        """Find directories with too many files."""
+        results = []
+        for item in repo_path.rglob("*"):
+            if item.is_dir() and item.name not in IGNORE_DIRS:
+                file_count = sum(1 for f in item.iterdir() if f.is_file())
+                if file_count > LARGE_MODULE_FILES:
+                    try:
+                        rel = str(item.relative_to(repo_path))
+                        results.append((rel, file_count))
+                    except ValueError:
+                        pass
+        return results
+
+    def _compute_health(self, counts: dict) -> str:
+        """Compute overall health score."""
+        if counts["critical"] > 5:
+            return "Critical"
+        elif counts["critical"] > 0 or counts["warning"] > 10:
+            return "Needs Attention"
+        elif counts["warning"] > 3:
+            return "Fair"
+        return "Healthy"
+
+    def _walk_source(self, root: Path):
+        source_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".go", ".rs", ".rb"}
+        for item in root.iterdir():
+            if item.name in IGNORE_DIRS:
+                continue
+            if item.is_dir():
+                yield from self._walk_source(item)
+            elif item.is_file() and item.suffix.lower() in source_exts:
+                yield item
