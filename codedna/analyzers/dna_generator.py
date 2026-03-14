@@ -20,6 +20,9 @@ class DNAGenerator:
         smells: dict,
         developers: dict,
         evolution: dict,
+        security: dict = None,
+        github: dict = None,
+        mermaid_graph: str = "",
     ) -> dict:
         """Aggregate all analysis into a DNA profile.
 
@@ -27,10 +30,10 @@ class DNAGenerator:
             Complete DNA profile dict.
         """
         # Compute overall health
-        health = self._compute_overall_health(smells, dependencies, architecture)
+        health = self._compute_overall_health(smells, dependencies, architecture, security)
 
         # Build risk signals
-        risks = self._extract_risks(smells, dependencies)
+        risks = self._extract_risks(smells, dependencies, security)
 
         # Build DNA signature
         signature = self._build_signature(languages, architecture, developers, structure)
@@ -79,6 +82,9 @@ class DNAGenerator:
                 "last_commit": evolution.get("last_commit"),
                 "patterns": evolution.get("patterns", []),
             },
+            "security": security or {"vulnerabilities": [], "total_critical": 0, "has_secrets": False},
+            "github": github or {},
+            "mermaid_graph": mermaid_graph,
         }
 
     def to_markdown(self, profile: dict) -> str:
@@ -86,7 +92,14 @@ class DNAGenerator:
         lines = []
         lines.append("# 🧬 CodeDNA Profile\n")
         lines.append(f"> Analyzed: `{profile['metadata']['source']}`")
-        lines.append(f"> Date: {profile['metadata']['analyzed_at'][:10]}\n")
+        lines.append(f"> Date: {profile['metadata']['analyzed_at'][:10]}")
+        
+        if profile.get("github", {}).get("is_github"):
+            gh = profile["github"]
+            lines.append(f"> ⭐️ {gh.get('stars', 0):,} Stars | 🔱 {gh.get('forks', 0):,} Forks | 🐛 {gh.get('issues', 0):,} Issues\n")
+        else:
+            lines.append("\n")
+
         lines.append("---\n")
 
         # System Type
@@ -139,8 +152,10 @@ class DNAGenerator:
         lines.append(f"- Modules: **{deps['total_modules']}**")
         lines.append(f"- Connections: **{deps['total_edges']}**")
         lines.append(f"- Density: **{deps['density']}**")
-        lines.append(f"- Circular Dependencies: **{'Yes ⚠️' if deps['has_circular_deps'] else 'None ✅'}**")
-        lines.append("")
+        lines.append(f"- Circular Dependencies: **{'Yes ⚠️' if deps['has_circular_deps'] else 'None ✅'}**\n")
+        
+        if profile.get("mermaid_graph"):
+            lines.append("```mermaid\n" + profile["mermaid_graph"] + "\n```\n")
 
         # Developer Genome
         dev = profile["developer_genome"]
@@ -179,10 +194,13 @@ class DNAGenerator:
         """Convert DNA profile to JSON."""
         return json.dumps(profile, indent=2, default=str)
 
-    def _compute_overall_health(self, smells: dict, deps: dict, arch: dict) -> dict:
+    def _compute_overall_health(self, smells: dict, deps: dict, arch: dict, security: dict = None) -> dict:
         """Compute overall health assessment."""
         severity = smells.get("severity_counts", {})
         health_score = smells.get("health_score", "Unknown")
+        
+        if security and security.get("has_secrets"):
+            health_score = "Critical"
 
         return {
             "overall": health_score,
@@ -191,9 +209,13 @@ class DNAGenerator:
             "circular_deps": deps.get("has_circular_deps", False),
         }
 
-    def _extract_risks(self, smells: dict, deps: dict) -> list[str]:
+    def _extract_risks(self, smells: dict, deps: dict, security: dict = None) -> list[str]:
         """Extract top risk signals from analysis."""
         risks = []
+
+        if security:
+            for vuln in security.get("vulnerabilities", []):
+                risks.append(f"🔴 {vuln['type']} in `{vuln['file']}`: {vuln['detail']}")
 
         for smell in smells.get("smells", []):
             if smell["severity"] == "critical":

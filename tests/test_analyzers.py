@@ -10,6 +10,8 @@ from codedna.analyzers.language_detector import LanguageDetector
 from codedna.analyzers.structure_analyzer import StructureAnalyzer
 from codedna.analyzers.dependency_mapper import DependencyMapper
 from codedna.analyzers.code_smell_detector import CodeSmellDetector
+from codedna.analyzers.security_detector import SecurityDetector
+from codedna.analyzers.github_analyzer import GitHubAnalyzer
 from codedna.analyzers.architecture_detector import ArchitectureDetector
 from codedna.analyzers.dna_generator import DNAGenerator
 
@@ -25,7 +27,7 @@ def sample_repo(tmp_path):
         "import os\nfrom src.utils import helper\n\ndef main():\n    pass\n"
     )
     (src / "utils.py").write_text(
-        "import json\n\ndef helper():\n    return 'hello'\n"
+        "import json\n\ndef helper():\n    return 'hello'\nAWS_KEY = 'AKIAIOSFODNN7EXAMPLE'\n"
     )
 
     # JS file
@@ -109,6 +111,23 @@ class TestCodeSmellDetector:
         assert result["health_score"] in ("Healthy", "Fair", "Needs Attention", "Critical")
 
 
+class TestSecurityDetector:
+    def test_detect_secrets(self, sample_repo):
+        result = SecurityDetector().detect(sample_repo)
+        assert result["total_critical"] > 0
+        assert result["has_secrets"] is True
+
+
+class TestGitHubAnalyzer:
+    def test_analyze_local(self):
+        result = GitHubAnalyzer().analyze(".")
+        assert result["is_github"] is False
+
+    def test_analyze_github_url(self):
+        result = GitHubAnalyzer().analyze("https://github.com/microsoft/typescript")
+        assert "is_github" in result
+
+
 class TestArchitectureDetector:
     def test_detect_architecture(self, sample_repo):
         result = ArchitectureDetector().detect(sample_repo)
@@ -132,6 +151,9 @@ class TestDNAGenerator:
             smells={"smells": [], "total": 0, "severity_counts": {"critical": 0, "warning": 0, "info": 0}, "health_score": "Healthy"},
             developers={"total_contributors": 1, "contributors": [{"name": "dev", "role": "Primary Architect", "commits": 10}], "bus_factor": 1},
             evolution={"total_commits": 10, "patterns": ["Stable Evolution"]},
+            security={"vulnerabilities": [], "total_critical": 0, "has_secrets": False},
+            github={"is_github": True, "stars": 100},
+            mermaid_graph="graph LR\n  A-->B",
         )
         assert profile["system_type"] == "Monolith"
         assert "signature" in profile

@@ -16,10 +16,13 @@ from .analyzers.structure_analyzer import StructureAnalyzer
 from .analyzers.dependency_mapper import DependencyMapper
 from .analyzers.architecture_detector import ArchitectureDetector
 from .analyzers.code_smell_detector import CodeSmellDetector
+from .analyzers.security_detector import SecurityDetector
 from .analyzers.developer_analyzer import DeveloperAnalyzer
 from .analyzers.evolution_engine import EvolutionEngine
+from .analyzers.github_analyzer import GitHubAnalyzer
 from .analyzers.dna_generator import DNAGenerator
 from .visualization.renderer import Renderer
+from .visualization.html_export import HTMLExporter
 
 console = Console()
 
@@ -38,7 +41,7 @@ def main():
 @main.command()
 @click.argument("source")
 @click.option("--output", "-o", type=click.Path(), help="Output directory for reports")
-@click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "both"]), default="both", help="Output format")
+@click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "html", "all"]), default="all", help="Output format")
 @click.option("--depth", "-d", type=int, default=100, help="Git history depth (commits to analyze)")
 @click.option("--no-visualize", is_flag=True, help="Skip terminal visualization")
 def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize: bool):
@@ -80,7 +83,9 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 4: Dependency Mapping ──
             progress.update(task, description="🔗 Mapping dependencies...")
-            dependencies = DependencyMapper().map(repo_path)
+            mapper = DependencyMapper()
+            dependencies = mapper.map(repo_path)
+            mermaid_graph = mapper.build_mermaid(repo_path)
             progress.update(task, description=f"[green]✓[/] {dependencies.get('total_edges', 0)} dependency edges found")
 
             # ── Stage 5: Architecture Detection ──
@@ -93,6 +98,11 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             smells = CodeSmellDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] {smells.get('total', 0)} issues found")
 
+            # ── Stage 6.5: Security Scanning ──
+            progress.update(task, description="🔒 Scanning for security vulnerabilities...")
+            security = SecurityDetector().detect(repo_path)
+            progress.update(task, description=f"[green]✓[/] {security.get('total_critical', 0)} critical vulnerabilities")
+
             # ── Stage 7: Developer Analysis ──
             progress.update(task, description="👥 Analyzing developer behavior...")
             developers = DeveloperAnalyzer().analyze(repo_path, max_commits=depth)
@@ -102,6 +112,11 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             progress.update(task, description="📈 Tracking evolution...")
             evolution = EvolutionEngine().analyze(repo_path)
             progress.update(task, description="[green]✓[/] Evolution timeline built")
+
+            # ── Stage 8.5: GitHub Analysis ──
+            progress.update(task, description="🌐 Fetching GitHub community stats...")
+            github_stats = GitHubAnalyzer().analyze(source)
+            progress.update(task, description="[green]✓[/] GitHub stats retrieved")
 
             # ── Stage 9: DNA Generation ──
             progress.update(task, description="🧬 Generating DNA profile...")
@@ -115,6 +130,9 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
                 smells=smells,
                 developers=developers,
                 evolution=evolution,
+                security=security,
+                github=github_stats,
+                mermaid_graph=mermaid_graph,
             )
             progress.update(task, description="[bold green]✓ DNA profile complete![/]")
 
@@ -127,15 +145,21 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             output_dir = Path(output)
             output_dir.mkdir(parents=True, exist_ok=True)
 
-            if fmt in ("markdown", "both"):
+            if fmt in ("markdown", "all"):
                 md_path = output_dir / "dna_report.md"
                 md_path.write_text(generator.to_markdown(profile), encoding="utf-8")
                 console.print(f"\n  📄 Report saved: [cyan]{md_path}[/]")
 
-            if fmt in ("json", "both"):
+            if fmt in ("json", "all"):
                 json_path = output_dir / "dna_profile.json"
                 json_path.write_text(generator.to_json(profile), encoding="utf-8")
                 console.print(f"  📊 Data saved: [cyan]{json_path}[/]")
+
+            if fmt in ("html", "all"):
+                html_path = output_dir / "dna_dashboard.html"
+                exporter = HTMLExporter()
+                html_path.write_text(exporter.export(profile, mermaid_graph), encoding="utf-8")
+                console.print(f"  🌐 Dashboard saved: [cyan]{html_path}[/]")
 
         console.print("\n[bold green]✨ Analysis complete![/]\n")
 

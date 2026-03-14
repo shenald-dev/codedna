@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "source": ".",
+    "analyzed_at": "2026-03-14T08:52:54.058682",
+    "version": "1.0.0"
+  },
+  "signature": "LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1",
+  "system_type": "Monolith",
+  "languages": {
+    "languages": {
+      "Python": {
+        "files": 16,
+        "lines": 1741,
+        "percentage": 83.8
+      },
+      "YAML": {
+        "files": 1,
+        "lines": 34,
+        "percentage": 1.6
+      },
+      "TOML": {
+        "files": 1,
+        "lines": 51,
+        "percentage": 2.5
+      },
+      "Markdown": {
+        "files": 1,
+        "lines": 252,
+        "percentage": 12.1
+      }
+    },
+    "primary": "Python",
+    "total_files": 19,
+    "total_lines": 2078
+  },
+  "architecture": {
+    "primary_pattern": "Monolith",
+    "detected_patterns": [],
+    "traits": [
+      "CI/CD Enabled",
+      "Tested",
+      "Type-Safe"
+    ],
+    "coupling": "Low"
+  },
+  "structure_stats": {
+    "total_files": 27,
+    "total_dirs": 51,
+    "max_depth": 2,
+    "modules": 4
+  },
+  "dependencies": {
+    "total_modules": 54,
+    "total_edges": 72,
+    "density": 0.0252,
+    "has_circular_deps": false,
+    "circular_count": 0
+  },
+  "health": {
+    "overall": "Healthy",
+    "severity_counts": {
+      "critical": 0,
+      "warning": 1,
+      "info": 2
+    },
+    "coupling": "Low",
+    "circular_deps": false
+  },
+  "risks": [
+    "\ud83d\udfe1 Long Function in `codedna\\cli.py`"
+  ],
+  "developer_genome": {
+    "total_contributors": 1,
+    "bus_factor": 1,
+    "primary_architect": "shenalmohsl-crypto",
+    "top_contributors": [
+      {
+        "name": "shenalmohsl-crypto",
+        "role": "Primary Architect",
+        "commits": 1
+      }
+    ]
+  },
+  "evolution": {
+    "total_commits": 1,
+    "first_commit": "2026-03-14T08:34:10+05:30",
+    "last_commit": "2026-03-14T08:34:10+05:30",
+    "patterns": [
+      "Insufficient data"
+    ]
+  }
+}
