@@ -25,9 +25,18 @@ class StructureAnalyzer:
             "modules": modules,
             "max_depth": max(depth_stats) if depth_stats else 0,
             "avg_depth": round(sum(depth_stats) / len(depth_stats), 1) if depth_stats else 0,
-            "total_dirs": sum(1 for _ in repo_path.rglob("*") if _.is_dir() and _.name not in IGNORE_DIRS),
+            "total_dirs": sum(1 for _ in self._walk_dirs(repo_path)),
             "total_files": sum(1 for _ in self._walk(repo_path) if _.is_file()),
         }
+
+    def _walk_dirs(self, root: Path):
+        """Walk directories, skipping ignored directories."""
+        for item in root.iterdir():
+            if item.name in IGNORE_DIRS:
+                continue
+            if item.is_dir():
+                yield item
+                yield from self._walk_dirs(item)
 
     def _build_tree(self, path: Path, root: Path, max_depth: int = 3, current: int = 0) -> dict:
         """Build a nested dict representing the file tree (limited depth)."""

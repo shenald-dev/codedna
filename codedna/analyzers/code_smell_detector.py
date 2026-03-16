@@ -137,16 +137,24 @@ class CodeSmellDetector:
     def _detect_large_modules(self, repo_path: Path) -> list[tuple[str, int]]:
         """Find directories with too many files."""
         results = []
-        for item in repo_path.rglob("*"):
-            if item.is_dir() and item.name not in IGNORE_DIRS:
-                file_count = sum(1 for f in item.iterdir() if f.is_file())
-                if file_count > LARGE_MODULE_FILES:
-                    try:
-                        rel = str(item.relative_to(repo_path))
-                        results.append((rel, file_count))
-                    except ValueError:
-                        pass
+        for item in self._walk_dirs(repo_path):
+            file_count = sum(1 for f in item.iterdir() if f.is_file())
+            if file_count > LARGE_MODULE_FILES:
+                try:
+                    rel = str(item.relative_to(repo_path))
+                    results.append((rel, file_count))
+                except ValueError:
+                    pass
         return results
+
+    def _walk_dirs(self, root: Path):
+        """Walk directories, skipping ignored directories."""
+        for item in root.iterdir():
+            if item.name in IGNORE_DIRS:
+                continue
+            if item.is_dir():
+                yield item
+                yield from self._walk_dirs(item)
 
     def _compute_health(self, counts: dict) -> str:
         """Compute overall health score."""
