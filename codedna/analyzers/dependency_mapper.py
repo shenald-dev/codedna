@@ -129,13 +129,19 @@ class DependencyMapper:
         return "\n".join(lines)
 
     def _walk_source(self, root: Path):
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield from self._walk_source(item)
-            elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
-                yield item
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        stack.append(item)
+                    elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
+                        yield item
+            except PermissionError:
+                pass
 
     def _to_module(self, path: str) -> str:
         return path.replace("\\", "/").rsplit(".", 1)[0]
