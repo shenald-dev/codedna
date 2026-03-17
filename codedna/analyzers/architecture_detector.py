@@ -133,15 +133,18 @@ class ArchitectureDetector:
             return "Moderate"
         return "Low"
 
-    def _walk(self, root: Path, max_depth: int = 5, current: int = 0):
-        if current >= max_depth:
-            return
-        try:
-            for item in root.iterdir():
-                if item.name in IGNORE_DIRS or item.name.startswith("."):
-                    continue
-                yield item
-                if item.is_dir():
-                    yield from self._walk(item, max_depth, current + 1)
-        except PermissionError:
-            pass
+    def _walk(self, root: Path, max_depth: int = 5):
+        stack = [(root, 0)]
+        while stack:
+            current_dir, current_depth = stack.pop()
+            if current_depth >= max_depth:
+                continue
+            try:
+                for item in current_dir.iterdir():
+                    if item.name in IGNORE_DIRS or item.name.startswith("."):
+                        continue
+                    yield item
+                    if item.is_dir():
+                        stack.append((item, current_depth + 1))
+            except PermissionError:
+                pass

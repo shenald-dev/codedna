@@ -24,6 +24,9 @@ class CodeSmellDetector:
         """
         smells: list[dict] = []
 
+        import re
+        MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX)", re.IGNORECASE)
+
         for file_path in self._walk_source(repo_path):
             try:
                 content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -64,16 +67,13 @@ class CodeSmellDetector:
 
             # ── TODO/FIXME/HACK markers ──
             for i, line in enumerate(lines, 1):
-                upper = line.upper()
-                for marker in ("TODO", "FIXME", "HACK", "XXX"):
-                    if marker in upper:
-                        smells.append({
-                            "type": "Code Marker",
-                            "severity": "info",
-                            "file": f"{relative}:{i}",
-                            "detail": f"{marker} found: {line.strip()[:80]}",
-                        })
-                        break  # One marker per line
+                if match := MARKER_PATTERN.search(line):
+                    smells.append({
+                        "type": "Code Marker",
+                        "severity": "info",
+                        "file": f"{relative}:{i}",
+                        "detail": f"{match.group(1).upper()} found: {line.strip()[:80]}",
+                    })
 
         # ── Large Modules ──
         modules = self._detect_large_modules(repo_path)
@@ -149,12 +149,18 @@ class CodeSmellDetector:
 
     def _walk_dirs(self, root: Path):
         """Walk directories, skipping ignored directories."""
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield item
-                yield from self._walk_dirs(item)
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        yield item
+                        stack.append(item)
+            except PermissionError:
+                pass
 
     def _compute_health(self, counts: dict) -> str:
         """Compute overall health score."""
@@ -168,10 +174,16 @@ class CodeSmellDetector:
 
     def _walk_source(self, root: Path):
         source_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".go", ".rs", ".rb"}
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield from self._walk_source(item)
-            elif item.is_file() and item.suffix.lower() in source_exts:
-                yield item
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        stack.append(item)
+                    elif item.is_file() and item.suffix.lower() in source_exts:
+                        yield item
+            except PermissionError:
+                pass

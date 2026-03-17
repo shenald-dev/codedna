@@ -86,7 +86,8 @@ class LanguageDetector:
                 counter[lang] += 1
                 total_files += 1
                 try:
-                    lines = len(file_path.read_text(encoding="utf-8", errors="ignore").splitlines())
+                    with file_path.open(encoding="utf-8", errors="ignore") as f:
+                        lines = sum(1 for _ in f)
                     line_counter[lang] += lines
                 except (OSError, UnicodeDecodeError):
                     pass
@@ -116,10 +117,16 @@ class LanguageDetector:
 
     def _walk_files(self, root: Path):
         """Walk files, skipping ignored directories."""
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield from self._walk_files(item)
-            elif item.is_file():
-                yield item
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        stack.append(item)
+                    elif item.is_file():
+                        yield item
+            except PermissionError:
+                pass
