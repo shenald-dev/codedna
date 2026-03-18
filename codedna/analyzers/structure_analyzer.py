@@ -31,31 +31,48 @@ class StructureAnalyzer:
 
     def _walk_dirs(self, root: Path):
         """Walk directories, skipping ignored directories."""
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield item
-                yield from self._walk_dirs(item)
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        yield item
+                        stack.append(item)
+            except PermissionError:
+                pass
 
-    def _build_tree(self, path: Path, root: Path, max_depth: int = 3, current: int = 0) -> dict:
-        """Build a nested dict representing the file tree (limited depth)."""
-        if current >= max_depth:
-            return {"...": None}
-
+    def _build_tree(self, path: Path, root: Path, max_depth: int = 3) -> dict:
+        """Build a nested dict representing the file tree (limited depth) iteratively."""
         result = {}
-        try:
-            items = sorted(path.iterdir(), key=lambda p: (p.is_file(), p.name))
-        except PermissionError:
-            return result
-
-        for item in items:
-            if item.name in IGNORE_DIRS or item.name.startswith("."):
+        stack = [(path, result, 0)]
+        while stack:
+            current_path, current_dict, current_depth = stack.pop()
+            if current_depth >= max_depth:
+                current_dict["..."] = None
                 continue
-            if item.is_dir():
-                result[f"📁 {item.name}/"] = self._build_tree(item, root, max_depth, current + 1)
-            else:
-                result[f"📄 {item.name}"] = None
+            try:
+                items = sorted(current_path.iterdir(), key=lambda p: (p.is_file(), p.name))
+            except PermissionError:
+                continue
+
+            # Keep track of items to push to stack so they are popped in correct order
+            dirs_to_process = []
+
+            for item in items:
+                if item.name in IGNORE_DIRS or item.name.startswith("."):
+                    continue
+                if item.is_dir():
+                    new_dict = {}
+                    current_dict[f"📁 {item.name}/"] = new_dict
+                    dirs_to_process.append((item, new_dict, current_depth + 1))
+                else:
+                    current_dict[f"📄 {item.name}"] = None
+
+            # Push directories to stack in reverse order so they are processed in correct order
+            stack.extend(reversed(dirs_to_process))
 
         return result
 
@@ -67,7 +84,10 @@ class StructureAnalyzer:
                 continue
             if path.name in ("__init__.py", "package.json", "go.mod", "Cargo.toml", "build.gradle"):
                 module_path = str(path.parent.relative_to(repo_path))
-                file_count = sum(1 for f in path.parent.iterdir() if f.is_file())
+                try:
+                    file_count = sum(1 for f in path.parent.iterdir() if f.is_file())
+                except PermissionError:
+                    file_count = 0
                 modules.append({
                     "path": module_path,
                     "marker": path.name,
@@ -88,11 +108,17 @@ class StructureAnalyzer:
         return depths
 
     def _walk(self, root: Path):
-        """Walk files, skipping ignored directories."""
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS:
-                continue
-            if item.is_dir():
-                yield from self._walk(item)
-            else:
-                yield item
+        """Walk files, skipping ignored directories iteratively."""
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS:
+                        continue
+                    if item.is_dir():
+                        stack.append(item)
+                    else:
+                        yield item
+            except PermissionError:
+                pass
