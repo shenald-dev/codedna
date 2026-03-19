@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
@@ -11,6 +12,13 @@ MAX_FILE_LINES = 500
 MAX_FUNCTION_LINES = 80
 GOD_CLASS_METHODS = 15
 LARGE_MODULE_FILES = 20
+
+# Pre-compiled Regular Expressions for performance
+MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX)", re.IGNORECASE)
+PY_METHOD_PATTERN = re.compile(r"^\s*def\s+\w+", re.MULTILINE)
+JS_METHOD_PATTERN = re.compile(r"(function\s+\w+|=>\s*\{|\w+\s*\([^)]*\)\s*\{)")
+JAVA_METHOD_PATTERN = re.compile(r"(public|private|protected)\s+\w+\s+\w+\s*\(")
+PY_FUNC_START_PATTERN = re.compile(r"^(\s*)def\s+(\w+)", re.MULTILINE)
 
 
 class CodeSmellDetector:
@@ -23,9 +31,6 @@ class CodeSmellDetector:
             Dict with categorized smells and severity ratings.
         """
         smells: list[dict] = []
-
-        import re
-        MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX)", re.IGNORECASE)
 
         for file_path in self._walk_source(repo_path):
             try:
@@ -99,24 +104,21 @@ class CodeSmellDetector:
 
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""
-        import re
         if ext == ".py":
-            return len(re.findall(r"^\s+def\s+\w+", content, re.MULTILINE))
+            return len(PY_METHOD_PATTERN.findall(content))
         elif ext in (".js", ".ts", ".jsx", ".tsx"):
-            return len(re.findall(r"(function\s+\w+|=>\s*\{|\w+\s*\([^)]*\)\s*\{)", content))
+            return len(JS_METHOD_PATTERN.findall(content))
         elif ext == ".java":
-            return len(re.findall(r"(public|private|protected)\s+\w+\s+\w+\s*\(", content))
+            return len(JAVA_METHOD_PATTERN.findall(content))
         return 0
 
     def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int]]:
         """Detect functions exceeding the line threshold."""
-        import re
         results = []
 
         if ext == ".py":
-            pattern = re.compile(r"^(\s*)def\s+(\w+)", re.MULTILINE)
             lines = content.splitlines()
-            for match in pattern.finditer(content):
+            for match in PY_FUNC_START_PATTERN.finditer(content):
                 indent = len(match.group(1))
                 name = match.group(2)
                 start_line = content[:match.start()].count("\n")
