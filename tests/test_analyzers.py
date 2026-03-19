@@ -124,8 +124,26 @@ class TestGitHubAnalyzer:
         assert result["is_github"] is False
 
     def test_analyze_github_url(self):
-        result = GitHubAnalyzer().analyze("https://github.com/microsoft/typescript")
-        assert "is_github" in result
+        from unittest.mock import patch, MagicMock
+        import json
+
+        mock_response = MagicMock()
+        mock_response.read.return_value = json.dumps({
+            "stargazers_count": 100,
+            "forks_count": 50,
+            "open_issues_count": 10,
+            "description": "Mocked desc",
+            "homepage": "mocked.com"
+        }).encode()
+
+        mock_context_manager = MagicMock()
+        mock_context_manager.__enter__.return_value = mock_response
+
+        with patch("urllib.request.urlopen", return_value=mock_context_manager):
+            result = GitHubAnalyzer().analyze("https://github.com/microsoft/typescript")
+
+        assert result["is_github"] is True
+        assert result["stars"] == 100
 
 
 class TestArchitectureDetector:
