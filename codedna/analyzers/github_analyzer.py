@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import urllib.request
+import urllib.parse
 from urllib.error import URLError, HTTPError
 
 
@@ -28,15 +29,27 @@ class GitHubAnalyzer:
             "homepage": "",
         }
 
-        if not source.startswith(("http://github.com", "https://github.com")):
+        try:
+            parsed = urllib.parse.urlparse(source)
+        except Exception:
             return stats
 
-        # Extract owner/repo
-        parts = source.rstrip("/").split("/")
-        if len(parts) >= 2:
-            owner, repo = parts[-2], parts[-1]
+        if parsed.scheme not in ("http", "https") or parsed.hostname != "github.com":
+            return stats
+
+        # Extract owner/repo from path (e.g., /owner/repo)
+        path_parts = [p for p in parsed.path.split("/") if p]
+        if len(path_parts) >= 2:
+            owner, repo = path_parts[0], path_parts[1]
             if repo.endswith(".git"):
                 repo = repo[:-4]
+
+            # Validate that owner and repo are safe strings
+            def is_valid_identifier(s):
+                return s and s not in ("..", ".") and all(c.isalnum() or c in "-_." for c in s)
+
+            if not is_valid_identifier(owner) or not is_valid_identifier(repo):
+                return stats
 
             api_url = f"https://api.github.com/repos/{owner}/{repo}"
             
