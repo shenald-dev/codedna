@@ -111,6 +111,40 @@ class TestCodeSmellDetector:
         assert result["health_score"] in ("Healthy", "Fair", "Needs Attention", "Critical")
 
 
+
+    @pytest.mark.parametrize(
+        "content, ext, expected",
+        [
+            # Python - Testing with required indentation
+            ("    def foo():\n        pass", ".py", 1),
+            ("class A:\n    def method(self):\n        pass", ".py", 1),
+            ("    def func1(): pass\n\n    def func2(): pass", ".py", 2),
+            ("    async def my_async_func():\n        pass", ".py", 0),
+            ("", ".py", 0),
+
+            # JS/TS
+            ("function normalFunc() {}", ".js", 1),
+            ("const arrowFunc = () => {}", ".ts", 1),
+            ("class MyClass { myMethod() {} }", ".jsx", 1),
+            ("function f1() {}\nconst f2 = () => {}", ".tsx", 2),
+            ("const noFunc = 42;", ".js", 0),
+
+            # Java
+            ("public void myMethod() {", ".java", 1),
+            ("private String anotherMethod(int a) {", ".java", 1),
+            ("protected static int someMethod() {", ".java", 0),
+            ("public class MyClass {}", ".java", 0),
+
+            # Unsupported extensions
+            ("    def foo():", ".txt", 0),
+            ("function bar() {}", ".cpp", 0),
+        ]
+    )
+    def test_count_methods_edge_cases(self, content, ext, expected):
+        detector = CodeSmellDetector()
+        assert detector._count_methods(content, ext) == expected
+
+
 class TestSecurityDetector:
     def test_detect_secrets(self, sample_repo):
         result = SecurityDetector().detect(sample_repo)
