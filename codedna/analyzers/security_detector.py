@@ -64,12 +64,18 @@ class SecurityDetector:
         }
 
     def _walk_source(self, root: Path):
-        for item in root.iterdir():
-            if item.name in IGNORE_DIRS or item.name.startswith(".git"):
-                continue
-            if item.is_dir():
-                yield from self._walk_source(item)
-            elif item.is_file():
-                # Skip known binary/media/data files
-                if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):
-                    yield item
+        stack = [root]
+        while stack:
+            current = stack.pop()
+            try:
+                for item in current.iterdir():
+                    if item.name in IGNORE_DIRS or item.name.startswith(".git"):
+                        continue
+                    if item.is_dir():
+                        stack.append(item)
+                    elif item.is_file():
+                        # Skip known binary/media/data files
+                        if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):
+                            yield item
+            except PermissionError:
+                pass
