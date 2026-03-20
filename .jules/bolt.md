@@ -13,3 +13,11 @@ Tests were performing real network requests (GitHub API) resulting in a slow exe
 
 Action:
 Ensure any external network call in `tests` uses mocking (like `unittest.mock.patch`). Added mocking to `TestGitHubAnalyzer.test_analyze_github_url` to avoid actual web requests, significantly speeding up the whole test suite.
+
+## 2026-03-20 — Refactor missing recursive directory traversals
+
+Learning:
+While most recursive directory traversals were optimized to use iterative stack-based traversal (DFS), `SecurityDetector._walk_source` was missed. This inconsistency could still lead to `RecursionError` and overhead in deeply nested large repositories.
+
+Action:
+Replaced the recursive directory `_walk_source` method in `SecurityDetector` with the standardized iterative stack-based traversal (DFS) to safely process deeply nested trees.
