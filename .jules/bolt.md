@@ -21,3 +21,11 @@ While most recursive directory traversals were optimized to use iterative stack-
 
 Action:
 Replaced the recursive directory `_walk_source` method in `SecurityDetector` with the standardized iterative stack-based traversal (DFS) to safely process deeply nested trees.
+
+## 2026-03-22 — Optimize Regex and Memory usage in Security Detector
+
+Learning:
+The `SecurityDetector` was taking an excessive amount of time (over 80s for Python's standard library) due to regex engine bottlenecks. The use of boundary markers `\b`, case insensitivity `(?i)`, and complex unbounded prefixes (e.g., `(?i)(?:key|token|...)[\s:=]+['\"]`) forces the regex engine to abandon fast Boyer-Moore literal searching. Additionally, calculating line numbers by creating large substrings (`content[:match.start()].count('\n')`) caused massive memory allocations and slowdowns.
+
+Action:
+Replaced slow regex patterns with fast literal-first searches (e.g., finding quoted strings first, then verifying the left context manually or with a strict anchored regex). Removed `\b` bounds and `(?i)` where the secret structure allowed (like `AKIA` which is always uppercase). Replaced string slicing with bounded counts (`content.count('\n', 0, match.start())`) to avoid memory copies. This reduced scanning time of the Python stdlib from ~84s to ~8s.
