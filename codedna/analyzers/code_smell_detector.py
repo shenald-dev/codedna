@@ -118,21 +118,23 @@ class CodeSmellDetector:
 
         if ext == ".py":
             lines = content.splitlines()
-            for match in PY_FUNC_START_PATTERN.finditer(content):
-                indent = len(match.group(1))
-                name = match.group(2)
-                start_line = content[:match.start()].count("\n")
-                # Count lines until next function or class at same/lower indent
-                func_lines = 0
-                for line in lines[start_line + 1:]:
-                    stripped = line.lstrip()
-                    if stripped and len(line) - len(stripped) <= indent and (
-                        stripped.startswith("def ") or stripped.startswith("class ")
-                    ):
-                        break
-                    func_lines += 1
-                if func_lines > MAX_FUNCTION_LINES:
-                    results.append((name, func_lines))
+            for i, line in enumerate(lines):
+                match = PY_FUNC_START_PATTERN.match(line)
+                if match:
+                    indent = len(match.group(1))
+                    name = match.group(2)
+                    # Count lines until next function or class at same/lower indent
+                    func_lines = 0
+                    for j in range(i + 1, len(lines)):
+                        inner_line = lines[j]
+                        stripped = inner_line.lstrip()
+                        if stripped and len(inner_line) - len(stripped) <= indent and (
+                            stripped.startswith("def ") or stripped.startswith("class ")
+                        ):
+                            break
+                        func_lines += 1
+                    if func_lines > MAX_FUNCTION_LINES:
+                        results.append((name, func_lines))
 
         return results
 
