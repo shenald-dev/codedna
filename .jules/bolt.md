@@ -21,3 +21,11 @@ While most recursive directory traversals were optimized to use iterative stack-
 
 Action:
 Replaced the recursive directory `_walk_source` method in `SecurityDetector` with the standardized iterative stack-based traversal (DFS) to safely process deeply nested trees.
+
+## 2026-03-23 — Optimize Regex Line Number Lookups in `SecurityDetector`
+
+Learning:
+When matching regex patterns across large multi-line strings, evaluating `content[:match.start()].count('\n') + 1` for each match triggers an O(N) operation per match. For files with many matches or long contents, this leads to an O(N*M) bottleneck.
+
+Action:
+Pre-calculate the end indices for all lines in the file (`[i for i, char in enumerate(content) if char == '\n']`), and use `bisect.bisect_right` on the line ends array to look up the line number in O(log L) time per match, drastically reducing processing time for large codebases.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import re
 from pathlib import Path
 
@@ -38,8 +39,13 @@ class SecurityDetector:
                 continue
 
             # Check for secrets
+            line_ends = None
             for secret_type, pattern in SECRET_PATTERNS.items():
                 for match in pattern.finditer(content):
+                    # Only calculate line ends if we actually found a secret
+                    if line_ends is None:
+                        line_ends = [i for i, char in enumerate(content) if char == '\n']
+
                     # To avoid printing real secrets, we truncate/mask the matched value
                     matched_value = match.group(0)
                     if len(matched_value) > 10:
@@ -48,7 +54,7 @@ class SecurityDetector:
                         masked = "***"
 
                     # Get line number approximation
-                    line_no = content[:match.start()].count('\n') + 1
+                    line_no = bisect.bisect_right(line_ends, match.start()) + 1
 
                     vulnerabilities.append({
                         "type": "Hardcoded Secret",
