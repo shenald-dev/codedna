@@ -29,3 +29,11 @@ The `_detect_long_functions` method in `code_smell_detector.py` previously compu
 
 Action:
 Replaced the full-string regex search (`re.finditer`) and newline counting logic with a line-by-line traversal using `content.splitlines()` and `enumerate(lines)`. By calling `.match()` on each line directly and avoiding slice-based iterations (`lines[i+1:]`) via index-based iteration (`range(i+1, len(lines))`), the performance of function extraction in Python files was significantly improved (from ~57 seconds to ~3 seconds on extremely large files in synthetic benchmarks).
+
+## 2026-03-24 — Fixing NameError Regression in SecurityDetector
+
+Learning:
+During a repository traversal refactor in `SecurityDetector._walk_source`, the loop variable was renamed from `item` to `file_path`. However, the references to the file name in `SecurityDetector.detect` for dependency manifests (`package.json` and `requirements.txt`) were not updated, resulting in a `NameError` that caused `test_detect_secrets` to fail completely.
+
+Action:
+Updated the dependency manifest checks in `SecurityDetector.detect` to correctly use `file_path.name` instead of `item.name`. Always verify that loop variable renames are consistently applied across the entire scope of the loop body to avoid correctness bugs and test failures.

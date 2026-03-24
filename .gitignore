@@ -36,3 +36,4 @@ htmlcov/
 
 # Cloned repos cache
 .codedna_cache/
+prof/

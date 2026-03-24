@@ -8,14 +8,14 @@ from pathlib import Path
 from .language_detector import IGNORE_DIRS
 
 SECRET_PATTERNS = {
-    "AWS Access Key": re.compile(r"(?i)\b((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})\b"),
-    "Generic API Key / Token": re.compile(r"(?i)(?:key|token|secret|password|pw|auth)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),
+    "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
+    "Generic API Key / Token": re.compile(r"(?:key|token|secret|password|pw|auth)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]", re.IGNORECASE),
     "RSA Private Key": re.compile(r"-----BEGIN RSA PRIVATE KEY-----"),
     "SSH Private Key": re.compile(r"-----BEGIN OPENSSH PRIVATE KEY-----"),
-    "GitHub Token": re.compile(r"(?i)\b((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})\b"),
-    "Stripe Secret Key": re.compile(r"(?i)\b(sk_live_[0-9a-zA-Z]{24})\b"),
+    "GitHub Token": re.compile(r"((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})"),
+    "Stripe Secret Key": re.compile(r"(sk_live_[0-9a-zA-Z]{24})"),
     "Slack Token": re.compile(r"(xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24})"),
-    "Google API Key": re.compile(r"(?i)\b(AIza[0-9A-Za-z\-_]{35})\b"),
+    "Google API Key": re.compile(r"(AIza[0-9A-Za-z\-_]{35})"),
     "Discord Bot Token": re.compile(r"[MND][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"),
     "SendGrid API Key": re.compile(r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"),
     "MailChimp API Key": re.compile(r"[0-9a-f]{32}-us[0-9]{1,2}"),
@@ -61,9 +61,9 @@ class SecurityDetector:
                     })
 
             # Check dependency manifests for outdated or naive flags
-            if item.name == "package.json":
+            if file_path.name == "package.json":
                 self._check_package_manifest(content, relative, vulnerabilities)
-            elif item.name == "requirements.txt":
+            elif file_path.name == "requirements.txt":
                 self._check_requirements(content, relative, vulnerabilities)
 
         return {
