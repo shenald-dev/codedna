@@ -6,6 +6,7 @@ import json
 import urllib.request
 import urllib.parse
 from urllib.error import URLError, HTTPError
+from .cache_manager import CacheManager
 
 
 class GitHubAnalyzer:
@@ -36,6 +37,12 @@ class GitHubAnalyzer:
 
         if parsed.scheme not in ("http", "https") or parsed.hostname != "github.com":
             return stats
+
+        # Check Cache 
+        cache = CacheManager()
+        cached_stats = cache.get("github_api", source)
+        if cached_stats:
+            return cached_stats
 
         # Extract owner/repo from path (e.g., /owner/repo)
         path_parts = [p for p in parsed.path.split("/") if p]
@@ -69,6 +76,8 @@ class GitHubAnalyzer:
                         "description": data.get("description", "") or "",
                         "homepage": data.get("homepage", "") or "",
                     })
+                    # Save to cache
+                    cache.set("github_api", source, stats)
             except (URLError, HTTPError):
                 # Fail gracefully if offline or rate limited
                 pass

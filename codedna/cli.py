@@ -21,6 +21,8 @@ from .analyzers.developer_analyzer import DeveloperAnalyzer
 from .analyzers.evolution_engine import EvolutionEngine
 from .analyzers.github_analyzer import GitHubAnalyzer
 from .analyzers.dna_generator import DNAGenerator
+from .analyzers.ai_analyzer import AIAnalyzer
+from .analyzers.cache_manager import CacheManager
 from .visualization.renderer import Renderer
 from .visualization.html_export import HTMLExporter
 
@@ -44,7 +46,8 @@ def main():
 @click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "html", "all"]), default="all", help="Output format")
 @click.option("--depth", "-d", type=int, default=100, help="Git history depth (commits to analyze)")
 @click.option("--no-visualize", is_flag=True, help="Skip terminal visualization")
-def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize: bool):
+@click.option("--ai", is_flag=True, help="Synthesize an Executive Summary via LLM")
+def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize: bool, ai: bool):
     """Analyze a repository and generate its DNA profile.
 
     SOURCE can be a GitHub URL or a local path to a repository.
@@ -120,7 +123,6 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 9: DNA Generation ──
             progress.update(task, description="🧬 Generating DNA profile...")
-            generator = DNAGenerator()
             profile = generator.generate(
                 repo_source=source,
                 languages=languages,
@@ -134,6 +136,19 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
                 github=github_stats,
                 mermaid_graph=mermaid_graph,
             )
+
+            # ── Stage 10: AI Synthesis ──
+            if ai:
+                progress.update(task, description="🧠 Synthesizing executive insights via AI...")
+                ai_result = AIAnalyzer().synthesize(profile)
+                if ai_result.success:
+                    profile["ai_insights"] = {
+                        "executive_summary": ai_result.executive_summary,
+                        "refactoring_recommendations": ai_result.refactoring_recommendations
+                    }
+                else:
+                    console.print(f"[yellow]⚠️ AI Synthesis failed:[/] {ai_result.error_message}")
+
             progress.update(task, description="[bold green]✓ DNA profile complete![/]")
 
         # ── Render to terminal ──

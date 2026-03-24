@@ -9,13 +9,16 @@ from .language_detector import IGNORE_DIRS
 
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"(?i)\b((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})\b"),
-    "Generic API Key / Token": re.compile(r"(?i)(?:key|token|secret|password|pw)[\s:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),
+    "Generic API Key / Token": re.compile(r"(?i)(?:key|token|secret|password|pw|auth)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),
     "RSA Private Key": re.compile(r"-----BEGIN RSA PRIVATE KEY-----"),
     "SSH Private Key": re.compile(r"-----BEGIN OPENSSH PRIVATE KEY-----"),
     "GitHub Token": re.compile(r"(?i)\b((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})\b"),
     "Stripe Secret Key": re.compile(r"(?i)\b(sk_live_[0-9a-zA-Z]{24})\b"),
     "Slack Token": re.compile(r"(xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24})"),
     "Google API Key": re.compile(r"(?i)\b(AIza[0-9A-Za-z\-_]{35})\b"),
+    "Discord Bot Token": re.compile(r"[MND][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"),
+    "SendGrid API Key": re.compile(r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"),
+    "MailChimp API Key": re.compile(r"[0-9a-f]{32}-us[0-9]{1,2}"),
 }
 
 
@@ -57,6 +60,12 @@ class SecurityDetector:
                         "detail": f"Detected {secret_type} ({masked})",
                     })
 
+            # Check dependency manifests for outdated or naive flags
+            if item.name == "package.json":
+                self._check_package_manifest(content, relative, vulnerabilities)
+            elif item.name == "requirements.txt":
+                self._check_requirements(content, relative, vulnerabilities)
+
         return {
             "vulnerabilities": vulnerabilities,
             "total_critical": len([v for v in vulnerabilities if v["severity"] == "critical"]),
@@ -79,3 +88,41 @@ class SecurityDetector:
                             yield item
             except PermissionError:
                 pass
+
+    def _check_package_manifest(self, content: str, relative: str, vulnerabilities: list):
+        """Scans package.json for known bad practices or dangerous dependencies."""
+        import json
+        try:
+            data = json.loads(content)
+            deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
+            if "node-ipc" in deps and "10" in str(deps["node-ipc"]):
+                vulnerabilities.append({
+                    "type": "Vulnerable Dependency",
+                    "severity": "critical",
+                    "file": relative,
+                    "detail": "node-ipc heavily compromised version detected."
+                })
+            # Check for overly broad wildcard resolutions
+            for pkg, ver in deps.items():
+                if ver == "*":
+                    vulnerabilities.append({
+                        "type": "Security Risk",
+                        "severity": "warning",
+                        "file": relative,
+                        "detail": f"Dependency '{pkg}' uses unrestricted version wildcard '*'"
+                    })
+        except Exception:
+            pass
+
+    def _check_requirements(self, content: str, relative: str, vulnerabilities: list):
+        """Scans requirements.txt for outdated known flags."""
+        lines = content.splitlines()
+        for idx, line in enumerate(lines):
+            line = line.strip().lower()
+            if line.startswith("django<2") or line.startswith("django==") and "1." in line:
+                vulnerabilities.append({
+                    "type": "Vulnerable Dependency",
+                    "severity": "critical",
+                    "file": f"{relative}:{idx + 1}",
+                    "detail": "Extremely outdated Django version detected."
+                })

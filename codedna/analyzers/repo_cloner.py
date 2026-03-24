@@ -10,6 +10,8 @@ from pathlib import Path
 from git import Repo
 from rich.console import Console
 
+from .cache_manager import CacheManager
+
 console = Console()
 
 
@@ -17,7 +19,12 @@ class RepoCloner:
     """Clones a Git repository to a local cache directory for analysis."""
 
     def __init__(self, cache_dir: str | None = None):
-        self.cache_dir = Path(cache_dir or tempfile.mkdtemp(prefix="codedna_"))
+        if cache_dir is None:
+            base_dir = Path(CacheManager().cache_dir)
+            self.cache_dir = base_dir / "repos"
+            self.cache_dir.mkdir(exist_ok=True)
+        else:
+            self.cache_dir = Path(cache_dir)
 
     def clone(self, source: str) -> Path:
         """Clone a repository from URL or resolve a local path.
@@ -46,6 +53,5 @@ class RepoCloner:
         return dest
 
     def cleanup(self) -> None:
-        """Remove the cache directory."""
-        if self.cache_dir.exists():
-            shutil.rmtree(self.cache_dir, ignore_errors=True)
+        """Remove the cache directory (No-op in V3 to allow persistent caching)."""
+        pass
