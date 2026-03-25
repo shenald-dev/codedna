@@ -37,3 +37,11 @@ During a repository traversal refactor in `SecurityDetector._walk_source`, the l
 
 Action:
 Updated the dependency manifest checks in `SecurityDetector.detect` to correctly use `file_path.name` instead of `item.name`. Always verify that loop variable renames are consistently applied across the entire scope of the loop body to avoid correctness bugs and test failures.
+
+## 2026-04-10 — SecurityDetector Performance & Multiline Regression Bottleneck
+
+Learning:
+String slicing and newline counting (`content[:match.start()].count('\n')`) inside a regex `finditer` loop causes severe O(N^2) slowdowns on large files with many matches due to repeated large string copies. However, iterating line-by-line via `splitlines()` hurts average case performance by executing regex matches `N_lines * M_patterns` times in Python instead of once in C, and breaks multiline pattern support.
+
+Action:
+Pre-compute newline offsets via `newline_positions = [m.start() for m in re.finditer(r'\n', content)]` and use binary search (`bisect.bisect_right(newline_positions, match.start())`) to calculate line numbers. This achieves O(log N) lookup time for matches without compromising multiline match semantics or average case scanning speed.

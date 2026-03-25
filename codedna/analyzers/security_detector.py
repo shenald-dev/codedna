@@ -40,6 +40,13 @@ class SecurityDetector:
             except (OSError, ValueError):
                 continue
 
+            import bisect
+
+            # Precompute newline positions for O(log N) line number lookups
+            # This avoids O(N^2) string slicing and count() overhead for files with many matches,
+            # while keeping regex search over the full file to support multiline patterns.
+            newline_positions = [m.start() for m in re.finditer(r'\n', content)]
+
             # Check for secrets
             for secret_type, pattern in SECRET_PATTERNS.items():
                 for match in pattern.finditer(content):
@@ -50,8 +57,8 @@ class SecurityDetector:
                     else:
                         masked = "***"
 
-                    # Get line number approximation
-                    line_no = content[:match.start()].count('\n') + 1
+                    # Get line number approximation using binary search
+                    line_no = bisect.bisect_right(newline_positions, match.start()) + 1
 
                     vulnerabilities.append({
                         "type": "Hardcoded Secret",
