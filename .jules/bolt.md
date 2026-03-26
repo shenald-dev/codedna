@@ -45,3 +45,11 @@ String slicing and newline counting (`content[:match.start()].count('\n')`) insi
 
 Action:
 Pre-compute newline offsets via `newline_positions = [m.start() for m in re.finditer(r'\n', content)]` and use binary search (`bisect.bisect_right(newline_positions, match.start())`) to calculate line numbers. This achieves O(log N) lookup time for matches without compromising multiline match semantics or average case scanning speed.
+
+## 2026-03-26 — Optimize Code Smell and Security Detection
+
+Learning:
+Using `.splitlines()` and looping over every line to run a regex search is significantly slower than using `.finditer()` on the whole file content, even if we need line numbers later. The C implementation of the regex engine is much faster at scanning the text. We also discovered that eagerly computing newline positions via `.finditer(r'\n', content)` was adding unnecessary overhead to every scanned file in `SecurityDetector`, even those without secrets.
+
+Action:
+Replaced `.splitlines()` iterations in `CodeSmellDetector` for `TODO`/`FIXME` markers with `MARKER_PATTERN.finditer(content)`. For line numbers, compute newline positions lazily using `bisect` only when a match is found. Also updated `SecurityDetector` to delay computing the newline positions array until a secret match is actually identified.

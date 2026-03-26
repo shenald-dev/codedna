@@ -42,12 +42,8 @@ class SecurityDetector:
 
             import bisect
 
-            # Precompute newline positions for O(log N) line number lookups
-            # This avoids O(N^2) string slicing and count() overhead for files with many matches,
-            # while keeping regex search over the full file to support multiline patterns.
-            newline_positions = [m.start() for m in re.finditer(r'\n', content)]
-
             # Check for secrets
+            newline_positions = None
             for secret_type, pattern in SECRET_PATTERNS.items():
                 for match in pattern.finditer(content):
                     # To avoid printing real secrets, we truncate/mask the matched value
@@ -56,6 +52,12 @@ class SecurityDetector:
                         masked = f"{matched_value[:4]}***{matched_value[-4:]}"
                     else:
                         masked = "***"
+
+                    # Precompute newline positions for O(log N) line number lookups lazily
+                    # This avoids O(N^2) string slicing and count() overhead for files with many matches,
+                    # while keeping regex search over the full file to support multiline patterns.
+                    if newline_positions is None:
+                        newline_positions = [m.start() for m in re.finditer(r'\n', content)]
 
                     # Get line number approximation using binary search
                     line_no = bisect.bisect_right(newline_positions, match.start()) + 1
