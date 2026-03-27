@@ -123,6 +123,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 9: DNA Generation ──
             progress.update(task, description="🧬 Generating DNA profile...")
+            generator = DNAGenerator()
             profile = generator.generate(
                 repo_source=source,
                 languages=languages,
