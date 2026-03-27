@@ -45,3 +45,11 @@ String slicing and newline counting (`content[:match.start()].count('\n')`) insi
 
 Action:
 Pre-compute newline offsets via `newline_positions = [m.start() for m in re.finditer(r'\n', content)]` and use binary search (`bisect.bisect_right(newline_positions, match.start())`) to calculate line numbers. This achieves O(log N) lookup time for matches without compromising multiline match semantics or average case scanning speed.
+
+## 2026-04-11 — Code Smell Detector Marker Pattern Bottleneck
+
+Learning:
+In `CodeSmellDetector.detect`, searching for code markers (TODO/FIXME/etc.) using string iteration (`for i, line in enumerate(lines)`) and checking each line individually using regex is significantly slower than using regex over the entire file content, especially because most lines do not contain a marker. Iterating over lines introduces Python interpreter overhead for every line of code.
+
+Action:
+Replaced line-by-line regex search with `MARKER_PATTERN.finditer(content)` in `CodeSmellDetector.detect`. Pre-computed newline offsets (`newline_positions`) to calculate line numbers and substring slices with binary search when markers are found, avoiding the loop overhead and maintaining correct detection output.

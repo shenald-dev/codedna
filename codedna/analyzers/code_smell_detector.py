@@ -71,13 +71,22 @@ class CodeSmellDetector:
                 })
 
             # ── TODO/FIXME/HACK markers ──
-            for i, line in enumerate(lines, 1):
-                if match := MARKER_PATTERN.search(line):
+            marker_matches = list(MARKER_PATTERN.finditer(content))
+            if marker_matches:
+                import bisect
+                newline_positions = [m.start() for m in re.finditer(r'\n', content)]
+                for match in marker_matches:
+                    line_no = bisect.bisect_right(newline_positions, match.start()) + 1
+                    # Extract the line content containing the match for the detail string
+                    start_of_line = 0 if line_no == 1 else newline_positions[line_no - 2] + 1
+                    end_of_line = newline_positions[line_no - 1] if line_no <= len(newline_positions) else len(content)
+                    line_text = content[start_of_line:end_of_line].strip()
+
                     smells.append({
                         "type": "Code Marker",
                         "severity": "info",
-                        "file": f"{relative}:{i}",
-                        "detail": f"{match.group(1).upper()} found: {line.strip()[:80]}",
+                        "file": f"{relative}:{line_no}",
+                        "detail": f"{match.group(1).upper()} found: {line_text[:80]}",
                     })
 
         # ── Large Modules ──
