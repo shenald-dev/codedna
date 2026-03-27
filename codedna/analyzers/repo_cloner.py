@@ -35,6 +35,12 @@ class RepoCloner:
         Returns:
             Path to the cloned/resolved repository.
         """
+        # Security: Prevent Git command injection by ensuring source doesn't start with '-'
+        # and looks like a valid URL or local path.
+        source = source.strip()
+        if source.startswith("-"):
+            raise ValueError(f"Invalid repository source: {source}")
+
         local_path = Path(source)
         if local_path.exists() and (local_path / ".git").exists():
             console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
