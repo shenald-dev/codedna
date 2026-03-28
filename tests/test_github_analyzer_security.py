@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, MagicMock
-import json
+from unittest.mock import MagicMock, patch
+
 from codedna.analyzers.github_analyzer import GitHubAnalyzer
+
 
 class TestGitHubAnalyzerSecurity(unittest.TestCase):
     def setUp(self):

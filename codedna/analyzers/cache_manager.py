@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
-from pathlib import Path
+import json
 from datetime import datetime, timedelta
-import os
+from pathlib import Path
 
 
 class CacheManager:
@@ -45,11 +44,11 @@ class CacheManager:
         try:
             data = json.loads(cache_file.read_text(encoding="utf-8"))
             timestamp = datetime.fromisoformat(data["_cached_at"])
-            
+
             # Check expiration
             if datetime.now() - timestamp > self.ttl:
                 return None
-                
+
             return data["payload"]
         except Exception:
             return None
@@ -74,7 +73,7 @@ class CacheManager:
         """Clear the entire cache."""
         if not self.cache_dir.exists():
             return
-            
+
         for child in self.cache_dir.iterdir():
             if child.is_file() and child.name != ".gitignore":
                 try:

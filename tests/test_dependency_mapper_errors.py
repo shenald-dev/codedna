@@ -1,33 +1,11 @@
-import unittest
-import sys
-from unittest.mock import MagicMock, patch
-from pathlib import Path
-import tempfile
 import shutil
-
-# Mock networkx before importing DependencyMapper
-mock_nx = MagicMock()
-sys.modules['networkx'] = mock_nx
-
-# Mock DiGraph to behave somewhat like a real one for basic tracking
-class MockDiGraph:
-    def __init__(self):
-        self.nodes = set()
-        self.edges = []
-    def add_node(self, node):
-        self.nodes.add(node)
-    def add_edge(self, u, v):
-        self.edges.append((u, v))
-    def __len__(self):
-        return len(self.nodes)
-
-mock_nx.DiGraph.side_effect = MockDiGraph
-mock_nx.density.return_value = 0.0
-mock_nx.pagerank.return_value = {}
-mock_nx.betweenness_centrality.return_value = {}
-mock_nx.simple_cycles.return_value = []
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from codedna.analyzers.dependency_mapper import DependencyMapper
+
 
 class TestDependencyMapperErrors(unittest.TestCase):
     def setUp(self):
@@ -44,7 +22,7 @@ class TestDependencyMapperErrors(unittest.TestCase):
 
         # Create another sample python file that will be read successfully
         py_file_ok = self.tmp_path / "ok.py"
-        py_file_ok.write_text("import sys")
+        py_file_ok.write_text("def ok():\n    pass\n")
 
         original_read_text = Path.read_text
 
@@ -57,13 +35,9 @@ class TestDependencyMapperErrors(unittest.TestCase):
         with patch("pathlib.Path.read_text", side_effect=mocked_read_text, autospec=True):
             result = self.mapper.map(self.tmp_path)
 
-        # "fail.py" should have been skipped, so only "ok.py" (module "ok") should be in nodes
-        # Note: result["total_modules"] comes from len(graph.nodes)
-        # In our MockDiGraph, len(graph.nodes) is len(self.nodes)
+        # "fail.py" should have been skipped, so only "ok.py" (module "ok") should be in nodes.
+        # Since ok.py has no external imports, no implicit edge nodes will be added by networkx.
         self.assertEqual(result["total_modules"], 1)
-
-        # We can also verify that the ok module is the one present if we want to be thorough,
-        # but the main thing is it didn't crash and processed the other file.
 
 if __name__ == "__main__":
     unittest.main()

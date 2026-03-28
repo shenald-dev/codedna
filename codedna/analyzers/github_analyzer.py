@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
-import urllib.request
 import urllib.parse
-from urllib.error import URLError, HTTPError
+import urllib.request
+from urllib.error import HTTPError, URLError
+
 from .cache_manager import CacheManager
 
 
@@ -38,7 +39,7 @@ class GitHubAnalyzer:
         if parsed.scheme not in ("http", "https") or parsed.hostname != "github.com":
             return stats
 
-        # Check Cache 
+        # Check Cache
         cache = CacheManager()
         cached_stats = cache.get("github_api", source)
         if cached_stats:
@@ -59,7 +60,7 @@ class GitHubAnalyzer:
                 return stats
 
             api_url = f"https://api.github.com/repos/{owner}/{repo}"
-            
+
             try:
                 req = urllib.request.Request(
                     api_url,
@@ -67,7 +68,7 @@ class GitHubAnalyzer:
                 )
                 with urllib.request.urlopen(req, timeout=5) as response:
                     data = json.loads(response.read().decode())
-                    
+
                     stats.update({
                         "is_github": True,
                         "stars": data.get("stargazers_count", 0),
