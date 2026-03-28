@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>

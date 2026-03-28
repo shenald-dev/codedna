@@ -6,7 +6,6 @@ from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
 
-
 # Architecture pattern definitions
 PATTERNS = {
     "MVC": {

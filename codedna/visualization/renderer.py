@@ -5,8 +5,6 @@ from __future__ import annotations
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
-from rich.columns import Columns
 
 console = Console()
 
@@ -82,7 +80,7 @@ class Renderer:
                 lines.append(f"  • {p['pattern']} [dim]({conf}%)[/] [green]{bar}[/]")
 
         if traits:
-            lines.append(f"\n[bold]Infrastructure Traits:[/]")
+            lines.append("\n[bold]Infrastructure Traits:[/]")
             for t in traits:
                 lines.append(f"  ✅ {t}")
 

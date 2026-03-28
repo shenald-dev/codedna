@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import os
 import json
+import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -18,7 +18,7 @@ class AIResult:
 
 class AIAnalyzer:
     """Uses an LLM to generate insights from the CodeDNA profile."""
-    
+
     def __init__(self):
         self.api_key = os.environ.get("OPENAI_API_KEY")
 
@@ -85,7 +85,7 @@ class AIAnalyzer:
 
         except Exception as e:
             return AIResult(
-                executive_summary=f"AI Analysis failed due to an API error.",
+                executive_summary="AI Analysis failed due to an API error.",
                 refactoring_recommendations=[],
                 success=False,
                 error_message=str(e)
@@ -97,13 +97,13 @@ class AIAnalyzer:
         # Drop raw file lists if they exist
         if "structure_stats" in clone and "modules" in clone["structure_stats"]:
             clone["structure_stats"]["modules"] = len(clone["structure_stats"]["modules"])
-            
+
         # Keep only top 5 risks to avoid blowing up context token limits
         if "risks" in clone:
             clone["risks"] = clone["risks"][:5]
-            
+
         # Strip out massive raw graphs
         if "mermaid_graph" in clone:
             del clone["mermaid_graph"]
-            
+
         return clone

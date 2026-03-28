@@ -1,19 +1,16 @@
 """Tests for CodeDNA analyzer modules."""
 
-import os
-import tempfile
-from pathlib import Path
 
 import pytest
 
-from codedna.analyzers.language_detector import LanguageDetector
-from codedna.analyzers.structure_analyzer import StructureAnalyzer
-from codedna.analyzers.dependency_mapper import DependencyMapper
-from codedna.analyzers.code_smell_detector import CodeSmellDetector
-from codedna.analyzers.security_detector import SecurityDetector
-from codedna.analyzers.github_analyzer import GitHubAnalyzer
 from codedna.analyzers.architecture_detector import ArchitectureDetector
+from codedna.analyzers.code_smell_detector import CodeSmellDetector
+from codedna.analyzers.dependency_mapper import DependencyMapper
 from codedna.analyzers.dna_generator import DNAGenerator
+from codedna.analyzers.github_analyzer import GitHubAnalyzer
+from codedna.analyzers.language_detector import LanguageDetector
+from codedna.analyzers.security_detector import SecurityDetector
+from codedna.analyzers.structure_analyzer import StructureAnalyzer
 
 
 @pytest.fixture
@@ -158,8 +155,8 @@ class TestGitHubAnalyzer:
         assert result["is_github"] is False
 
     def test_analyze_github_url(self):
-        from unittest.mock import patch, MagicMock
         import json
+        from unittest.mock import MagicMock, patch
 
         mock_response = MagicMock()
         mock_response.read.return_value = json.dumps({

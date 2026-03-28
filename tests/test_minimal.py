@@ -1,8 +1,10 @@
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import shutil
+
 from codedna.analyzers.code_smell_detector import CodeSmellDetector
+
 
 class TestCodeSmellDetectorMinimal(unittest.TestCase):
     def setUp(self):

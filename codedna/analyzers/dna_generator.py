@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from pathlib import Path
 
 
 class DNAGenerator:
@@ -93,7 +92,7 @@ class DNAGenerator:
         lines.append("# 🧬 CodeDNA Profile\n")
         lines.append(f"> Analyzed: `{profile['metadata']['source']}`")
         lines.append(f"> Date: {profile['metadata']['analyzed_at'][:10]}")
-        
+
         if profile.get("github", {}).get("is_github"):
             gh = profile["github"]
             lines.append(f"> ⭐️ {gh.get('stars', 0):,} Stars | 🔱 {gh.get('forks', 0):,} Forks | 🐛 {gh.get('issues', 0):,} Issues\n")
@@ -153,7 +152,7 @@ class DNAGenerator:
         lines.append(f"- Connections: **{deps['total_edges']}**")
         lines.append(f"- Density: **{deps['density']}**")
         lines.append(f"- Circular Dependencies: **{'Yes ⚠️' if deps['has_circular_deps'] else 'None ✅'}**\n")
-        
+
         if profile.get("mermaid_graph"):
             lines.append("```mermaid\n" + profile["mermaid_graph"] + "\n```\n")
 
@@ -198,7 +197,7 @@ class DNAGenerator:
         """Compute overall health assessment."""
         severity = smells.get("severity_counts", {})
         health_score = smells.get("health_score", "Unknown")
-        
+
         if security and security.get("has_secrets"):
             health_score = "Critical"
 

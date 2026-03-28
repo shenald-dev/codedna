@@ -1,7 +1,6 @@
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-from pathlib import Path
 
 # Mock necessary modules
 sys.modules['git'] = MagicMock()
@@ -9,6 +8,7 @@ sys.modules['rich'] = MagicMock()
 sys.modules['rich.console'] = MagicMock()
 
 from codedna.analyzers.repo_cloner import RepoCloner
+
 
 class TestRepoCloner(unittest.TestCase):
     def setUp(self):

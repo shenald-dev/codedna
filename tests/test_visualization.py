@@ -1,7 +1,9 @@
 """Tests for visualization modules."""
 
 import pytest
+
 from codedna.visualization.html_export import HTMLExporter
+
 
 @pytest.fixture
 def mock_profile():

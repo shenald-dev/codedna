@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -10,27 +9,26 @@ import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .analyzers.repo_cloner import RepoCloner
-from .analyzers.language_detector import LanguageDetector
-from .analyzers.structure_analyzer import StructureAnalyzer
-from .analyzers.dependency_mapper import DependencyMapper
+from .analyzers.ai_analyzer import AIAnalyzer
 from .analyzers.architecture_detector import ArchitectureDetector
 from .analyzers.code_smell_detector import CodeSmellDetector
-from .analyzers.security_detector import SecurityDetector
+from .analyzers.dependency_mapper import DependencyMapper
 from .analyzers.developer_analyzer import DeveloperAnalyzer
+from .analyzers.dna_generator import DNAGenerator
 from .analyzers.evolution_engine import EvolutionEngine
 from .analyzers.github_analyzer import GitHubAnalyzer
-from .analyzers.dna_generator import DNAGenerator
-from .analyzers.ai_analyzer import AIAnalyzer
-from .analyzers.cache_manager import CacheManager
-from .visualization.renderer import Renderer
+from .analyzers.language_detector import LanguageDetector
+from .analyzers.repo_cloner import RepoCloner
+from .analyzers.security_detector import SecurityDetector
+from .analyzers.structure_analyzer import StructureAnalyzer
 from .visualization.html_export import HTMLExporter
+from .visualization.renderer import Renderer
 
 console = Console()
 
 
 @click.group()
-@click.version_option(version="1.0.0", prog_name="codedna")
+@click.version_option(version="1.0.1", prog_name="codedna")
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
 
@@ -58,7 +56,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
         codedna analyze ./my-local-project
         codedna analyze . --output reports/
     """
-    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.0[/]")
+    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.1[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
     cloner = RepoCloner()
@@ -191,7 +189,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 @main.command()
 def version():
     """Show CodeDNA version."""
-    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.0")
+    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.1")
 
 
 if __name__ == "__main__":
