@@ -24,10 +24,10 @@ class AIAnalyzer:
 
     def synthesize(self, raw_dna_profile: dict) -> AIResult:
         """Sends the raw DNA profile to the LLM and parses the response.
-        
+
         Args:
             raw_dna_profile: The JSON-serializable dictionary of all generated metrics.
-            
+
         Returns:
             An AIResult containing the summary and recommendations.
         """

@@ -66,7 +66,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <!-- Main Content Left Column -->
     <div class="md:col-span-8 flex flex-col gap-6">
-        
+
         <!-- Architecture Graph -->
         <div class="card p-6">
             <h2 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
@@ -93,7 +93,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <!-- Sidebar Right Column -->
     <div class="md:col-span-4 flex flex-col gap-6">
-        
+
         <!-- Risk Signals -->
         <div class="card p-6 border-l-4 border-l-red-500">
             <h2 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
