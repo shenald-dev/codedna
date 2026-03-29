@@ -16,8 +16,8 @@ LARGE_MODULE_FILES = 20
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX|todo|fixme|hack|xxx|Todo|Fixme|Hack|Xxx)")
 PY_METHOD_PATTERN = re.compile(r"^\s*def\s+\w+", re.MULTILINE)
-JS_METHOD_PATTERN = re.compile(r"(function\s+\w+|=>\s*\{|\b[a-zA-Z_]\w*\s*\([^)]*\)\s*\{)")
-JAVA_METHOD_PATTERN = re.compile(r"(public|private|protected)\s+\w+\s+\w+\s*\(")
+JS_METHOD_PATTERN = re.compile(r"(?:function\s+\w+|=>\s*\{|\b[a-zA-Z_]\w*\s*\([^)]*\)\s*\{)")
+JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
 PY_FUNC_START_PATTERN = re.compile(r"^(\s*)def\s+(\w+)", re.MULTILINE)
 
 

@@ -56,3 +56,11 @@ Replaced `.splitlines()` iterations in `CodeSmellDetector` for `TODO`/`FIXME` ma
 ## 2026-03-29 — Optimize slow regex patterns
 Learning: Regex using re.IGNORECASE flag limits the engine from employing Boyer-Moore optimization on literal parts of the string.
 Action: Removed IGNORECASE matching for SECRET_PATTERNS and MARKER_PATTERN, employing explicit alternative cases instead. Added exact start anchors to JS matching. This shaves ~300ms from normal analyzer execution.
+
+## 2026-03-30 — Optimize Regex Performance with Non-Capturing Groups
+
+Learning:
+When using `re.findall` or similar methods simply to count the number of matches in a string (e.g., `len(PATTERN.findall(content))`), capturing groups `(...)` inside the pattern cause the `re` engine to allocate additional memory for the captured substrings. This results in unnecessary overhead, especially when scanning large files with many matches.
+
+Action:
+Replaced capturing groups `(...)` with non-capturing groups `(?:...)` in `JS_METHOD_PATTERN` and `JAVA_METHOD_PATTERN` within `CodeSmellDetector` where the primary goal is just counting the matches. This provides a small, measurable performance improvement during the analysis phase for JavaScript and Java codebases without altering behavior.
