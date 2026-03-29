@@ -1,7 +1,8 @@
 # 🧬 CodeDNA Profile
 
 > Analyzed: `.`
-> Date: 2026-03-14
+> Date: 2026-03-29
+
 
 ---
 
@@ -16,48 +17,90 @@
 
 | Language | Files | Lines | Share |
 |----------|-------|-------|-------|
-| Python | 16 | 1,741 | 83.8% `████████████████` |
-| YAML | 1 | 34 | 1.6% `█` |
-| TOML | 1 | 51 | 2.5% `█` |
-| Markdown | 1 | 252 | 12.1% `██` |
+| Python | 43 | 3,296 | 77.9% `███████████████` |
+| Markdown | 5 | 426 | 10.1% `██` |
+| JSON | 4 | 165 | 3.9% `█` |
+| TOML | 1 | 54 | 1.3% `█` |
+| YAML | 1 | 34 | 0.8% `█` |
+| HTML | 1 | 255 | 6.0% `█` |
 
-## 🩺 Health Score: **Healthy**
+## 🩺 Health Score: **Critical**
 
-- 🔴 Critical: 0
-- 🟡 Warning: 1
-- 🔵 Info: 2
+- 🔴 Critical: 1
+- 🟡 Warning: 5
+- 🔵 Info: 17
 
 ## ⚠️ Risk Signals
 
-- 🟡 Long Function in `codedna\cli.py`
+- 🔴 Hardcoded Secret in `test_regex_opt9.py:27`: Detected RSA Private Key (----***----)
+- 🔴 Hardcoded Secret in `test_regex_opt9.py:28`: Detected SSH Private Key (----***----)
+- 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)
+- 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:13`: Detected RSA Private Key (----***----)
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected SSH Private Key (----***----)
+- 🔴 God Class in `tests/test_analyzers.py`: 20 methods detected (threshold: 15)
+- 🟡 Long Function in `codedna/cli.py`
 
 ## 🔗 Dependency Graph
 
-- Modules: **54**
-- Connections: **72**
-- Density: **0.0252**
+- Modules: **105**
+- Connections: **175**
+- Density: **0.016**
 - Circular Dependencies: **None ✅**
+
+```mermaid
+graph LR
+    run_sec_line --> codedna_analyzers_security_detector
+    run_sec_line --> sys
+    run_sec_line --> pathlib
+    test_regex_opt8 --> re
+    test_regex_opt8 --> time
+    test_regex_opt8 --> codedna_analyzers_security_detector
+    test_regex_opt8 --> pathlib
+    test_regex_opt2 --> re
+    test_regex_opt2 --> time
+    test_regex_opt2 --> codedna_analyzers_security_detector
+    test_regex_opt2 --> pathlib
+    test_regex_opt5 --> re
+    test_regex_opt5 --> time
+    test_regex_opt5 --> codedna_analyzers_security_detector
+    test_regex_opt5 --> pathlib
+    test_regex_real --> re
+    test_regex_real --> time
+    test_regex_real --> cProfile
+    test_regex_real --> pathlib
+    test_regex_real --> codedna_analyzers_security_detector
+    test_perf --> time
+    test_perf --> subprocess
+    test_perf --> os
+    run_sec --> codedna_analyzers_security_detector
+    run_sec --> pathlib
+    test_regex --> re
+    test_regex --> time
+    test_regex --> codedna_analyzers_security_detector
+    test_regex_opt4 --> re
+```
 
 ## 👥 Developer Genome
 
 - Contributors: **1**
 - Bus Factor: **1**
-- Primary Architect: **shenalmohsl-crypto**
+- Primary Architect: **Shenal D**
 
 | Developer | Role | Commits |
 |-----------|------|---------|
-| shenalmohsl-crypto | Primary Architect | 1 |
+| Shenal D | Primary Architect | 1 |
 
 ## 📈 Evolution
 
 - Total Commits: **1**
-- First Commit: 2026-03-14
+- First Commit: 2026-03-28
 - Patterns: Insufficient data
 
 ## 🧬 DNA Signature
 
 ```
-LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1
+LANG:PYT | ARCH:MON | SIZE:LG | TEAM:SOLO | HEALTH:1
 ```
 
 ---

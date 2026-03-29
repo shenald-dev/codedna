@@ -9,7 +9,7 @@ from .language_detector import IGNORE_DIRS
 
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
-    "Generic API Key / Token": re.compile(r"(?:key|token|secret|password|pw|auth)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]", re.IGNORECASE),
+    "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),
     "RSA Private Key": re.compile(r"-----BEGIN RSA PRIVATE KEY-----"),
     "SSH Private Key": re.compile(r"-----BEGIN OPENSSH PRIVATE KEY-----"),
     "GitHub Token": re.compile(r"((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})"),
