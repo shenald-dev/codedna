@@ -1,3 +1,10 @@
+# Changelog
+
+## [1.0.2] - 2026-03-29
+
+### Changed
+* **Dependencies:** Added `networkx`, `pytest-cov`, and `pytest-profiling` to the test suite setup instructions, ensuring `tests/test_dependency_mapper_errors.py` correctly interacts with the dependency mapping logic.
+* **Code Quality:** Fixed minor issues and enforced `ruff check` linting fixes across the repository, improving code cleanliness without altering functionality.
 
 ## [1.0.1] - 2026-03-27
 
