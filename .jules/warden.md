@@ -1,5 +1,11 @@
 2026-03-29 — Assessment & Lifecycle
 Observation / Pruned:
+Discovered a regression in `PY_METHOD_PATTERN` and `PY_FUNC_START_PATTERN` within `code_smell_detector.py`. The previous optimization using `re.MULTILINE` coupled with `\s*` caused the regex engine to improperly match newlines, breaking the Python method detection logic and functional counts by capturing empty lines as part of function blocks.
+Alignment / Deferred:
+Reverted the `re.MULTILINE` modification for Python method detections and replaced `\s*` with `^[ \t]*`. Reverted `_count_methods` to iterate line-by-line via `content.splitlines()` with `re.match` to ensure deterministic behavior. Verified survival with a new adversarial newline test.
+
+2026-03-29 — Assessment & Lifecycle
+Observation / Pruned:
 Discovered that `test_analyzers.py` and `test_dependency_mapper_errors.py` were failing locally without actual installation of `networkx` despite mocks in prior commits. Correctly configured the environment to use real implementations for network graph testing in `dependency_mapper.py` instead of brittle `sys.modules` patching. Re-applied aggressive `ruff check --fix` policies to purge any lingering ambiguous variable names and unused imports.
 
 Alignment / Deferred:
