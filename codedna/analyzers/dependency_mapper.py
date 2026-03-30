@@ -12,8 +12,8 @@ from .language_detector import IGNORE_DIRS
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
     "Python": [
-        re.compile(r"^\s*import\s+([\w.]+)", re.MULTILINE),
-        re.compile(r"^\s*from\s+([\w.]+)\s+import", re.MULTILINE),
+        re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE),
+        re.compile(r"^[ \t]*from\s+([\w.]+)\s+import", re.MULTILINE),
     ],
     "JavaScript": [
         re.compile(r"""import\s+.*?\s+from\s+['"]([^'"]+)['"]""", re.MULTILINE),
@@ -27,11 +27,11 @@ IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
         re.compile(r'"([^"]+)"', re.MULTILINE),
     ],
     "Java": [
-        re.compile(r"^\s*import\s+([\w.]+);", re.MULTILINE),
+        re.compile(r"^[ \t]*import\s+([\w.]+);", re.MULTILINE),
     ],
     "Rust": [
-        re.compile(r"^\s*use\s+([\w:]+)", re.MULTILINE),
-        re.compile(r"^\s*extern\s+crate\s+(\w+)", re.MULTILINE),
+        re.compile(r"^[ \t]*use\s+([\w:]+)", re.MULTILINE),
+        re.compile(r"^[ \t]*extern\s+crate\s+(\w+)", re.MULTILINE),
     ],
 }
 
