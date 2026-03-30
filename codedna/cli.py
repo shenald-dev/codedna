@@ -28,7 +28,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="1.0.2", prog_name="codedna")
+@click.version_option(version="1.0.3", prog_name="codedna")
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
 
@@ -56,7 +56,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
         codedna analyze ./my-local-project
         codedna analyze . --output reports/
     """
-    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.2[/]")
+    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.3[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
     cloner = RepoCloner()
@@ -189,7 +189,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 @main.command()
 def version():
     """Show CodeDNA version."""
-    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.2")
+    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.3")
 
 
 if __name__ == "__main__":

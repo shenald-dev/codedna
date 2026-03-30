@@ -15,10 +15,10 @@ LARGE_MODULE_FILES = 20
 
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX|todo|fixme|hack|xxx|Todo|Fixme|Hack|Xxx)")
-PY_METHOD_PATTERN = re.compile(r"^\s*def\s+\w+", re.MULTILINE)
+PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+")
 JS_METHOD_PATTERN = re.compile(r"(?:function\s+\w+|=>\s*\{|\b[a-zA-Z_]\w*\s*\([^)]*\)\s*\{)")
 JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
-PY_FUNC_START_PATTERN = re.compile(r"^(\s*)def\s+(\w+)", re.MULTILINE)
+PY_FUNC_START_PATTERN = re.compile(r"^([ \t]*)def\s+(\w+)")
 
 
 class CodeSmellDetector:
@@ -112,7 +112,7 @@ class CodeSmellDetector:
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""
         if ext == ".py":
-            return len(PY_METHOD_PATTERN.findall(content))
+            return sum(1 for line in content.splitlines() if PY_METHOD_PATTERN.match(line))
         elif ext in (".js", ".ts", ".jsx", ".tsx"):
             return len(JS_METHOD_PATTERN.findall(content))
         elif ext == ".java":
