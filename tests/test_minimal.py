@@ -43,5 +43,10 @@ class TestCodeSmellDetectorMinimal(unittest.TestCase):
         self.assertEqual(len(count), 1)
         self.assertEqual(count[0][0], "long_func")
 
+    def test_count_methods_py_newlines(self):
+        content = "def func1():\n\n\n    def inner():\n        pass\n\ndef func2():\n    pass\n"
+        count = self.detector._count_methods(content, ".py")
+        self.assertEqual(count, 3)
+
 if __name__ == "__main__":
     unittest.main()

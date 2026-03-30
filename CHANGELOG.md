@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.3] - 2026-03-29
+
+### Fixed
+* **Regex Regression:** Reverted aggressive use of `re.MULTILINE` in `PY_METHOD_PATTERN` and `PY_FUNC_START_PATTERN` within `code_smell_detector.py`. The `\s*` token was improperly matching newlines, causing Python method detection logic to erroneously consume multiple blank lines and break functional counts. Added adversarial tests to ensure survival.
+
 ## [1.0.2] - 2026-03-29
 
 ### Changed
