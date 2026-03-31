@@ -33,7 +33,7 @@ class AIAnalyzer:
         """
         if not self.api_key:
             return AIResult(
-                executive_summary="AI Analysis skipped. Set the `OPENAI_API_KEY` environment variable to enable intelligent synthesis.",
+                executive_summary="AI Analysis skipped. Set the `OPENAI_API_KEY` environment variable to enable intelligent synthesis.",  # noqa: E501
                 refactoring_recommendations=[],
                 success=False,
                 error_message="Missing OPENAI_API_KEY"
@@ -44,7 +44,7 @@ class AIAnalyzer:
             client = OpenAI(api_key=self.api_key)
         except ImportError:
             return AIResult(
-                executive_summary="AI Analysis skipped. The `openai` python package is not installed.",
+                executive_summary="AI Analysis skipped. The `openai` python package is not installed.",  # noqa: E501
                 refactoring_recommendations=[],
                 success=False,
                 error_message="Missing openai package"
@@ -55,10 +55,10 @@ class AIAnalyzer:
 
         system_prompt = (
             "You are CodeDNA, an expert software architect and senior code reviewer. "
-            "You are provided with a 'DNA Profile' of a codebase containing metrics about languages, "
+            "You are provided with a 'DNA Profile' of a codebase containing metrics about languages, "  # noqa: E501
             "architecture, dependencies, developers, and code smells. "
-            "Your task is to synthesize this raw data into a brilliant, concise 'Executive Summary' (2-3 paragraphs) "
-            "and extract EXACTLY 3 major 'Refactoring Recommendations' based on the worst code smells or architectural flaws detected.\n\n"
+            "Your task is to synthesize this raw data into a brilliant, concise 'Executive Summary' (2-3 paragraphs) "  # noqa: E501
+            "and extract EXACTLY 3 major 'Refactoring Recommendations' based on the worst code smells or architectural flaws detected.\n\n"  # noqa: E501
             "Format the output strictly as a JSON object with two keys:\n"
             '{"executive_summary": "...", "refactoring_recommendations": ["...", "...", "..."]}'
         )

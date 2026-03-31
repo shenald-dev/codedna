@@ -63,7 +63,7 @@ class TestLanguageDetector:
 
     def test_calculates_percentage(self, sample_repo):
         result = LanguageDetector().detect(sample_repo)
-        total_pct = sum(l["percentage"] for l in result["languages"].values())
+        total_pct = sum(lang_data["percentage"] for lang_data in result["languages"].values())
         assert 99 <= total_pct <= 101  # Should sum to ~100%
 
 
@@ -193,12 +193,12 @@ class TestDNAGenerator:
         gen = DNAGenerator()
         profile = gen.generate(
             repo_source="test-repo",
-            languages={"languages": {"Python": {"files": 3, "lines": 20, "percentage": 80}}, "primary": "Python", "total_files": 3, "total_lines": 20},
+            languages={"languages": {"Python": {"files": 3, "lines": 20, "percentage": 80}}, "primary": "Python", "total_files": 3, "total_lines": 20},  # noqa: E501
             structure={"total_files": 5, "total_dirs": 2, "max_depth": 2, "modules": []},
-            dependencies={"total_modules": 3, "total_edges": 2, "density": 0.3, "has_circular_deps": False, "cycles": []},
-            architecture={"primary_pattern": "Monolith", "detected_patterns": [], "traits": [], "coupling": "Low"},
-            smells={"smells": [], "total": 0, "severity_counts": {"critical": 0, "warning": 0, "info": 0}, "health_score": "Healthy"},
-            developers={"total_contributors": 1, "contributors": [{"name": "dev", "role": "Primary Architect", "commits": 10}], "bus_factor": 1},
+            dependencies={"total_modules": 3, "total_edges": 2, "density": 0.3, "has_circular_deps": False, "cycles": []},  # noqa: E501
+            architecture={"primary_pattern": "Monolith", "detected_patterns": [], "traits": [], "coupling": "Low"},  # noqa: E501
+            smells={"smells": [], "total": 0, "severity_counts": {"critical": 0, "warning": 0, "info": 0}, "health_score": "Healthy"},  # noqa: E501
+            developers={"total_contributors": 1, "contributors": [{"name": "dev", "role": "Primary Architect", "commits": 10}], "bus_factor": 1},  # noqa: E501
             evolution={"total_commits": 10, "patterns": ["Stable Evolution"]},
             security={"vulnerabilities": [], "total_critical": 0, "has_secrets": False},
             github={"is_github": True, "stars": 100},
@@ -213,8 +213,8 @@ class TestDNAGenerator:
             repo_source="test",
             languages={"languages": {}, "primary": "Python", "total_files": 0, "total_lines": 0},
             structure={"total_files": 0, "total_dirs": 0, "max_depth": 0, "modules": []},
-            dependencies={"total_modules": 0, "total_edges": 0, "density": 0, "has_circular_deps": False, "cycles": []},
-            architecture={"primary_pattern": "Unknown", "detected_patterns": [], "traits": [], "coupling": "Low"},
+            dependencies={"total_modules": 0, "total_edges": 0, "density": 0, "has_circular_deps": False, "cycles": []},  # noqa: E501
+            architecture={"primary_pattern": "Unknown", "detected_patterns": [], "traits": [], "coupling": "Low"},  # noqa: E501
             smells={"smells": [], "total": 0, "severity_counts": {}, "health_score": "Healthy"},
             developers={"total_contributors": 0, "contributors": [], "bus_factor": 0},
             evolution={"total_commits": 0, "patterns": []},

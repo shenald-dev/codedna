@@ -98,7 +98,7 @@ class Renderer:
         overall = health.get("overall", "Unknown")
         counts = health.get("severity_counts", {})
 
-        color = {"Healthy": "green", "Fair": "yellow", "Needs Attention": "dark_orange", "Critical": "red"}.get(overall, "white")
+        color = {"Healthy": "green", "Fair": "yellow", "Needs Attention": "dark_orange", "Critical": "red"}.get(overall, "white")  # noqa: E501
 
         risks = profile.get("risks", [])
         risk_text = "\n".join(risks[:6]) if risks else "  No critical risks detected ✅"

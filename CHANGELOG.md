@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.4] - 2026-03-31
+
+### Changed
+* **Code Quality:** Fixed various line length issues, ambiguous variable names, and unused variables. Added `# noqa: E501` to long lines in HTML exports where splitting them would cause template fragmentation. Removed unused `source_path` parameter from `_normalize_import` in `codedna/analyzers/dependency_mapper.py`. Added `# noqa: E402` to `tests/test_repo_cloner.py` to suppress module import level warnings.
+
 ## [1.0.3] - 2026-03-29
 
 ### Fixed

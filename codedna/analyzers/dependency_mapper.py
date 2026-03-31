@@ -79,7 +79,7 @@ class DependencyMapper:
                     dep = match.group(1)
                     # Skip stdlib / external packages (heuristic: no dots for local)
                     if dep.startswith(".") or "/" in dep:
-                        dep = self._normalize_import(dep, relative)
+                        dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)
                     edges.append({"from": module_name, "to": dep})
 
@@ -146,7 +146,7 @@ class DependencyMapper:
     def _to_module(self, path: str) -> str:
         return path.replace("\\", "/").rsplit(".", 1)[0]
 
-    def _normalize_import(self, dep: str, source_path: str) -> str:
+    def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
             return dep.lstrip("./")
         return dep

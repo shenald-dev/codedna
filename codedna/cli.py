@@ -28,7 +28,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="1.0.3", prog_name="codedna")
+@click.version_option(version="1.0.4", prog_name="codedna")
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
 
@@ -41,7 +41,7 @@ def main():
 @main.command()
 @click.argument("source")
 @click.option("--output", "-o", type=click.Path(), help="Output directory for reports")
-@click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "html", "all"]), default="all", help="Output format")
+@click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "html", "all"]), default="all", help="Output format")  # noqa: E501
 @click.option("--depth", "-d", type=int, default=100, help="Git history depth (commits to analyze)")
 @click.option("--no-visualize", is_flag=True, help="Skip terminal visualization")
 @click.option("--ai", is_flag=True, help="Synthesize an Executive Summary via LLM")
@@ -56,7 +56,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
         codedna analyze ./my-local-project
         codedna analyze . --output reports/
     """
-    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.3[/]")
+    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.4[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
     cloner = RepoCloner()
@@ -75,24 +75,24 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             # ── Stage 2: Language Detection ──
             progress.update(task, description="🔍 Detecting languages...")
             languages = LanguageDetector().detect(repo_path)
-            progress.update(task, description=f"[green]✓[/] Found {len(languages.get('languages', {}))} languages")
+            progress.update(task, description=f"[green]✓[/] Found {len(languages.get('languages', {}))} languages")  # noqa: E501
 
             # ── Stage 3: Structure Analysis ──
             progress.update(task, description="📁 Analyzing structure...")
             structure = StructureAnalyzer().analyze(repo_path)
-            progress.update(task, description=f"[green]✓[/] {structure.get('total_files', 0)} files analyzed")
+            progress.update(task, description=f"[green]✓[/] {structure.get('total_files', 0)} files analyzed")  # noqa: E501
 
             # ── Stage 4: Dependency Mapping ──
             progress.update(task, description="🔗 Mapping dependencies...")
             mapper = DependencyMapper()
             dependencies = mapper.map(repo_path)
             mermaid_graph = mapper.build_mermaid(repo_path)
-            progress.update(task, description=f"[green]✓[/] {dependencies.get('total_edges', 0)} dependency edges found")
+            progress.update(task, description=f"[green]✓[/] {dependencies.get('total_edges', 0)} dependency edges found")  # noqa: E501
 
             # ── Stage 5: Architecture Detection ──
             progress.update(task, description="🏗️ Detecting architecture patterns...")
             architecture = ArchitectureDetector().detect(repo_path)
-            progress.update(task, description=f"[green]✓[/] Pattern: {architecture.get('primary_pattern', '?')}")
+            progress.update(task, description=f"[green]✓[/] Pattern: {architecture.get('primary_pattern', '?')}")  # noqa: E501
 
             # ── Stage 6: Code Smell Detection ──
             progress.update(task, description="🐛 Scanning for code smells...")
@@ -102,12 +102,12 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             # ── Stage 6.5: Security Scanning ──
             progress.update(task, description="🔒 Scanning for security vulnerabilities...")
             security = SecurityDetector().detect(repo_path)
-            progress.update(task, description=f"[green]✓[/] {security.get('total_critical', 0)} critical vulnerabilities")
+            progress.update(task, description=f"[green]✓[/] {security.get('total_critical', 0)} critical vulnerabilities")  # noqa: E501
 
             # ── Stage 7: Developer Analysis ──
             progress.update(task, description="👥 Analyzing developer behavior...")
             developers = DeveloperAnalyzer().analyze(repo_path, max_commits=depth)
-            progress.update(task, description=f"[green]✓[/] {developers.get('total_contributors', 0)} contributors")
+            progress.update(task, description=f"[green]✓[/] {developers.get('total_contributors', 0)} contributors")  # noqa: E501
 
             # ── Stage 8: Evolution Engine ──
             progress.update(task, description="📈 Tracking evolution...")
@@ -189,7 +189,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 @main.command()
 def version():
     """Show CodeDNA version."""
-    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.3")
+    console.print("[bold cyan]🧬 CodeDNA[/] v1.0.4")
 
 
 if __name__ == "__main__":
