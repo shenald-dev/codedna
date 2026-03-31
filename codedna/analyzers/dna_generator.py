@@ -81,7 +81,7 @@ class DNAGenerator:
                 "last_commit": evolution.get("last_commit"),
                 "patterns": evolution.get("patterns", []),
             },
-            "security": security or {"vulnerabilities": [], "total_critical": 0, "has_secrets": False},
+            "security": security or {"vulnerabilities": [], "total_critical": 0, "has_secrets": False},  # noqa: E501
             "github": github or {},
             "mermaid_graph": mermaid_graph,
         }
@@ -95,7 +95,7 @@ class DNAGenerator:
 
         if profile.get("github", {}).get("is_github"):
             gh = profile["github"]
-            lines.append(f"> ⭐️ {gh.get('stars', 0):,} Stars | 🔱 {gh.get('forks', 0):,} Forks | 🐛 {gh.get('issues', 0):,} Issues\n")
+            lines.append(f"> ⭐️ {gh.get('stars', 0):,} Stars | 🔱 {gh.get('forks', 0):,} Forks | 🐛 {gh.get('issues', 0):,} Issues\n")  # noqa: E501
         else:
             lines.append("\n")
 
@@ -127,7 +127,7 @@ class DNAGenerator:
             lines.append("|----------|-------|-------|-------|")
             for lang, data in lang_data["languages"].items():
                 bar = "█" * max(1, int(data["percentage"] / 5))
-                lines.append(f"| {lang} | {data['files']} | {data['lines']:,} | {data['percentage']}% `{bar}` |")
+                lines.append(f"| {lang} | {data['files']} | {data['lines']:,} | {data['percentage']}% `{bar}` |")  # noqa: E501
             lines.append("")
 
         # Health
@@ -151,7 +151,7 @@ class DNAGenerator:
         lines.append(f"- Modules: **{deps['total_modules']}**")
         lines.append(f"- Connections: **{deps['total_edges']}**")
         lines.append(f"- Density: **{deps['density']}**")
-        lines.append(f"- Circular Dependencies: **{'Yes ⚠️' if deps['has_circular_deps'] else 'None ✅'}**\n")
+        lines.append(f"- Circular Dependencies: **{'Yes ⚠️' if deps['has_circular_deps'] else 'None ✅'}**\n")  # noqa: E501
 
         if profile.get("mermaid_graph"):
             lines.append("```mermaid\n" + profile["mermaid_graph"] + "\n```\n")
@@ -193,7 +193,7 @@ class DNAGenerator:
         """Convert DNA profile to JSON."""
         return json.dumps(profile, indent=2, default=str)
 
-    def _compute_overall_health(self, smells: dict, deps: dict, arch: dict, security: dict = None) -> dict:
+    def _compute_overall_health(self, smells: dict, deps: dict, arch: dict, security: dict = None) -> dict:  # noqa: E501
         """Compute overall health assessment."""
         severity = smells.get("severity_counts", {})
         health_score = smells.get("health_score", "Unknown")
@@ -230,7 +230,7 @@ class DNAGenerator:
 
         return risks[:10]
 
-    def _build_signature(self, languages: dict, architecture: dict, developers: dict, structure: dict) -> str:
+    def _build_signature(self, languages: dict, architecture: dict, developers: dict, structure: dict) -> str:  # noqa: E501
         """Build a DNA-style signature string."""
         parts = []
 

@@ -7,7 +7,7 @@ sys.modules['git'] = MagicMock()
 sys.modules['rich'] = MagicMock()
 sys.modules['rich.console'] = MagicMock()
 
-from codedna.analyzers.repo_cloner import RepoCloner
+from codedna.analyzers.repo_cloner import RepoCloner  # noqa: E402
 
 
 class TestRepoCloner(unittest.TestCase):

@@ -9,7 +9,7 @@ from .language_detector import IGNORE_DIRS
 
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
-    "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),
+    "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),  # noqa: E501
     "RSA Private Key": re.compile(r"-----BEGIN RSA PRIVATE KEY-----"),
     "SSH Private Key": re.compile(r"-----BEGIN OPENSSH PRIVATE KEY-----"),
     "GitHub Token": re.compile(r"((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})"),
@@ -54,7 +54,7 @@ class SecurityDetector:
                         masked = "***"
 
                     # Precompute newline positions for O(log N) line number lookups lazily
-                    # This avoids O(N^2) string slicing and count() overhead for files with many matches,
+                    # This avoids O(N^2) string slicing and count() overhead for files with many matches,  # noqa: E501
                     # while keeping regex search over the full file to support multiline patterns.
                     if newline_positions is None:
                         newline_positions = [m.start() for m in re.finditer(r'\n', content)]
@@ -93,7 +93,7 @@ class SecurityDetector:
                         stack.append(item)
                     elif item.is_file():
                         # Skip known binary/media/data files
-                        if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):
+                        if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
                             yield item
             except PermissionError:
                 pass

@@ -57,7 +57,7 @@ class CodeSmellDetector:
                         "type": "God Class",
                         "severity": "critical",
                         "file": relative,
-                        "detail": f"{method_count} methods detected (threshold: {GOD_CLASS_METHODS})",
+                        "detail": f"{method_count} methods detected (threshold: {GOD_CLASS_METHODS})",  # noqa: E501
                     })
 
             # ── Long Functions ──
