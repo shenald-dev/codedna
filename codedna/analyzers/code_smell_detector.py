@@ -16,7 +16,7 @@ LARGE_MODULE_FILES = 20
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX|todo|fixme|hack|xxx|Todo|Fixme|Hack|Xxx)")
 PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+")
-JS_METHOD_PATTERN = re.compile(r"(?:function\s+\w+|=>\s*\{|\b[a-zA-Z_]\w*\s*\([^)]*\)\s*\{)")
+JS_METHOD_PATTERN = re.compile(r"function\s+\w+|=>\s*\{|[a-zA-Z_]\w*\s*\([^)]*\)\s*\{")
 JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
 PY_FUNC_START_PATTERN = re.compile(r"^([ \t]*)def\s+(\w+)")
 
@@ -114,9 +114,9 @@ class CodeSmellDetector:
         if ext == ".py":
             return sum(1 for line in content.splitlines() if PY_METHOD_PATTERN.match(line))
         elif ext in (".js", ".ts", ".jsx", ".tsx"):
-            return len(JS_METHOD_PATTERN.findall(content))
+            return sum(1 for _ in JS_METHOD_PATTERN.finditer(content))
         elif ext == ".java":
-            return len(JAVA_METHOD_PATTERN.findall(content))
+            return sum(1 for _ in JAVA_METHOD_PATTERN.finditer(content))
         return 0
 
     def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int]]:

@@ -72,3 +72,11 @@ Using unbounded matching characters like `\s*` at the beginning of regular expre
 
 Action:
 Replaced `^\s*` with `^[ \t]*` in the regular expressions within `codedna/analyzers/dependency_mapper.py` for mapping imports across languages. Restricting the match to horizontal whitespace prevents the engine from crossing newline boundaries while searching, achieving ~500x speedup (from 56 seconds to 0.1 seconds in synthetic benchmarks) for large files without altering the matching behavior.
+
+## 2026-04-12 — Memory Efficiency when Counting Regex Matches
+
+Learning:
+When simply counting the number of occurrences of a regular expression pattern in a large string, using `len(PATTERN.findall(content))` creates a large intermediate list containing all the matched substrings in memory. For extremely large files with many matches, this can cause significant memory allocation overhead.
+
+Action:
+Instead of `len(PATTERN.findall(content))`, use the generator expression `sum(1 for _ in PATTERN.finditer(content))` to lazily evaluate matches. This effectively turns an O(N) memory allocation into an O(1) memory operation, making analyzers like `CodeSmellDetector` significantly more memory-efficient when analyzing large source files.
