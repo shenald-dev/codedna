@@ -131,23 +131,36 @@ class CodeSmellDetector:
 
         if ext == ".py":
             lines = content.splitlines()
+            active_funcs = []
+
             for i, line in enumerate(lines):
-                match = PY_FUNC_START_PATTERN.match(line)
-                if match:
-                    indent = len(match.group(1))
-                    name = match.group(2)
-                    # Count lines until next function or class at same/lower indent
-                    func_lines = 0
-                    for j in range(i + 1, len(lines)):
-                        inner_line = lines[j]
-                        stripped = inner_line.lstrip()
-                        if stripped and len(inner_line) - len(stripped) <= indent and (
-                            stripped.startswith("def ") or stripped.startswith("class ")
-                        ):
-                            break
-                        func_lines += 1
-                    if func_lines > MAX_FUNCTION_LINES:
-                        results.append((name, func_lines))
+                stripped = line.lstrip()
+                if not stripped:
+                    continue
+
+                indent = len(line) - len(stripped)
+                is_def = stripped.startswith("def ")
+                is_class = stripped.startswith("class ")
+
+                if is_def or is_class:
+                    while active_funcs and active_funcs[-1][0] >= indent:
+                        prev_indent, prev_name, prev_start = active_funcs.pop()
+                        func_lines = i - prev_start - 1
+                        if func_lines > MAX_FUNCTION_LINES:
+                            results.append((prev_name, func_lines))
+
+                    if is_def:
+                        # Extract the function name, handle possible edge cases like "def a(b):"
+                        match = PY_FUNC_START_PATTERN.match(line)
+                        if match:
+                            name = match.group(2)
+                            active_funcs.append((indent, name, i))
+
+            total_lines = len(lines)
+            for indent, name, start in active_funcs:
+                func_lines = total_lines - start - 1
+                if func_lines > MAX_FUNCTION_LINES:
+                    results.append((name, func_lines))
 
         return results
 
