@@ -80,3 +80,11 @@ When simply counting the number of occurrences of a regular expression pattern i
 
 Action:
 Instead of `len(PATTERN.findall(content))`, use the generator expression `sum(1 for _ in PATTERN.finditer(content))` to lazily evaluate matches. This effectively turns an O(N) memory allocation into an O(1) memory operation, making analyzers like `CodeSmellDetector` significantly more memory-efficient when analyzing large source files.
+
+## 2026-04-14 — Optimize string line splitting and matching in CodeSmellDetector
+
+Learning:
+Using `content.splitlines()` on large text files introduces massive memory overhead and slows down analysis because it creates Python lists of every line in the file. Further, iterating through these strings line-by-line and applying a regex `match` is far slower than running the C-based regex engine over the entire string (`content`) using `finditer()`, provided the multiline pattern restricts matching to horizontal whitespace (e.g. `^[ \t]*`).
+
+Action:
+Removed eager `content.splitlines()` in `CodeSmellDetector.detect`. Replaced `len(lines)` with `content.count('\n') + 1` for line counts, which is an order of magnitude faster. Refactored `_count_methods` to use `re.MULTILINE` with `finditer()` to execute regex checks globally across `.py` files instead of line-by-line. Replaced array line lookups with calculated string slicing based on `newline_positions`.
