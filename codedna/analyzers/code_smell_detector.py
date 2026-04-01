@@ -15,7 +15,7 @@ LARGE_MODULE_FILES = 20
 
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX|todo|fixme|hack|xxx|Todo|Fixme|Hack|Xxx)")
-PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+")
+PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+", re.MULTILINE)
 JS_METHOD_PATTERN = re.compile(r"function\s+\w+|=>\s*\{|[a-zA-Z_]\w*\s*\([^)]*\)\s*\{")
 JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
 PY_FUNC_START_PATTERN = re.compile(r"^([ \t]*)def\s+(\w+)")
@@ -35,18 +35,18 @@ class CodeSmellDetector:
         for file_path in self._walk_source(repo_path):
             try:
                 content = file_path.read_text(encoding="utf-8", errors="ignore")
-                lines = content.splitlines()
                 relative = str(file_path.relative_to(repo_path))
             except (OSError, ValueError):
                 continue
 
             # ── Large File ──
-            if len(lines) > MAX_FILE_LINES:
+            line_count = content.count('\n') + 1
+            if line_count > MAX_FILE_LINES:
                 smells.append({
                     "type": "Large File",
-                    "severity": "warning" if len(lines) < 1000 else "critical",
+                    "severity": "warning" if line_count < 1000 else "critical",
                     "file": relative,
-                    "detail": f"{len(lines)} lines (threshold: {MAX_FILE_LINES})",
+                    "detail": f"{line_count} lines (threshold: {MAX_FILE_LINES})",
                 })
 
             # ── God Class ──
@@ -78,7 +78,13 @@ class CodeSmellDetector:
                     newline_positions = [m.start() for m in re.finditer(r'\n', content)]
                 line_no = bisect.bisect_right(newline_positions, match.start()) + 1
 
-                line_text = lines[line_no - 1] if line_no <= len(lines) else ""
+                # Extract just the matched line directly to avoid full splitlines()
+                start_idx = 0 if line_no == 1 else newline_positions[line_no - 2] + 1
+                end_idx = (
+                    newline_positions[line_no - 1]
+                    if line_no <= len(newline_positions) else len(content)
+                )
+                line_text = content[start_idx:end_idx]
 
                 smells.append({
                     "type": "Code Marker",
@@ -112,7 +118,7 @@ class CodeSmellDetector:
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""
         if ext == ".py":
-            return sum(1 for line in content.splitlines() if PY_METHOD_PATTERN.match(line))
+            return sum(1 for _ in PY_METHOD_PATTERN.finditer(content))
         elif ext in (".js", ".ts", ".jsx", ".tsx"):
             return sum(1 for _ in JS_METHOD_PATTERN.finditer(content))
         elif ext == ".java":
