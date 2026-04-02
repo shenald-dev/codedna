@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import re
 from pathlib import Path
 
@@ -19,6 +20,19 @@ SECRET_PATTERNS = {
     "Discord Bot Token": re.compile(r"[MND][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"),
     "SendGrid API Key": re.compile(r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"),
     "MailChimp API Key": re.compile(r"[0-9a-f]{32}-us[0-9]{1,2}"),
+}
+
+SECRET_HINTS = {
+    "AWS Access Key": ("AKIA", "ABIA", "ACCA", "ASIA"),
+    "Generic API Key / Token": ("key", "token", "secret", "password", "pw", "auth", "KEY", "TOKEN", "SECRET", "PASSWORD", "PW", "AUTH", "Key", "Token", "Secret", "Password", "Pw", "Auth"),
+    "RSA Private Key": ("-----BEGIN RSA PRIVATE KEY-----",),
+    "SSH Private Key": ("-----BEGIN OPENSSH PRIVATE KEY-----",),
+    "GitHub Token": ("ghp_", "gho_", "ghu_", "ghs_", "ghr_"),
+    "Stripe Secret Key": ("sk_live_",),
+    "Slack Token": ("xox",),
+    "Google API Key": ("AIza",),
+    "SendGrid API Key": ("SG.",),
+    "MailChimp API Key": ("-us",),
 }
 
 
@@ -40,11 +54,13 @@ class SecurityDetector:
             except (OSError, ValueError):
                 continue
 
-            import bisect
-
             # Check for secrets
             newline_positions = None
             for secret_type, pattern in SECRET_PATTERNS.items():
+                hints = SECRET_HINTS.get(secret_type)
+                if hints and not any(hint in content for hint in hints):
+                    continue
+
                 for match in pattern.finditer(content):
                     # To avoid printing real secrets, we truncate/mask the matched value
                     matched_value = match.group(0)
