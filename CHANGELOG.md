@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.5] - 2026-04-15
+
+### Changed
+* **Code Quality:** Added adversarial tests for `CodeSmellDetector` to verify multiline marker extraction logic.
+* **Cleanup:** Pruned unused `clear` method in `CacheManager` and unused `version` command in `cli.py`.
+
 ## [1.0.4] - 2026-03-31
 
 ### Changed

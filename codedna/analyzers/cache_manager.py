@@ -68,15 +68,3 @@ class CacheManager:
             return True
         except Exception:
             return False
-
-    def clear(self):
-        """Clear the entire cache."""
-        if not self.cache_dir.exists():
-            return
-
-        for child in self.cache_dir.iterdir():
-            if child.is_file() and child.name != ".gitignore":
-                try:
-                    child.unlink()
-                except Exception:
-                    pass

@@ -107,7 +107,18 @@ class TestCodeSmellDetector:
         result = CodeSmellDetector().detect(sample_repo)
         assert result["health_score"] in ("Healthy", "Fair", "Needs Attention", "Critical")
 
-
+    def test_multiline_markers(self, tmp_path):
+        test_file = tmp_path / "test_marker.py"
+        test_file.write_text("TODO: fix this\n\n\nTODO: and this\n")
+        detector = CodeSmellDetector()
+        result = detector.detect(tmp_path)
+        smells = result["smells"]
+        markers = [s for s in smells if s["type"] == "Code Marker"]
+        assert len(markers) == 2
+        assert markers[0]["file"] == "test_marker.py:1"
+        assert "TODO: fix this" in markers[0]["detail"]
+        assert markers[1]["file"] == "test_marker.py:4"
+        assert "TODO: and this" in markers[1]["detail"]
 
     @pytest.mark.parametrize(
         "content, ext, expected",

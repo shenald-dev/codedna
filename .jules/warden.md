@@ -21,3 +21,8 @@ Observation / Pruned:
 Discovered unused source_path argument in _normalize_import method of dependency_mapper.py. Used ruff check and vulture to ensure we are pruning all unused features. Some template strings were flagged by ruff for being too long (E501), but it was deferred to prevent fragmentation in html templates.
 Alignment / Deferred:
 Deleted unused arguments and applied noqa: E501 to html export string templates so they will not be reported as lint errors in the future.
+2026-04-15 — Assessment & Lifecycle
+Observation / Pruned:
+Discovered and removed unused dead code (`CacheManager.clear` and `cli.version`) identified via static analysis. Added adversarial test to `test_analyzers.py` to ensure multiline marker tracking doesn't silently regress due to previous regex indexing refactors.
+Alignment / Deferred:
+Deferred resolving lines that exceed PEP8 length in `html_export.py` HTML template strings to prevent architectural fragmentation.
