@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import re
 from pathlib import Path
 
@@ -100,7 +101,10 @@ class DependencyMapper:
                 pass
 
         # Detect circular dependencies
-        cycles = list(nx.simple_cycles(graph))
+        try:
+            cycles = list(itertools.islice(nx.simple_cycles(graph), 10))
+        except Exception:
+            cycles = []
 
         return {
             "total_modules": len(graph.nodes),
