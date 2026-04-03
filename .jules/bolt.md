@@ -9,3 +9,11 @@ Replaced the lookahead nested loop with a single-pass O(N) stack-based approach 
 2026-04-02 — Security Scanner Performance Bottleneck
 Learning: Running multiple complex regular expressions sequentially over every file's content is a severe performance bottleneck. Profiling `SecurityDetector` revealed that `pattern.finditer` took ~76% of the execution time, scanning for secrets that often have known, fixed prefixes (like `AKIA` or `sk_live_`).
 Action: For heavily repeated regex scans, I added a fast-path literal substring check (`SECRET_HINTS`) before executing the expensive regex. Files lacking the literal substring immediately skip the regex. This drastically reduced the execution time of `SecurityDetector.detect` by avoiding the regex engine entirely on the vast majority of files.
+
+## 2026-04-03 — Reliability: Exponential Time Trap in NetworkX Cycles Detection
+
+Learning:
+In `DependencyMapper`, the `nx.simple_cycles` function was being fully evaluated using `list(nx.simple_cycles(graph))`. In directed graphs, especially large or highly coupled codebases, the number of simple cycles can grow exponentially. Fully evaluating the generator caused catastrophic performance bottlenecks and potential OOM errors during the mapping phase.
+
+Action:
+Modified the circular dependency detection to lazily evaluate the cycle generator, capping the extraction to a maximum of 10 cycles using `itertools.islice(nx.simple_cycles(graph), 10)`. Wrapped this in a defensive try/except block to ensure the analysis pipeline remains robust even if graph parsing fails or times out.
