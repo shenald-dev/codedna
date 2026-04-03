@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.6] - 2026-04-16
+
+### Changed
+* **Performance:** Optimized `SecurityDetector` by using fast-path literal substring hints (`SECRET_HINTS`) before executing expensive regular expressions (`pattern.finditer()`). This drastically reduces overhead when scanning files that do not contain potential secrets.
+* **Cleanup:** Removed unused `prev_indent` variable in `CodeSmellDetector` to ensure codebase remains entropy-free.
+
 ## [1.0.5] - 2026-04-15
 
 ### Changed

@@ -144,7 +144,7 @@ class CodeSmellDetector:
 
                 if is_def or is_class:
                     while active_funcs and active_funcs[-1][0] >= indent:
-                        prev_indent, prev_name, prev_start = active_funcs.pop()
+                        _, prev_name, prev_start = active_funcs.pop()
                         func_lines = i - prev_start - 1
                         if func_lines > MAX_FUNCTION_LINES:
                             results.append((prev_name, func_lines))
@@ -157,7 +157,7 @@ class CodeSmellDetector:
                             active_funcs.append((indent, name, i))
 
             total_lines = len(lines)
-            for indent, name, start in active_funcs:
+            for _, name, start in active_funcs:
                 func_lines = total_lines - start - 1
                 if func_lines > MAX_FUNCTION_LINES:
                     results.append((name, func_lines))

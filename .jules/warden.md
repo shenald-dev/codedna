@@ -26,3 +26,9 @@ Observation / Pruned:
 Discovered and removed unused dead code (`CacheManager.clear` and `cli.version`) identified via static analysis. Added adversarial test to `test_analyzers.py` to ensure multiline marker tracking doesn't silently regress due to previous regex indexing refactors.
 Alignment / Deferred:
 Deferred resolving lines that exceed PEP8 length in `html_export.py` HTML template strings to prevent architectural fragmentation.
+
+2026-04-16 — Assessment & Lifecycle
+Observation / Pruned:
+The previous agent correctly implemented an optimization to `SecurityDetector` by using fast-path substrings before regular expressions. Scanned codebase for dead code and discovered an unused `prev_indent` variable in `CodeSmellDetector` via static analysis, which was successfully pruned.
+Alignment / Deferred:
+Synchronized the changelog to reflect the `SecurityDetector` optimization and the pruning. Version bumped to 1.0.6. No upgrades deferred.
