@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import urllib.parse
 from pathlib import Path
 
 from git import Repo
@@ -35,7 +37,7 @@ class RepoCloner:
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
         # and looks like a valid URL or local path.
         source = source.strip()
-        if source.startswith("-"):
+        if source.startswith("-") or source.startswith("ext::"):
             raise ValueError(f"Invalid repository source: {source}")
 
         local_path = Path(source)
@@ -43,8 +45,18 @@ class RepoCloner:
             console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
             return local_path
 
+        parsed_url = urllib.parse.urlparse(source)
+        allowed_schemes = {"http", "https", "ssh", "git", ""}
+        if parsed_url.scheme not in allowed_schemes:
+            raise ValueError(f"Invalid repository source scheme: {parsed_url.scheme}")
+
         # Clone from URL
-        repo_name = source.rstrip("/").split("/")[-1].replace(".git", "")
+        unquoted_path = urllib.parse.unquote(parsed_url.path or source)
+        repo_name = os.path.basename(unquoted_path.rstrip("/")).replace(".git", "")
+
+        if not repo_name or repo_name in (".", ".."):
+            raise ValueError(f"Invalid repository name derived from source: {source}")
+
         dest = self.cache_dir / repo_name
 
         if dest.exists():
