@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.7] - 2026-04-04
+
+### Changed
+* **Performance:** Lazily evaluate the generator in `nx.simple_cycles` capping the extraction to a maximum of 10 cycles, and wrapped it in a defensive try/except block to ensure pipeline reliability, preventing Out-Of-Memory (OOM) errors during the Dependency Mapping phase.
+
 ## [1.0.6] - 2026-04-16
 
 ### Changed
