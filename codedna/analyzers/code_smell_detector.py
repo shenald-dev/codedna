@@ -18,7 +18,6 @@ MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX|todo|fixme|hack|xxx|Todo|Fixm
 PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+", re.MULTILINE)
 JS_METHOD_PATTERN = re.compile(r"function\s+\w+|=>\s*\{|[a-zA-Z_]\w*\s*\([^)]*\)\s*\{")
 JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
-PY_FUNC_START_PATTERN = re.compile(r"^([ \t]*)def\s+(\w+)")
 
 
 class CodeSmellDetector:
@@ -130,37 +129,46 @@ class CodeSmellDetector:
         results = []
 
         if ext == ".py":
-            lines = content.splitlines()
             active_funcs = []
+            pattern = re.compile(r"^[ \t]*(def\s+(\w+)|class\s+\w+)", re.MULTILINE)
 
-            for i, line in enumerate(lines):
-                stripped = line.lstrip()
-                if not stripped:
-                    continue
+            last_idx = 0
+            current_line = 0
 
-                indent = len(line) - len(stripped)
-                is_def = stripped.startswith("def ")
-                is_class = stripped.startswith("class ")
+            for match in pattern.finditer(content):
+                start_idx = match.start()
 
-                if is_def or is_class:
-                    while active_funcs and active_funcs[-1][0] >= indent:
-                        _, prev_name, prev_start = active_funcs.pop()
-                        func_lines = i - prev_start - 1
-                        if func_lines > MAX_FUNCTION_LINES:
-                            results.append((prev_name, func_lines))
+                # count newlines between last match and this match
+                current_line += content.count('\n', last_idx, start_idx)
+                last_idx = start_idx
 
-                    if is_def:
-                        # Extract the function name, handle possible edge cases like "def a(b):"
-                        match = PY_FUNC_START_PATTERN.match(line)
-                        if match:
-                            name = match.group(2)
-                            active_funcs.append((indent, name, i))
+                # find indent
+                j = start_idx
+                while j < len(content) and content[j] in ' \t':
+                    j += 1
+                indent = j - start_idx
 
-            total_lines = len(lines)
-            for _, name, start in active_funcs:
-                func_lines = total_lines - start - 1
-                if func_lines > MAX_FUNCTION_LINES:
-                    results.append((name, func_lines))
+                is_def = match.group(1).startswith("def")
+
+                while active_funcs and active_funcs[-1][0] >= indent:
+                    _, prev_name, prev_start = active_funcs.pop()
+                    func_lines = current_line - prev_start - 1
+                    if func_lines > MAX_FUNCTION_LINES:
+                        results.append((prev_name, func_lines))
+
+                if is_def:
+                    name = match.group(2)
+                    active_funcs.append((indent, name, current_line))
+
+            if active_funcs:
+                total_lines = current_line + content.count('\n', last_idx)
+                if content and not content.endswith('\n'):
+                    total_lines += 1
+
+                for _, name, start in active_funcs:
+                    func_lines = total_lines - start - 1
+                    if func_lines > MAX_FUNCTION_LINES:
+                        results.append((name, func_lines))
 
         return results
 
