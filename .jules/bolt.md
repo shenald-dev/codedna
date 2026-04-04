@@ -17,3 +17,11 @@ In `DependencyMapper`, the `nx.simple_cycles` function was being fully evaluated
 
 Action:
 Modified the circular dependency detection to lazily evaluate the cycle generator, capping the extraction to a maximum of 10 cycles using `itertools.islice(nx.simple_cycles(graph), 10)`. Wrapped this in a defensive try/except block to ensure the analysis pipeline remains robust even if graph parsing fails or times out.
+
+## 2026-04-04 — Performance Optimization: CLI Startup Time Bottleneck
+
+Learning:
+Heavy third-party dependencies (`networkx` and `gitpython`) were being imported at the module level across several analyzers (`DependencyMapper`, `DeveloperAnalyzer`, `EvolutionEngine`). Because `codedna/cli.py` imports these analyzers at the top level to register commands, these heavy dependencies were being loaded every time the CLI was invoked (even for simple commands like `codedna --help`), adding ~0.4s to the startup time.
+
+Action:
+Moved the imports for `networkx` and `git` inside the specific execution methods (`map` and `analyze`) of the respective analyzer classes to lazily load them only when required. This significantly improved the CLI startup and responsiveness.
