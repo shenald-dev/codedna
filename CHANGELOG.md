@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.7] - 2026-05-02
+
+### Changed
+* **Performance:** Fixed Out-Of-Memory (OOM) hangs during the dependency mapping phase by capping the number of evaluated paths from `nx.simple_cycles` to a maximum of 10. The extraction is now safely lazily evaluated using `itertools.islice`.
+
 ## [1.0.6] - 2026-04-16
 
 ### Changed
