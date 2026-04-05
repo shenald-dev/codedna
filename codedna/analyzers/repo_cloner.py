@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import urllib.parse
 from pathlib import Path
 
 from git import Repo
@@ -44,7 +46,13 @@ class RepoCloner:
             return local_path
 
         # Clone from URL
-        repo_name = source.rstrip("/").split("/")[-1].replace(".git", "")
+        # Mitigate path traversal risks by unquoting URL components and extracting just the base name.
+        unquoted_source = urllib.parse.unquote(source)
+        repo_name = os.path.basename(unquoted_source.rstrip("/")).replace(".git", "")
+
+        if not repo_name or repo_name in (".", ".."):
+            raise ValueError(f"Invalid repository source path: {source}")
+
         dest = self.cache_dir / repo_name
 
         if dest.exists():
