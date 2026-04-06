@@ -233,3 +233,23 @@ class TestDNAGenerator:
         md = gen.to_markdown(profile)
         assert "CodeDNA Profile" in md
         assert "DNA Signature" in md
+
+    def test_circular_dependencies_lazily_evaluated(self, tmp_path):
+        from unittest.mock import patch
+
+        # We mock nx.simple_cycles to return an infinite generator to simulate
+        # a massive dense graph. If the fix (itertools.islice) is not in place,
+        # this will hang indefinitely or cause OOM.
+
+        def infinite_cycles(*args, **kwargs):
+            while True:
+                yield ["A", "B", "C"]
+
+        with patch("networkx.simple_cycles", side_effect=infinite_cycles):
+            # Create a simple repo structure so mapping runs
+            (tmp_path / "a.py").write_text("import b")
+
+            result = DependencyMapper().map(tmp_path)
+            # The mapper should extract exactly 10 cycles and not hang
+            assert len(result["cycles"]) == 10
+            assert result["has_circular_deps"] is True

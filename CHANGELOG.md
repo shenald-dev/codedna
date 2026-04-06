@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.7] - 2026-04-16
+
+### Changed
+* **Code Quality:** Added an adversarial test in `test_analyzers.py` to ensure circular dependency extraction correctly uses lazy evaluation to avoid Out-Of-Memory (OOM) errors in dense dependency graphs. Applied auto linting.
+
 ## [1.0.6] - 2026-04-16
 
 ### Changed
