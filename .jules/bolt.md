@@ -17,3 +17,11 @@ In `DependencyMapper`, the `nx.simple_cycles` function was being fully evaluated
 
 Action:
 Modified the circular dependency detection to lazily evaluate the cycle generator, capping the extraction to a maximum of 10 cycles using `itertools.islice(nx.simple_cycles(graph), 10)`. Wrapped this in a defensive try/except block to ensure the analysis pipeline remains robust even if graph parsing fails or times out.
+
+## 2026-04-04 — Security Hardening in RepoCloner
+
+Learning:
+RepoCloner was susceptible to command injection via ext:: prefix and lacked robust validation of URL schemes and repository path extraction, potentially leading to path traversal and SSRF attacks.
+
+Action:
+Hardened RepoCloner by explicitly blocking the ext:: prefix, validating URL schemes (allowing only http, https, ssh, git, file), unquoting paths, and explicitly rejecting ".", "..", and empty paths. This pattern of rigorous input sanitization and boundary checking should be applied to all analyzers accepting external inputs.

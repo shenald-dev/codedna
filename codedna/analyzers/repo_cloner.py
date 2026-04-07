@@ -35,7 +35,7 @@ class RepoCloner:
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
         # and looks like a valid URL or local path.
         source = source.strip()
-        if source.startswith("-"):
+        if source.startswith("-") or source.startswith("ext::"):
             raise ValueError(f"Invalid repository source: {source}")
 
         local_path = Path(source)
@@ -43,8 +43,20 @@ class RepoCloner:
             console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
             return local_path
 
+        import os
+        import urllib.parse
+
+        parsed = urllib.parse.urlparse(source)
+        if parsed.scheme and parsed.scheme.lower() not in ("http", "https", "ssh", "git", "file"):
+            raise ValueError(f"Invalid or unauthorized URL scheme: {parsed.scheme}")
+
         # Clone from URL
-        repo_name = source.rstrip("/").split("/")[-1].replace(".git", "")
+        unquoted_path = urllib.parse.unquote(parsed.path or source)
+        repo_name = os.path.basename(unquoted_path.rstrip("/")).replace(".git", "")
+
+        if not repo_name or repo_name in (".", ".."):
+            raise ValueError(f"Invalid repository name derived from source: {source}")
+
         dest = self.cache_dir / repo_name
 
         if dest.exists():
