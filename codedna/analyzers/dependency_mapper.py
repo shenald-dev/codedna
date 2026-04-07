@@ -6,7 +6,6 @@ import itertools
 import re
 from pathlib import Path
 
-import networkx as nx
 
 from .language_detector import IGNORE_DIRS
 
@@ -57,6 +56,7 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        import networkx as nx
         graph = nx.DiGraph()
         edges: list[dict] = []
 
