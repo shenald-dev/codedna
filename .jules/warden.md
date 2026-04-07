@@ -32,3 +32,9 @@ Observation / Pruned:
 The previous agent correctly implemented an optimization to `SecurityDetector` by using fast-path substrings before regular expressions. Scanned codebase for dead code and discovered an unused `prev_indent` variable in `CodeSmellDetector` via static analysis, which was successfully pruned.
 Alignment / Deferred:
 Synchronized the changelog to reflect the `SecurityDetector` optimization and the pruning. Version bumped to 1.0.6. No upgrades deferred.
+
+2026-04-16 — Assessment & Lifecycle
+Observation / Pruned:
+Discovered that `DependencyMapper` was vulnerable to exponential time hangs and OOM errors when processing dense circular dependencies in `nx.simple_cycles`. The previous agent optimized it by bounding evaluation to the first 10 cycles using `itertools.islice`, along with a defensive try/except block.
+Alignment / Deferred:
+Synchronized the changelog to reflect the `DependencyMapper` reliability optimization. Bounded execution ensures large or complex codebases will no longer crash the pipeline. Version bumped to 1.0.7.
