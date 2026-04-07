@@ -32,8 +32,8 @@ class RepoCloner:
         Returns:
             Path to the cloned/resolved repository.
         """
-        import urllib.parse
         import os
+        import urllib.parse
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
         # and looks like a valid URL or local path.
         source = source.strip()
