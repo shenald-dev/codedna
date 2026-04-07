@@ -6,7 +6,6 @@ import itertools
 import re
 from pathlib import Path
 
-
 from .language_detector import IGNORE_DIRS
 
 # Import patterns per language
