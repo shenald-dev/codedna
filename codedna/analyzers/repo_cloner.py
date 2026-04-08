@@ -31,6 +31,8 @@ class RepoCloner:
         Returns:
             Path to the cloned/resolved repository.
         """
+        import os
+        import urllib.parse
         from git import Repo
 
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
@@ -39,19 +41,39 @@ class RepoCloner:
         if source.startswith("-"):
             raise ValueError(f"Invalid repository source: {source}")
 
+        if source.startswith("ext::"):
+            raise ValueError(f"Invalid repository source: {source}")
+
         local_path = Path(source)
         if local_path.exists() and (local_path / ".git").exists():
             console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
             return local_path
 
+        parsed = urllib.parse.urlparse(source)
+
+        # Git supports diverse URI formats like SCP style (git@github.com:user/repo.git)
+        # where urlparse might incorrectly identify the domain or windows drive as a scheme.
+        # We instead check for explicit unauthorized schemes and allow others to pass to Git
+        if parsed.scheme:
+             # Reject known dangerous schemes
+            scheme = parsed.scheme.lower()
+            # block some remote helpers and risky protocols, we already blocked ext::
+            if scheme in ("ext", "ftp", "ftps", "telnet"):
+                 raise ValueError(f"Unauthorized URL scheme: {parsed.scheme}")
+
         # Clone from URL
-        repo_name = source.rstrip("/").split("/")[-1].replace(".git", "")
+        unquoted_path = urllib.parse.unquote(parsed.path or source)
+        repo_name = os.path.basename(unquoted_path.rstrip("/")).replace(".git", "")
+        if not repo_name or repo_name in (".", ".."):
+            raise ValueError(f"Invalid repository name: {repo_name}")
+
         dest = self.cache_dir / repo_name
 
         if dest.exists():
             console.print(f"  ♻️  Using cached clone: [cyan]{dest}[/]")
             return dest
 
+        from git import Repo
         console.print(f"  📥 Cloning [cyan]{source}[/] ...")
         Repo.clone_from(source, str(dest), depth=100)
         return dest
