@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from git import Repo
 from rich.console import Console
 
 from .cache_manager import CacheManager
@@ -51,6 +50,7 @@ class RepoCloner:
             console.print(f"  ♻️  Using cached clone: [cyan]{dest}[/]")
             return dest
 
+        from git import Repo
         console.print(f"  📥 Cloning [cyan]{source}[/] ...")
         Repo.clone_from(source, str(dest), depth=100)
         return dest
