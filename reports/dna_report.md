@@ -1,7 +1,7 @@
 # 🧬 CodeDNA Profile
 
 > Analyzed: `.`
-> Date: 2026-03-29
+> Date: 2026-04-08
 
 
 ---
@@ -17,68 +17,69 @@
 
 | Language | Files | Lines | Share |
 |----------|-------|-------|-------|
-| Python | 43 | 3,296 | 77.9% `███████████████` |
-| Markdown | 5 | 426 | 10.1% `██` |
-| JSON | 4 | 165 | 3.9% `█` |
-| TOML | 1 | 54 | 1.3% `█` |
+| Python | 33 | 3,095 | 76.0% `███████████████` |
+| Markdown | 5 | 463 | 11.4% `██` |
+| JSON | 4 | 165 | 4.1% `█` |
+| TOML | 1 | 58 | 1.4% `█` |
 | YAML | 1 | 34 | 0.8% `█` |
-| HTML | 1 | 255 | 6.0% `█` |
+| HTML | 1 | 255 | 6.3% `█` |
 
 ## 🩺 Health Score: **Critical**
 
 - 🔴 Critical: 1
-- 🟡 Warning: 5
-- 🔵 Info: 17
+- 🟡 Warning: 4
+- 🔵 Info: 21
 
 ## ⚠️ Risk Signals
 
-- 🔴 Hardcoded Secret in `test_regex_opt9.py:27`: Detected RSA Private Key (----***----)
-- 🔴 Hardcoded Secret in `test_regex_opt9.py:28`: Detected SSH Private Key (----***----)
 - 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)
 - 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:13`: Detected RSA Private Key (----***----)
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected SSH Private Key (----***----)
-- 🔴 God Class in `tests/test_analyzers.py`: 20 methods detected (threshold: 15)
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected RSA Private Key (----***----)
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:28`: Detected RSA Private Key (----***----)
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:15`: Detected SSH Private Key (----***----)
+- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:29`: Detected SSH Private Key (----***----)
+- 🔴 God Class in `tests/test_analyzers.py`: 21 methods detected (threshold: 15)
 - 🟡 Long Function in `codedna/cli.py`
 
 ## 🔗 Dependency Graph
 
-- Modules: **105**
-- Connections: **175**
-- Density: **0.016**
+- Modules: **94**
+- Connections: **141**
+- Density: **0.0161**
 - Circular Dependencies: **None ✅**
 
 ```mermaid
 graph LR
-    run_sec_line --> codedna_analyzers_security_detector
-    run_sec_line --> sys
-    run_sec_line --> pathlib
-    test_regex_opt8 --> re
-    test_regex_opt8 --> time
-    test_regex_opt8 --> codedna_analyzers_security_detector
-    test_regex_opt8 --> pathlib
-    test_regex_opt2 --> re
-    test_regex_opt2 --> time
-    test_regex_opt2 --> codedna_analyzers_security_detector
-    test_regex_opt2 --> pathlib
-    test_regex_opt5 --> re
-    test_regex_opt5 --> time
-    test_regex_opt5 --> codedna_analyzers_security_detector
-    test_regex_opt5 --> pathlib
-    test_regex_real --> re
-    test_regex_real --> time
-    test_regex_real --> cProfile
-    test_regex_real --> pathlib
-    test_regex_real --> codedna_analyzers_security_detector
+    test_git --> time
+    test_git --> git
+    test_arch --> time
+    test_arch --> pathlib
+    test_arch --> codedna_analyzers_architecture_detector
+    test_deps --> time
+    test_deps --> pathlib
+    test_deps --> codedna_analyzers_dependency_mapper
     test_perf --> time
-    test_perf --> subprocess
-    test_perf --> os
-    run_sec --> codedna_analyzers_security_detector
-    run_sec --> pathlib
-    test_regex --> re
-    test_regex --> time
-    test_regex --> codedna_analyzers_security_detector
-    test_regex_opt4 --> re
+    test_perf --> pathlib
+    test_perf --> codedna_analyzers_developer_analyzer
+    test_perf --> codedna_analyzers_evolution_engine
+    test_perf2 --> time
+    test_perf2 --> pathlib
+    test_perf2 --> codedna_analyzers_structure_analyzer
+    test_perf2 --> codedna_analyzers_language_detector
+    test_perf3 --> time
+    test_perf3 --> pathlib
+    test_perf3 --> codedna_analyzers_structure_analyzer
+    tests_test_minimal --> shutil
+    tests_test_minimal --> tempfile
+    tests_test_minimal --> unittest
+    tests_test_minimal --> pathlib
+    tests_test_minimal --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> pytest
+    tests_test_analyzers --> json
+    tests_test_analyzers --> codedna_analyzers_architecture_detector
+    tests_test_analyzers --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> codedna_analyzers_dependency_mapper
+    tests_test_analyzers --> codedna_analyzers_dna_generator
 ```
 
 ## 👥 Developer Genome
@@ -94,13 +95,13 @@ graph LR
 ## 📈 Evolution
 
 - Total Commits: **1**
-- First Commit: 2026-03-28
+- First Commit: 2026-04-08
 - Patterns: Insufficient data
 
 ## 🧬 DNA Signature
 
 ```
-LANG:PYT | ARCH:MON | SIZE:LG | TEAM:SOLO | HEALTH:1
+LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1
 ```
 
 ---
