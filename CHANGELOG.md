@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.7] - 2026-04-16
+
+### Changed
+* **Reliability:** Capped the execution of `nx.simple_cycles` in `DependencyMapper` to a maximum of 10 cycles. This prevents infinite-seeming hangs and out-of-memory (OOM) crashes on heavily coupled, dense dependency graphs where cycle generation is exponential.
+
 ## [1.0.6] - 2026-04-16
 
 ### Changed
