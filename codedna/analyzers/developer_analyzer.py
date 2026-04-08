@@ -5,9 +5,6 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
-
 
 class DeveloperAnalyzer:
     """Analyzes developer contribution patterns from Git history."""
@@ -18,6 +15,9 @@ class DeveloperAnalyzer:
         Returns:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
+        from git import Repo
+        from git.exc import InvalidGitRepositoryError
+
         try:
             repo = Repo(str(repo_path))
         except InvalidGitRepositoryError:
