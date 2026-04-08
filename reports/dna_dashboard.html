@@ -12,7 +12,7 @@
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
         .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; }
-        .header-bg { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-bottom: 1px solid #334155; }
+        .header-bg { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-bottom: 1px solid #334155; }  # noqa: E501
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -20,20 +20,20 @@
 <div class="header-bg py-10 px-6">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center group">
         <div>
-            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">  # noqa: E501
                 🧬 CodeDNA Profile
             </h1>
             <p class="text-slate-400 text-lg flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>  # noqa: E501
                 .
             </p>
 
         </div>
         <div class="mt-4 md:mt-0 text-right">
-            <span class="inline-block px-4 py-2 rounded-full bg-slate-800 border border-slate-700 font-mono text-cyan-400 font-semibold shadow-xl">
-                LANG:PYT | ARCH:MON | SIZE:LG | TEAM:SOLO | HEALTH:1
+            <span class="inline-block px-4 py-2 rounded-full bg-slate-800 border border-slate-700 font-mono text-cyan-400 font-semibold shadow-xl">  # noqa: E501
+                LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1
             </span>
-            <p class="text-sm text-slate-500 mt-2">Analyzed on 2026-03-29</p>
+            <p class="text-sm text-slate-500 mt-2">Analyzed on 2026-04-08</p>
         </div>
     </div>
 </div>
@@ -43,19 +43,19 @@
     <!-- Overviews -->
     <div class="md:col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="card p-6 flex flex-col justify-center">
-            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">System Type</h3>
+            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">System Type</h3>  # noqa: E501
             <p class="text-2xl font-bold text-white">Monolith</p>
         </div>
         <div class="card p-6 flex flex-col justify-center">
-            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Overall Health</h3>
+            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Overall Health</h3>  # noqa: E501
             <p class="text-2xl font-bold text-red-500">Critical</p>
         </div>
         <div class="card p-6 flex flex-col justify-center">
-            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Total Files</h3>
-            <p class="text-2xl font-bold text-white">112</p>
+            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Total Files</h3>  # noqa: E501
+            <p class="text-2xl font-bold text-white">58</p>
         </div>
         <div class="card p-6 flex flex-col justify-center">
-            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Contributors</h3>
+            <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Contributors</h3>  # noqa: E501
             <p class="text-2xl font-bold text-white">1</p>
         </div>
     </div>
@@ -68,38 +68,39 @@
             <h2 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
                 🔗 Module Dependencies
             </h2>
-            <div class="bg-slate-900 rounded-lg p-4 w-full overflow-x-auto min-h-[300px] flex items-center justify-center">
+            <div class="bg-slate-900 rounded-lg p-4 w-full overflow-x-auto min-h-[300px] flex items-center justify-center">  # noqa: E501
                 <div class="mermaid">
 graph LR
-    run_sec_line --> codedna_analyzers_security_detector
-    run_sec_line --> sys
-    run_sec_line --> pathlib
-    test_regex_opt8 --> re
-    test_regex_opt8 --> time
-    test_regex_opt8 --> codedna_analyzers_security_detector
-    test_regex_opt8 --> pathlib
-    test_regex_opt2 --> re
-    test_regex_opt2 --> time
-    test_regex_opt2 --> codedna_analyzers_security_detector
-    test_regex_opt2 --> pathlib
-    test_regex_opt5 --> re
-    test_regex_opt5 --> time
-    test_regex_opt5 --> codedna_analyzers_security_detector
-    test_regex_opt5 --> pathlib
-    test_regex_real --> re
-    test_regex_real --> time
-    test_regex_real --> cProfile
-    test_regex_real --> pathlib
-    test_regex_real --> codedna_analyzers_security_detector
+    test_git --> time
+    test_git --> git
+    test_arch --> time
+    test_arch --> pathlib
+    test_arch --> codedna_analyzers_architecture_detector
+    test_deps --> time
+    test_deps --> pathlib
+    test_deps --> codedna_analyzers_dependency_mapper
     test_perf --> time
-    test_perf --> subprocess
-    test_perf --> os
-    run_sec --> codedna_analyzers_security_detector
-    run_sec --> pathlib
-    test_regex --> re
-    test_regex --> time
-    test_regex --> codedna_analyzers_security_detector
-    test_regex_opt4 --> re
+    test_perf --> pathlib
+    test_perf --> codedna_analyzers_developer_analyzer
+    test_perf --> codedna_analyzers_evolution_engine
+    test_perf2 --> time
+    test_perf2 --> pathlib
+    test_perf2 --> codedna_analyzers_structure_analyzer
+    test_perf2 --> codedna_analyzers_language_detector
+    test_perf3 --> time
+    test_perf3 --> pathlib
+    test_perf3 --> codedna_analyzers_structure_analyzer
+    tests_test_minimal --> shutil
+    tests_test_minimal --> tempfile
+    tests_test_minimal --> unittest
+    tests_test_minimal --> pathlib
+    tests_test_minimal --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> pytest
+    tests_test_analyzers --> json
+    tests_test_analyzers --> codedna_analyzers_architecture_detector
+    tests_test_analyzers --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> codedna_analyzers_dependency_mapper
+    tests_test_analyzers --> codedna_analyzers_dna_generator
                 </div>
             </div>
         </div>
@@ -114,10 +115,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">Python</span>
-                    <span class="text-slate-400">77.9% <span class="text-xs ml-1">(43 files)</span></span>
+                    <span class="text-slate-400">76.0% <span class="text-xs ml-1">(33 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 77.9%"></div>
+                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 76.0%"></div>
                 </div>
             </div>
 
@@ -125,10 +126,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">Markdown</span>
-                    <span class="text-slate-400">10.1% <span class="text-xs ml-1">(5 files)</span></span>
+                    <span class="text-slate-400">11.4% <span class="text-xs ml-1">(5 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-slate-400 h-2 rounded-full" style="width: 10.1%"></div>
+                    <div class="bg-slate-400 h-2 rounded-full" style="width: 11.4%"></div>
                 </div>
             </div>
 
@@ -136,10 +137,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">JSON</span>
-                    <span class="text-slate-400">3.9% <span class="text-xs ml-1">(4 files)</span></span>
+                    <span class="text-slate-400">4.1% <span class="text-xs ml-1">(4 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-slate-400 h-2 rounded-full" style="width: 3.9%"></div>
+                    <div class="bg-slate-400 h-2 rounded-full" style="width: 4.1%"></div>
                 </div>
             </div>
 
@@ -147,10 +148,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">TOML</span>
-                    <span class="text-slate-400">1.3% <span class="text-xs ml-1">(1 files)</span></span>
+                    <span class="text-slate-400">1.4% <span class="text-xs ml-1">(1 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-slate-400 h-2 rounded-full" style="width: 1.3%"></div>
+                    <div class="bg-slate-400 h-2 rounded-full" style="width: 1.4%"></div>
                 </div>
             </div>
 
@@ -158,7 +159,7 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">YAML</span>
-                    <span class="text-slate-400">0.8% <span class="text-xs ml-1">(1 files)</span></span>
+                    <span class="text-slate-400">0.8% <span class="text-xs ml-1">(1 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
                     <div class="bg-slate-400 h-2 rounded-full" style="width: 0.8%"></div>
@@ -169,10 +170,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">HTML</span>
-                    <span class="text-slate-400">6.0% <span class="text-xs ml-1">(1 files)</span></span>
+                    <span class="text-slate-400">6.3% <span class="text-xs ml-1">(1 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-orange-400 h-2 rounded-full" style="width: 6.0%"></div>
+                    <div class="bg-orange-400 h-2 rounded-full" style="width: 6.3%"></div>
                 </div>
             </div>
 
@@ -190,7 +191,7 @@ graph LR
                 ⚠️ Risk Signals
             </h2>
             <ul class="space-y-3 text-sm">
-                <li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `test_regex_opt9.py:27`: Detected RSA Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `test_regex_opt9.py:28`: Detected SSH Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:13`: Detected RSA Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected SSH Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>God Class in `tests/test_analyzers.py`: 20 methods detected (threshold: 15)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/cli.py`</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/analyzers/dna_generator.py`</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/analyzers/code_smell_detector.py`</span></li>
+                <li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected RSA Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:28`: Detected RSA Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:15`: Detected SSH Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>Hardcoded Secret in `codedna/analyzers/security_detector.py:29`: Detected SSH Private Key (----***----)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🔴</span><span>God Class in `tests/test_analyzers.py`: 21 methods detected (threshold: 15)</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/cli.py`</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/analyzers/dna_generator.py`</span></li><li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">🟡</span><span>Long Function in `codedna/analyzers/code_smell_detector.py`</span></li>
             </ul>
         </div>
 
@@ -209,7 +210,7 @@ graph LR
             <h2 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
                 👥 Developer Genome
             </h2>
-            <p class="text-sm text-slate-400 mb-3">Bus Factor: <strong class="text-white">1</strong></p>
+            <p class="text-sm text-slate-400 mb-3">Bus Factor: <strong class="text-white">1</strong></p>  # noqa: E501
             <div class="space-y-3 mt-4">
 
             <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded">
@@ -232,8 +233,8 @@ graph LR
                 📈 Evolution
             </h2>
             <ul class="space-y-2 text-sm text-slate-300">
-                <li class="flex justify-between"><span>Total Commits</span> <strong class="text-white">1</strong></li>
-                <li class="flex justify-between"><span>First Commit</span> <strong class="text-white">2026-03-28</strong></li>
+                <li class="flex justify-between"><span>Total Commits</span> <strong class="text-white">1</strong></li>  # noqa: E501
+                <li class="flex justify-between"><span>First Commit</span> <strong class="text-white">2026-04-08</strong></li>  # noqa: E501
             </ul>
             <div class="mt-4 pt-4 border-t border-slate-700">
                 <p class="text-xs text-slate-500 uppercase font-semibold mb-2">Detected Patterns</p>
@@ -248,7 +249,7 @@ graph LR
 </main>
 
 <footer class="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
-    Generated by <a href="https://github.com/shenald-dev/codedna" class="text-cyan-400 hover:underline">CodeDNA</a> — A genetic analyzer for software.
+    Generated by <a href="https://github.com/shenald-dev/codedna" class="text-cyan-400 hover:underline">CodeDNA</a> — A genetic analyzer for software.  # noqa: E501
 </footer>
 
 </body>
