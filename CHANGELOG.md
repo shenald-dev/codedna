@@ -3,6 +3,7 @@
 ## [1.0.7] - 2026-04-16
 
 ### Changed
+* **Reliability:** Capped the execution of `nx.simple_cycles` in `DependencyMapper` to a maximum of 10 cycles. This prevents infinite-seeming hangs and out-of-memory (OOM) crashes on heavily coupled, dense dependency graphs where cycle generation is exponential.
 * **Code Quality:** Added an adversarial test in `test_analyzers.py` to ensure circular dependency extraction correctly uses lazy evaluation to avoid Out-Of-Memory (OOM) errors in dense dependency graphs. Applied auto linting.
 
 ## [1.0.6] - 2026-04-16
