@@ -29,3 +29,10 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+
+## 2026-04-09 — Performance Optimization: CLI Startup Time
+
+Learning:
+Moving heavy module imports to the module level in `codedna/cli.py` adds significant overhead to the execution time, severely impacting startup performance for commands that do not utilize them (like `codedna --help`).
+Action:
+Refactored `codedna/cli.py` to lazy load heavy imports (e.g. `ArchitectureDetector`, `RepoCloner`, `SecurityDetector`) inside the `analyze` function execution. In CLI commands, module dependencies should always be evaluated inside execution functions to avoid bloating startup speed.
