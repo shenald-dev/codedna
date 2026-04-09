@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.8] - 2026-04-16
+
+### Changed
+* **Performance:** Optimized CLI startup time via lazy loading by moving heavy module imports inside the specific methods where they are used.
+
 ## [1.0.7] - 2026-04-16
 
 ### Changed
