@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.9] - 2026-04-09
+
+### Fixed
+* **Security:** Fixed false positive secret detection when CodeDNA analyzes its own test suite and sources.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed
