@@ -9,21 +9,6 @@ import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .analyzers.ai_analyzer import AIAnalyzer
-from .analyzers.architecture_detector import ArchitectureDetector
-from .analyzers.code_smell_detector import CodeSmellDetector
-from .analyzers.dependency_mapper import DependencyMapper
-from .analyzers.developer_analyzer import DeveloperAnalyzer
-from .analyzers.dna_generator import DNAGenerator
-from .analyzers.evolution_engine import EvolutionEngine
-from .analyzers.github_analyzer import GitHubAnalyzer
-from .analyzers.language_detector import LanguageDetector
-from .analyzers.repo_cloner import RepoCloner
-from .analyzers.security_detector import SecurityDetector
-from .analyzers.structure_analyzer import StructureAnalyzer
-from .visualization.html_export import HTMLExporter
-from .visualization.renderer import Renderer
-
 console = Console()
 
 
@@ -59,6 +44,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.8[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
+    from .analyzers.repo_cloner import RepoCloner
     cloner = RepoCloner()
 
     try:
@@ -74,16 +60,19 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 2: Language Detection ──
             progress.update(task, description="🔍 Detecting languages...")
+            from .analyzers.language_detector import LanguageDetector
             languages = LanguageDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] Found {len(languages.get('languages', {}))} languages")  # noqa: E501
 
             # ── Stage 3: Structure Analysis ──
             progress.update(task, description="📁 Analyzing structure...")
+            from .analyzers.structure_analyzer import StructureAnalyzer
             structure = StructureAnalyzer().analyze(repo_path)
             progress.update(task, description=f"[green]✓[/] {structure.get('total_files', 0)} files analyzed")  # noqa: E501
 
             # ── Stage 4: Dependency Mapping ──
             progress.update(task, description="🔗 Mapping dependencies...")
+            from .analyzers.dependency_mapper import DependencyMapper
             mapper = DependencyMapper()
             dependencies = mapper.map(repo_path)
             mermaid_graph = mapper.build_mermaid(repo_path)
@@ -91,36 +80,43 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 5: Architecture Detection ──
             progress.update(task, description="🏗️ Detecting architecture patterns...")
+            from .analyzers.architecture_detector import ArchitectureDetector
             architecture = ArchitectureDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] Pattern: {architecture.get('primary_pattern', '?')}")  # noqa: E501
 
             # ── Stage 6: Code Smell Detection ──
             progress.update(task, description="🐛 Scanning for code smells...")
+            from .analyzers.code_smell_detector import CodeSmellDetector
             smells = CodeSmellDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] {smells.get('total', 0)} issues found")
 
             # ── Stage 6.5: Security Scanning ──
             progress.update(task, description="🔒 Scanning for security vulnerabilities...")
+            from .analyzers.security_detector import SecurityDetector
             security = SecurityDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] {security.get('total_critical', 0)} critical vulnerabilities")  # noqa: E501
 
             # ── Stage 7: Developer Analysis ──
             progress.update(task, description="👥 Analyzing developer behavior...")
+            from .analyzers.developer_analyzer import DeveloperAnalyzer
             developers = DeveloperAnalyzer().analyze(repo_path, max_commits=depth)
             progress.update(task, description=f"[green]✓[/] {developers.get('total_contributors', 0)} contributors")  # noqa: E501
 
             # ── Stage 8: Evolution Engine ──
             progress.update(task, description="📈 Tracking evolution...")
+            from .analyzers.evolution_engine import EvolutionEngine
             evolution = EvolutionEngine().analyze(repo_path)
             progress.update(task, description="[green]✓[/] Evolution timeline built")
 
             # ── Stage 8.5: GitHub Analysis ──
             progress.update(task, description="🌐 Fetching GitHub community stats...")
+            from .analyzers.github_analyzer import GitHubAnalyzer
             github_stats = GitHubAnalyzer().analyze(source)
             progress.update(task, description="[green]✓[/] GitHub stats retrieved")
 
             # ── Stage 9: DNA Generation ──
             progress.update(task, description="🧬 Generating DNA profile...")
+            from .analyzers.dna_generator import DNAGenerator
             generator = DNAGenerator()
             profile = generator.generate(
                 repo_source=source,
@@ -139,6 +135,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             # ── Stage 10: AI Synthesis ──
             if ai:
                 progress.update(task, description="🧠 Synthesizing executive insights via AI...")
+                from .analyzers.ai_analyzer import AIAnalyzer
                 ai_result = AIAnalyzer().synthesize(profile)
                 if ai_result.success:
                     profile["ai_insights"] = {
@@ -152,6 +149,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
         # ── Render to terminal ──
         if not no_visualize:
+            from .visualization.renderer import Renderer
             Renderer().render_dna_profile(profile)
 
         # ── Save outputs ──
@@ -171,6 +169,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             if fmt in ("html", "all"):
                 html_path = output_dir / "dna_dashboard.html"
+                from .visualization.html_export import HTMLExporter
                 exporter = HTMLExporter()
                 html_path.write_text(exporter.export(profile, mermaid_graph), encoding="utf-8")
                 console.print(f"  🌐 Dashboard saved: [cyan]{html_path}[/]")
