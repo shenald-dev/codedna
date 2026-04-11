@@ -29,3 +29,6 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+2026-04-11 — Optimize CLI and prevent XSS
+Learning: A large block of eager imports at the module level in `cli.py` added ~0.250s of overhead to every command invocation. Escaping untrusted metadata with `html.escape` is necessary to prevent injection in generated HTML reports.
+Action: Shifted heavy module imports directly into the execution context of the `analyze` command. Patched string interpolations in `html_export.py` to prevent XSS. Tests passed successfully.

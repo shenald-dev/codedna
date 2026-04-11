@@ -55,7 +55,10 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
-        import networkx as nx
+        try:
+            import networkx as nx
+        except ImportError:
+            return {'total_modules': 0, 'total_edges': 0, 'density': 0, 'cycles': [], 'has_circular_deps': False, 'top_central_modules': {}, 'edges': []}
         graph = nx.DiGraph()
         edges: list[dict] = []
 
