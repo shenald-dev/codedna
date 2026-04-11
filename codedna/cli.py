@@ -9,20 +9,7 @@ import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .analyzers.ai_analyzer import AIAnalyzer
-from .analyzers.architecture_detector import ArchitectureDetector
-from .analyzers.code_smell_detector import CodeSmellDetector
-from .analyzers.dependency_mapper import DependencyMapper
-from .analyzers.developer_analyzer import DeveloperAnalyzer
-from .analyzers.dna_generator import DNAGenerator
-from .analyzers.evolution_engine import EvolutionEngine
-from .analyzers.github_analyzer import GitHubAnalyzer
-from .analyzers.language_detector import LanguageDetector
-from .analyzers.repo_cloner import RepoCloner
-from .analyzers.security_detector import SecurityDetector
-from .analyzers.structure_analyzer import StructureAnalyzer
-from .visualization.html_export import HTMLExporter
-from .visualization.renderer import Renderer
+# Move lazy imports inside command
 
 console = Console()
 
@@ -56,6 +43,21 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
         codedna analyze ./my-local-project
         codedna analyze . --output reports/
     """
+    from .analyzers.ai_analyzer import AIAnalyzer
+    from .analyzers.architecture_detector import ArchitectureDetector
+    from .analyzers.code_smell_detector import CodeSmellDetector
+    from .analyzers.dependency_mapper import DependencyMapper
+    from .analyzers.developer_analyzer import DeveloperAnalyzer
+    from .analyzers.dna_generator import DNAGenerator
+    from .analyzers.evolution_engine import EvolutionEngine
+    from .analyzers.github_analyzer import GitHubAnalyzer
+    from .analyzers.language_detector import LanguageDetector
+    from .analyzers.repo_cloner import RepoCloner
+    from .analyzers.security_detector import SecurityDetector
+    from .analyzers.structure_analyzer import StructureAnalyzer
+    from .visualization.html_export import HTMLExporter
+    from .visualization.renderer import Renderer
+
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.8[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
