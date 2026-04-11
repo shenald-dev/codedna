@@ -1,5 +1,7 @@
 """Tests for visualization modules."""
 
+import html as html_lib
+
 import pytest
 
 from codedna.visualization.html_export import HTMLExporter
@@ -64,7 +66,7 @@ class TestHTMLExporter:
         exporter = HTMLExporter()
         custom_graph = "graph TD\n  A --> B"
         html = exporter.export(mock_profile, custom_graph)
-        assert custom_graph in html
+        assert html_lib.escape(custom_graph) in html
         assert "graph LR\n  A[No connection data found]" not in html
 
     def test_export_no_github(self, mock_profile):
