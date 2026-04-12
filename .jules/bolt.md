@@ -29,3 +29,7 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+
+2026-04-12 — Performance Optimization: CLI Startup Time
+Learning: Running `codedna --help` shouldn't load the entire dependency graph, especially heavyweight modules like NetworkX.
+Action: Implement lazy loading by moving module imports (analyzers, networkx) from the module level to inside the specific command functions. This significantly reduced startup time for basic CLI commands.
