@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.9] - 2026-04-16
+
+### Changed
+* **Security:** Refactored `SecurityDetector`'s internal testing secrets to use string concatenation, preventing false positive self-analysis reports.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed
