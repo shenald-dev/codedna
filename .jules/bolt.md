@@ -29,3 +29,10 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+## 2026-04-13 — Optimize CLI Startup Time
+
+Learning:
+CLI tools built with `click` or `argparse` can experience significant startup latency (e.g., when running `--help`) if heavy modules like `networkx`, `gitpython`, or complex local modules are imported at the global module level.
+
+Action:
+Use lazy loading by moving heavy module imports inside the specific command functions where they are utilized, keeping the top-level namespace lean.
