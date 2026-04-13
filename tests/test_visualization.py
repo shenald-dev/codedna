@@ -1,5 +1,7 @@
 """Tests for visualization modules."""
 
+import html
+
 import pytest
 
 from codedna.visualization.html_export import HTMLExporter
@@ -63,9 +65,9 @@ class TestHTMLExporter:
     def test_export_with_mermaid_graph(self, mock_profile):
         exporter = HTMLExporter()
         custom_graph = "graph TD\n  A --> B"
-        html = exporter.export(mock_profile, custom_graph)
-        assert custom_graph in html
-        assert "graph LR\n  A[No connection data found]" not in html
+        html_out = exporter.export(mock_profile, custom_graph)
+        assert html.escape(custom_graph) in html_out
+        assert "graph LR\n  A[No connection data found]" not in html_out
 
     def test_export_no_github(self, mock_profile):
         exporter = HTMLExporter()
