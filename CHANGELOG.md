@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.9] - 2026-04-16
+
+### Changed
+* **Security:** Mitigated Cross-Site Scripting (XSS) vulnerabilities in HTML report generation by utilizing `html.escape` to sanitize untrusted interpolations in templates within `html_export.py`.
+* **Reliability:** Upgraded outdated dependency `greenlet` from 3.3.2 to 3.4.0 to resolve environmental skew.
+* **Cleanup:** Removed dead `CacheManager` module caching boilerplate which caused high cache miss-rates.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed

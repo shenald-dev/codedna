@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import html as html_lib
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,6 +156,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+
+
 class HTMLExporter:
     """Exports a DNA profile to an interactive HTML dashboard."""
 
@@ -165,16 +169,22 @@ class HTMLExporter:
         if profile.get("github"):
             gh = profile["github"]
             if gh.get("is_github"):
+                stars = gh.get("stars", 0)
+                stars_str = f"{stars:,}" if isinstance(stars, (int, float)) else html_lib.escape(str(stars))
+                forks = gh.get("forks", 0)
+                forks_str = f"{forks:,}" if isinstance(forks, (int, float)) else html_lib.escape(str(forks))
+                issues = gh.get("issues", 0)
+                issues_str = f"{issues:,}" if isinstance(issues, (int, float)) else html_lib.escape(str(issues))
                 github_stats = f"""
                 <div class="flex items-center gap-4 mt-3 text-sm font-medium text-slate-400">
-                    <span class="flex items-center gap-1"><span class="text-yellow-400">★</span> {gh.get('stars', 0):,}</span>  # noqa: E501
-                    <span class="flex items-center gap-1"><span class="text-slate-300">⑂</span> {gh.get('forks', 0):,}</span>  # noqa: E501
-                    <span class="flex items-center gap-1"><span class="text-green-400">⊙</span> {gh.get('issues', 0):,} issues</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-yellow-400">★</span> {stars_str}</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-slate-300">⑂</span> {forks_str}</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-green-400">⊙</span> {issues_str} issues</span>  # noqa: E501
                 </div>
                 """
 
         # Format Health
-        health_score = profile["health"]["overall"]
+        health_score = html_lib.escape(str(profile["health"]["overall"]))
         health_color = (
             "text-green-400" if health_score == "Healthy"
             else "text-yellow-400" if health_score == "Fair"
@@ -186,15 +196,18 @@ class HTMLExporter:
         lang_bars = []
         for lang, data in profile.get("languages", {}).get("languages", {}).items():
             pct = data['percentage']
+            pct_escaped = html_lib.escape(str(pct))
             color = self._lang_tw_color(lang)
+            lang_escaped = html_lib.escape(str(lang))
+            files_escaped = html_lib.escape(str(data['files']))
             lang_bars.append(f"""
             <div>
                 <div class="flex justify-between text-sm mb-1">
-                    <span class="font-medium text-slate-200">{lang}</span>
-                    <span class="text-slate-400">{pct}% <span class="text-xs ml-1">({data['files']} files)</span></span>  # noqa: E501
+                    <span class="font-medium text-slate-200">{lang_escaped}</span>
+                    <span class="text-slate-400">{pct_escaped}% <span class="text-xs ml-1">({files_escaped} files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="{color} h-2 rounded-full" style="width: {pct}%"></div>
+                    <div class="{color} h-2 rounded-full" style="width: {pct_escaped}%"></div>
                 </div>
             </div>
             """)
@@ -207,12 +220,12 @@ class HTMLExporter:
         else:
             for risk in risks:
                 icon = "🔴" if "🔴" in risk else "🟡"
-                clean_risk = risk.replace("🔴 ", "").replace("🟡 ", "")
+                clean_risk = html_lib.escape(str(risk.replace("🔴 ", "").replace("🟡 ", "")))
                 risk_html += f'<li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">{icon}</span><span>{clean_risk}</span></li>'  # noqa: E501
 
         # Architecture Traits
         traits = profile.get("architecture", {}).get("traits", [])
-        traits_html = "".join(f'<li class="flex items-center gap-2"><span class="text-green-400">✓</span> {t}</li>' for t in traits)  # noqa: E501
+        traits_html = "".join(f'<li class="flex items-center gap-2"><span class="text-green-400">✓</span> {html_lib.escape(str(t))}</li>' for t in traits)  # noqa: E501
         if not traits_html:
             traits_html = '<li class="text-slate-500 italic">No standard traits detected</li>'
 
@@ -220,14 +233,17 @@ class HTMLExporter:
         devs = profile.get("developer_genome", {}).get("top_contributors", [])
         devs_html = ""
         for d in devs:
+            name_escaped = html_lib.escape(str(d.get('name', '')))
+            role_escaped = html_lib.escape(str(d.get('role', '')))
+            commits_escaped = html_lib.escape(str(d.get('commits', '')))
             devs_html += f"""
             <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded">
                 <div>
-                    <p class="text-sm font-medium text-slate-200">{d['name']}</p>
-                    <p class="text-xs text-cyan-400">{d['role']}</p>
+                    <p class="text-sm font-medium text-slate-200">{name_escaped}</p>
+                    <p class="text-xs text-cyan-400">{role_escaped}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm font-bold text-white">{d['commits']}</p>
+                    <p class="text-sm font-bold text-white">{commits_escaped}</p>
                     <p class="text-xs text-slate-500">commits</p>
                 </div>
             </div>
@@ -235,30 +251,34 @@ class HTMLExporter:
 
         # Evolution Patterns
         evo_patterns = profile.get("evolution", {}).get("patterns", [])
-        evo_html = "".join(f'<span class="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-xs">{p}</span>' for p in evo_patterns)  # noqa: E501
+        evo_html = "".join(f'<span class="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-xs">{html_lib.escape(str(p))}</span>' for p in evo_patterns)  # noqa: E501
 
         # Mermaid Fallback
         if not mermaid_graph:
             mermaid_graph = "graph LR\n  A[No connection data found]"
+        mermaid_graph_escaped = html_lib.escape(str(mermaid_graph))
+
+        first_commit = profile["evolution"].get("first_commit")
+        first_commit_escaped = html_lib.escape(str(first_commit)[:10]) if first_commit else "Unknown"
 
         html = HTML_TEMPLATE.format(
-            source=profile["metadata"]["source"],
-            analyzed_at=profile["metadata"]["analyzed_at"][:10],
+            source=html_lib.escape(str(profile["metadata"]["source"])),
+            analyzed_at=html_lib.escape(str(profile["metadata"]["analyzed_at"])[:10]),
             github_stats=github_stats,
-            signature=profile["signature"],
-            system_type=profile["system_type"],
+            signature=html_lib.escape(str(profile["signature"])),
+            system_type=html_lib.escape(str(profile["system_type"])),
             health_score=health_score,
             health_color=health_color,
-            total_files=profile["structure_stats"]["total_files"],
-            total_contributors=profile["developer_genome"]["total_contributors"],
-            mermaid_graph=mermaid_graph,
+            total_files=html_lib.escape(str(profile["structure_stats"]["total_files"])),
+            total_contributors=html_lib.escape(str(profile["developer_genome"]["total_contributors"])),
+            mermaid_graph=mermaid_graph_escaped,
             language_bars="\n".join(lang_bars),
             risk_signals=risk_html,
             architecture_traits=traits_html,
-            bus_factor=profile["developer_genome"]["bus_factor"],
+            bus_factor=html_lib.escape(str(profile["developer_genome"]["bus_factor"])),
             top_contributors=devs_html,
-            total_commits=profile["evolution"]["total_commits"],
-            first_commit=profile["evolution"].get("first_commit", "")[:10] if profile["evolution"].get("first_commit") else "Unknown",  # noqa: E501
+            total_commits=html_lib.escape(str(profile["evolution"]["total_commits"])),
+            first_commit=first_commit_escaped,
             evolution_patterns=evo_html
         )
 

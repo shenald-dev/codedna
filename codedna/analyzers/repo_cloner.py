@@ -6,8 +6,6 @@ from pathlib import Path
 
 from rich.console import Console
 
-from .cache_manager import CacheManager
-
 console = Console()
 
 
@@ -16,9 +14,9 @@ class RepoCloner:
 
     def __init__(self, cache_dir: str | None = None):
         if cache_dir is None:
-            base_dir = Path(CacheManager().cache_dir)
+            base_dir = Path(".codedna_cache")
             self.cache_dir = base_dir / "repos"
-            self.cache_dir.mkdir(exist_ok=True)
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
         else:
             self.cache_dir = Path(cache_dir)
 
