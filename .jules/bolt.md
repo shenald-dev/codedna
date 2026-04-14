@@ -29,3 +29,6 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+2025-03-01 — HTML Exporter XSS Vulnerability & CLI Startup Time
+Learning: String interpolation in HTML templates using untrusted repository metadata exposes the application to XSS; additionally, loading heavy visualization/analysis libraries at the global scope significantly harms CLI startup performance.
+Action: Always apply standard library `html.escape` to dynamically interpolated fields in HTML contexts, and lazily load heavy modules within command entry points.

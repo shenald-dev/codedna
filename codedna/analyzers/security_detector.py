@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import bisect
+import json
 import re
 from pathlib import Path
 
@@ -116,7 +117,6 @@ class SecurityDetector:
 
     def _check_package_manifest(self, content: str, relative: str, vulnerabilities: list):
         """Scans package.json for known bad practices or dangerous dependencies."""
-        import json
         try:
             data = json.loads(content)
             deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
