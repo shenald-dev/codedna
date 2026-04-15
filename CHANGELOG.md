@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.9] - 2026-04-15
+
+### Changed
+* **Cleanup:** Pruned orphaned auto-generated artifacts (`reports/dna_dashboard.html`, `reports/dna_profile.json`, `reports/dna_report.md`) from repository and added `reports/` to `.gitignore` to prevent tracking entropy.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed
