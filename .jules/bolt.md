@@ -29,3 +29,11 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+
+## 2026-04-15 — Security Improvement: Prevented XSS in HTML Dashboard Generation
+
+Learning:
+Generating HTML dashboards from untrusted repository metadata (e.g., in `html_export.py`) without escaping interpolated data allows for Cross-Site Scripting (XSS) attacks. Additionally, numerical format specifiers in f-strings must be used carefully, as applying them to non-numeric strings during injection attempts can cause exceptions.
+
+Action:
+I used `html.escape(str(var))` on all dynamically interpolated data points within `html_export.py` to prevent XSS. For numeric values that are formatted with specifiers like `:,`, I implemented a check `isinstance(val, (int, float))` before formatting to avoid `ValueError`s when the data turns out to be an injected string.

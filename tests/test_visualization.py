@@ -64,7 +64,8 @@ class TestHTMLExporter:
         exporter = HTMLExporter()
         custom_graph = "graph TD\n  A --> B"
         html = exporter.export(mock_profile, custom_graph)
-        assert custom_graph in html
+        # Check for escaped characters as HTMLExporter now escapes output
+        assert "graph TD\n  A --&gt; B" in html
         assert "graph LR\n  A[No connection data found]" not in html
 
     def test_export_no_github(self, mock_profile):
