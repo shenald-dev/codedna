@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import html as html_lib
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -208,11 +210,12 @@ class HTMLExporter:
             for risk in risks:
                 icon = "🔴" if "🔴" in risk else "🟡"
                 clean_risk = risk.replace("🔴 ", "").replace("🟡 ", "")
-                risk_html += f'<li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">{icon}</span><span>{clean_risk}</span></li>'  # noqa: E501
+                clean_risk_esc = html_lib.escape(str(clean_risk))
+                risk_html += f'<li class="flex items-start gap-2 text-slate-300"><span class="shrink-0">{icon}</span><span>{clean_risk_esc}</span></li>'  # noqa: E501
 
         # Architecture Traits
         traits = profile.get("architecture", {}).get("traits", [])
-        traits_html = "".join(f'<li class="flex items-center gap-2"><span class="text-green-400">✓</span> {t}</li>' for t in traits)  # noqa: E501
+        traits_html = "".join(f'<li class="flex items-center gap-2"><span class="text-green-400">✓</span> {html_lib.escape(str(t))}</li>' for t in traits)  # noqa: E501
         if not traits_html:
             traits_html = '<li class="text-slate-500 italic">No standard traits detected</li>'
 
@@ -220,14 +223,17 @@ class HTMLExporter:
         devs = profile.get("developer_genome", {}).get("top_contributors", [])
         devs_html = ""
         for d in devs:
+            name_esc = html_lib.escape(str(d['name']))
+            role_esc = html_lib.escape(str(d['role']))
+            commits_esc = html_lib.escape(str(d['commits']))
             devs_html += f"""
             <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded">
                 <div>
-                    <p class="text-sm font-medium text-slate-200">{d['name']}</p>
-                    <p class="text-xs text-cyan-400">{d['role']}</p>
+                    <p class="text-sm font-medium text-slate-200">{name_esc}</p>
+                    <p class="text-xs text-cyan-400">{role_esc}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm font-bold text-white">{d['commits']}</p>
+                    <p class="text-sm font-bold text-white">{commits_esc}</p>
                     <p class="text-xs text-slate-500">commits</p>
                 </div>
             </div>
@@ -235,30 +241,30 @@ class HTMLExporter:
 
         # Evolution Patterns
         evo_patterns = profile.get("evolution", {}).get("patterns", [])
-        evo_html = "".join(f'<span class="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-xs">{p}</span>' for p in evo_patterns)  # noqa: E501
+        evo_html = "".join(f'<span class="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-xs">{html_lib.escape(str(p))}</span>' for p in evo_patterns)  # noqa: E501
 
         # Mermaid Fallback
         if not mermaid_graph:
             mermaid_graph = "graph LR\n  A[No connection data found]"
 
         html = HTML_TEMPLATE.format(
-            source=profile["metadata"]["source"],
-            analyzed_at=profile["metadata"]["analyzed_at"][:10],
+            source=html_lib.escape(str(profile["metadata"]["source"])),
+            analyzed_at=html_lib.escape(str(profile["metadata"]["analyzed_at"][:10])),
             github_stats=github_stats,
-            signature=profile["signature"],
-            system_type=profile["system_type"],
-            health_score=health_score,
-            health_color=health_color,
-            total_files=profile["structure_stats"]["total_files"],
-            total_contributors=profile["developer_genome"]["total_contributors"],
-            mermaid_graph=mermaid_graph,
+            signature=html_lib.escape(str(profile["signature"])),
+            system_type=html_lib.escape(str(profile["system_type"])),
+            health_score=html_lib.escape(str(health_score)),
+            health_color=health_color,  # Safe class string
+            total_files=html_lib.escape(str(profile["structure_stats"]["total_files"])),
+            total_contributors=html_lib.escape(str(profile["developer_genome"]["total_contributors"])),
+            mermaid_graph=html_lib.escape(str(mermaid_graph)),
             language_bars="\n".join(lang_bars),
             risk_signals=risk_html,
             architecture_traits=traits_html,
-            bus_factor=profile["developer_genome"]["bus_factor"],
+            bus_factor=html_lib.escape(str(profile["developer_genome"]["bus_factor"])),
             top_contributors=devs_html,
-            total_commits=profile["evolution"]["total_commits"],
-            first_commit=profile["evolution"].get("first_commit", "")[:10] if profile["evolution"].get("first_commit") else "Unknown",  # noqa: E501
+            total_commits=html_lib.escape(str(profile["evolution"]["total_commits"])),
+            first_commit=html_lib.escape(str(profile["evolution"].get("first_commit", "")[:10] if profile["evolution"].get("first_commit") else "Unknown")),  # noqa: E501
             evolution_patterns=evo_html
         )
 

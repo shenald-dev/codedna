@@ -29,3 +29,6 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+2024-05-24 — Resolved XSS vulnerabilities in HTML Exporter
+Learning: Interpolating untrusted parsed codebase data directly into HTML dashboards enables Cross-Site Scripting (XSS) if the data is intentionally malicious.
+Action: Always wrap variables explicitly cast to strings inside `html.escape(str(var))` before format string interpolation when generating markup to harden the reporting pipeline.
