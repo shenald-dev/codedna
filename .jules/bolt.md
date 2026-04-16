@@ -30,6 +30,10 @@ Security scanners like `SecurityDetector` will often flag their own source code 
 Action:
 Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
 
+## 2026-04-15 — Startup Time Optimization in CLI
+Learning: Global imports of heavy libraries like `rich` and many analyzer modules in `codedna/cli.py` were adding ~0.25 seconds of startup latency, even when simply querying the `--help` menu.
+Action: Moved all non-essential analyzer and visualization imports (e.g., `rich.console`, `CodeSmellDetector`, `LanguageDetector`) from the global scope in `codedna/cli.py` into the `analyze` command function itself. This defers their execution until the actual heavy command runs, reducing `--help` execution time from ~0.24s down to ~0.06s.
+
 ## 2026-04-15 — Security Improvement: Prevented XSS in HTML Dashboard Generation
 
 Learning:
