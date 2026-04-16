@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.9] - 2026-04-16
+
+### Changed
+* **Code Quality:** Fixed `SecurityDetector` to properly obfuscate hardcoded dummy secrets and regex pattern strings in `tests/test_analyzers.py` and its own source code, preventing false positives when CodeDNA runs a self-analysis.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed
