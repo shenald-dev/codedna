@@ -84,5 +84,26 @@ class TestHTMLExporter:
     def test_export_no_traits(self, mock_profile):
         exporter = HTMLExporter()
         mock_profile["architecture"]["traits"] = []
-        html = exporter.export(mock_profile, "")
-        assert "No standard traits detected" in html
+        html_out = exporter.export(mock_profile, "")
+        assert "No standard traits detected" in html_out
+
+    def test_export_xss_protection(self, mock_profile):
+        exporter = HTMLExporter()
+        malicious_payload = "<script>alert('XSS')</script>"
+
+        # Inject malicious payload into several fields
+        mock_profile["metadata"]["source"] = malicious_payload
+        mock_profile["developer_genome"]["top_contributors"][0]["name"] = malicious_payload
+        mock_profile["risks"] = [malicious_payload]
+        mock_profile["architecture"]["traits"] = [malicious_payload]
+        mock_profile["github"]["stars"] = malicious_payload
+
+        html_out = exporter.export(mock_profile, "")
+
+        escaped_payload = html.escape(malicious_payload)
+
+        # Ensure the unescaped payload does NOT exist in the output
+        assert malicious_payload not in html_out
+
+        # Ensure the escaped version DOES exist
+        assert escaped_payload in html_out
