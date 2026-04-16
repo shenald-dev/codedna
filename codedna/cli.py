@@ -44,6 +44,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.8[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
+    # Lazy import to optimize CLI startup time
     from .analyzers.repo_cloner import RepoCloner
     cloner = RepoCloner()
 
@@ -60,18 +61,21 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 2: Language Detection ──
             progress.update(task, description="🔍 Detecting languages...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.language_detector import LanguageDetector
             languages = LanguageDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] Found {len(languages.get('languages', {}))} languages")  # noqa: E501
 
             # ── Stage 3: Structure Analysis ──
             progress.update(task, description="📁 Analyzing structure...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.structure_analyzer import StructureAnalyzer
             structure = StructureAnalyzer().analyze(repo_path)
             progress.update(task, description=f"[green]✓[/] {structure.get('total_files', 0)} files analyzed")  # noqa: E501
 
             # ── Stage 4: Dependency Mapping ──
             progress.update(task, description="🔗 Mapping dependencies...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.dependency_mapper import DependencyMapper
             mapper = DependencyMapper()
             dependencies = mapper.map(repo_path)
@@ -80,42 +84,49 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             # ── Stage 5: Architecture Detection ──
             progress.update(task, description="🏗️ Detecting architecture patterns...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.architecture_detector import ArchitectureDetector
             architecture = ArchitectureDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] Pattern: {architecture.get('primary_pattern', '?')}")  # noqa: E501
 
             # ── Stage 6: Code Smell Detection ──
             progress.update(task, description="🐛 Scanning for code smells...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.code_smell_detector import CodeSmellDetector
             smells = CodeSmellDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] {smells.get('total', 0)} issues found")
 
             # ── Stage 6.5: Security Scanning ──
             progress.update(task, description="🔒 Scanning for security vulnerabilities...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.security_detector import SecurityDetector
             security = SecurityDetector().detect(repo_path)
             progress.update(task, description=f"[green]✓[/] {security.get('total_critical', 0)} critical vulnerabilities")  # noqa: E501
 
             # ── Stage 7: Developer Analysis ──
             progress.update(task, description="👥 Analyzing developer behavior...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.developer_analyzer import DeveloperAnalyzer
             developers = DeveloperAnalyzer().analyze(repo_path, max_commits=depth)
             progress.update(task, description=f"[green]✓[/] {developers.get('total_contributors', 0)} contributors")  # noqa: E501
 
             # ── Stage 8: Evolution Engine ──
             progress.update(task, description="📈 Tracking evolution...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.evolution_engine import EvolutionEngine
             evolution = EvolutionEngine().analyze(repo_path)
             progress.update(task, description="[green]✓[/] Evolution timeline built")
 
             # ── Stage 8.5: GitHub Analysis ──
             progress.update(task, description="🌐 Fetching GitHub community stats...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.github_analyzer import GitHubAnalyzer
             github_stats = GitHubAnalyzer().analyze(source)
             progress.update(task, description="[green]✓[/] GitHub stats retrieved")
 
             # ── Stage 9: DNA Generation ──
             progress.update(task, description="🧬 Generating DNA profile...")
+            # Lazy import to optimize CLI startup time
             from .analyzers.dna_generator import DNAGenerator
             generator = DNAGenerator()
             profile = generator.generate(
@@ -135,6 +146,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             # ── Stage 10: AI Synthesis ──
             if ai:
                 progress.update(task, description="🧠 Synthesizing executive insights via AI...")
+                # Lazy import to optimize CLI startup time
                 from .analyzers.ai_analyzer import AIAnalyzer
                 ai_result = AIAnalyzer().synthesize(profile)
                 if ai_result.success:
@@ -149,6 +161,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
         # ── Render to terminal ──
         if not no_visualize:
+            # Lazy import to optimize CLI startup time
             from .visualization.renderer import Renderer
             Renderer().render_dna_profile(profile)
 
@@ -169,6 +182,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
             if fmt in ("html", "all"):
                 html_path = output_dir / "dna_dashboard.html"
+                # Lazy import to optimize CLI startup time
                 from .visualization.html_export import HTMLExporter
                 exporter = HTMLExporter()
                 html_path.write_text(exporter.export(profile, mermaid_graph), encoding="utf-8")
