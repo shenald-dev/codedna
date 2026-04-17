@@ -52,10 +52,22 @@ class Renderer:
             bar_len = max(1, int(data["percentage"] / 5))
             bar = "█" * bar_len + "░" * (20 - bar_len)
             color = self._lang_color(lang)
+
+            lines_val = data['lines']
+            if isinstance(lines_val, str):
+                try:
+                    lines_val = float(lines_val)
+                    if lines_val.is_integer():
+                        lines_val = int(lines_val)
+                except ValueError:
+                    pass
+
+            lines_str = f"{lines_val:,}" if isinstance(lines_val, (int, float)) else str(lines_val)
+
             table.add_row(
                 lang,
                 str(data["files"]),
-                f"{data['lines']:,}",
+                lines_str,
                 f"{data['percentage']}%",
                 f"[{color}]{bar}[/]",
             )

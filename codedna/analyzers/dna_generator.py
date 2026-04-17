@@ -95,7 +95,21 @@ class DNAGenerator:
 
         if profile.get("github", {}).get("is_github"):
             gh = profile["github"]
-            lines.append(f"> ⭐️ {gh.get('stars', 0):,} Stars | 🔱 {gh.get('forks', 0):,} Forks | 🐛 {gh.get('issues', 0):,} Issues\n")  # noqa: E501
+            def _fmt_num(val):
+                if isinstance(val, str):
+                    try:
+                        val = float(val)
+                        if val.is_integer():
+                            val = int(val)
+                    except ValueError:
+                        pass
+                return f"{val:,}" if isinstance(val, (int, float)) else str(val)
+
+            stars_str = _fmt_num(gh.get('stars', 0))
+            forks_str = _fmt_num(gh.get('forks', 0))
+            issues_str = _fmt_num(gh.get('issues', 0))
+
+            lines.append(f"> ⭐️ {stars_str} Stars | 🔱 {forks_str} Forks | 🐛 {issues_str} Issues\n")  # noqa: E501
         else:
             lines.append("\n")
 
@@ -127,7 +141,16 @@ class DNAGenerator:
             lines.append("|----------|-------|-------|-------|")
             for lang, data in lang_data["languages"].items():
                 bar = "█" * max(1, int(data["percentage"] / 5))
-                lines.append(f"| {lang} | {data['files']} | {data['lines']:,} | {data['percentage']}% `{bar}` |")  # noqa: E501
+                lines_val = data['lines']
+                if isinstance(lines_val, str):
+                    try:
+                        lines_val = float(lines_val)
+                        if lines_val.is_integer():
+                            lines_val = int(lines_val)
+                    except ValueError:
+                        pass
+                lines_str = f"{lines_val:,}" if isinstance(lines_val, (int, float)) else str(lines_val)
+                lines.append(f"| {lang} | {data['files']} | {lines_str} | {data['percentage']}% `{bar}` |")  # noqa: E501
             lines.append("")
 
         # Health

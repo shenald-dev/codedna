@@ -102,3 +102,19 @@ class TestHTMLExporter:
         assert "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" in html
         assert "&lt;img src=x onerror=alert(1)&gt;" in html
         assert "&lt;b onmouseover=alert(1)&gt;Risk&lt;/b&gt;" in html
+
+    def test_export_string_numeric_values(self, mock_profile):
+        exporter = HTMLExporter()
+        mock_profile["languages"]["languages"]["Python"]["lines"] = "100.5"
+        mock_profile["github"]["stars"] = "1000"
+        mock_profile["github"]["forks"] = "bad"
+        mock_profile["github"]["issues"] = "2.0"
+
+        # This shouldn't raise a ValueError
+        html = exporter.export(mock_profile, "")
+
+        # Check that the formatted values appear in the HTML
+        assert "100.5" in html or "100" in html # lines, it might not render the exact string if it isn't cast correctly
+        assert "1,000" in html # stars
+        assert "bad" in html # forks
+        assert "2 issues" in html # issues

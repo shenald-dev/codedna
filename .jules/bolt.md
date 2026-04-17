@@ -40,3 +40,10 @@ Found lazy imports (`import bisect`, `import json`) deep inside loop iterations 
 
 Action:
 Relocated standard library imports to the module level to improve execution speed for repetitive repository scans without negatively impacting startup latency.
+## 2026-04-17 — Prevent formatting exceptions on parsed JSON data
+
+Learning:
+When interpolating API or untrusted parsed JSON data into numeric f-string formats (like `{val:,}` for commas or `{val:.2f}` for precision), python will raise a `ValueError` if the data is a string instead of a float/int. Data retrieved from sources like GitHub API or JSON payload can unexpectedly return strings.
+
+Action:
+Always explicitly check `isinstance(val, (int, float))` or attempt a cast before applying numeric format specifiers to external/parsed data to prevent runtime crashes.
