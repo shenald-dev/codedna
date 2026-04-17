@@ -32,3 +32,11 @@ Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime
 ## 2026-04-15 — Startup Time Optimization in CLI
 Learning: Global imports of heavy libraries like `rich` and many analyzer modules in `codedna/cli.py` were adding ~0.25 seconds of startup latency, even when simply querying the `--help` menu.
 Action: Moved all non-essential analyzer and visualization imports (e.g., `rich.console`, `CodeSmellDetector`, `LanguageDetector`) from the global scope in `codedna/cli.py` into the `analyze` command function itself. This defers their execution until the actual heavy command runs, reducing `--help` execution time from ~0.24s down to ~0.06s.
+
+## $(date +%Y-%m-%d) — Optimize import performance
+
+Learning:
+Found lazy imports (`import bisect`, `import json`) deep inside loop iterations (`CodeSmellDetector.detect`) and frequently called methods (`SecurityDetector._check_package_manifest`). While useful for startup time, repeating these in hot paths or loops creates unnecessary overhead.
+
+Action:
+Relocated standard library imports to the module level to improve execution speed for repetitive repository scans without negatively impacting startup latency.

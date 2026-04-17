@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import bisect
 import re
 from pathlib import Path
 
@@ -70,7 +71,6 @@ class CodeSmellDetector:
                 })
 
             # ── TODO/FIXME/HACK markers ──
-            import bisect
             newline_positions = None
             for match in MARKER_PATTERN.finditer(content):
                 if newline_positions is None:
