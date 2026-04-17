@@ -84,3 +84,21 @@ class TestHTMLExporter:
         mock_profile["architecture"]["traits"] = []
         html = exporter.export(mock_profile, "")
         assert "No standard traits detected" in html
+
+    def test_export_xss_escaping(self, mock_profile):
+        exporter = HTMLExporter()
+        mock_profile["metadata"]["source"] = "<script>alert('xss')</script>"
+        mock_profile["developer_genome"]["top_contributors"][0]["name"] = "<img src=x onerror=alert(1)>"
+        mock_profile["risks"] = ["🔴 <b onmouseover=alert(1)>Risk</b>"]
+
+        html = exporter.export(mock_profile, "")
+
+        # Original XSS strings should not be in the output
+        assert "<script>alert('xss')</script>" not in html
+        assert "<img src=x onerror=alert(1)>" not in html
+        assert "<b onmouseover=alert(1)>Risk</b>" not in html
+
+        # Escaped versions should be in the output
+        assert "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" in html
+        assert "&lt;img src=x onerror=alert(1)&gt;" in html
+        assert "&lt;b onmouseover=alert(1)&gt;Risk&lt;/b&gt;" in html

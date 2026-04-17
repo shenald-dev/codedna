@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.9] - 2026-04-17
+
+### Fixed
+* **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in `html_export.py` by ensuring all profile data interpolated into the HTML templates is properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs.
+
 ## [1.0.8] - 2026-04-16
 
 ### Changed

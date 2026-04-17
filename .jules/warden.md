@@ -38,3 +38,9 @@ Observation / Pruned:
 Discovered that `DependencyMapper` was vulnerable to exponential time hangs and OOM errors when processing dense circular dependencies in `nx.simple_cycles`. The previous agent optimized it by bounding evaluation to the first 10 cycles using `itertools.islice`, along with a defensive try/except block.
 Alignment / Deferred:
 Synchronized the changelog to reflect the `DependencyMapper` reliability optimization. Bounded execution ensures large or complex codebases will no longer crash the pipeline. Version bumped to 1.0.7.
+
+2026-04-17 — Assessment & Lifecycle
+Observation / Pruned:
+Discovered a Cross-Site Scripting (XSS) vulnerability in `codedna/visualization/html_export.py` where user-controlled repository metadata (such as repo source, developer names, and risk signals) was directly interpolated into HTML templates without sanitization. This allowed execution of malicious scripts if untrusted profiles were rendered into dashboards. Added an adversarial test in `tests/test_visualization.py` to prevent regressions.
+Alignment / Deferred:
+Enforced HTML escaping for all profile data bindings within `HTMLExporter` using `html.escape` while correctly mapping the module as `html_lib` to avoid shadowing. Synchronized the changelog to reflect the security update and bumped the version to 1.0.9. No upgrades deferred.
