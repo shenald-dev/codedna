@@ -167,11 +167,25 @@ class HTMLExporter:
         if profile.get("github"):
             gh = profile["github"]
             if gh.get("is_github"):
+                def _fmt_num(val):
+                    if isinstance(val, str):
+                        try:
+                            val = float(val)
+                            if val.is_integer():
+                                val = int(val)
+                        except ValueError:
+                            pass
+                    return f"{val:,}" if isinstance(val, (int, float)) else str(val)
+
+                stars_str = _fmt_num(gh.get('stars', 0))
+                forks_str = _fmt_num(gh.get('forks', 0))
+                issues_str = _fmt_num(gh.get('issues', 0))
+
                 github_stats = f"""
                 <div class="flex items-center gap-4 mt-3 text-sm font-medium text-slate-400">
-                    <span class="flex items-center gap-1"><span class="text-yellow-400">★</span> {gh.get('stars', 0):,}</span>  # noqa: E501
-                    <span class="flex items-center gap-1"><span class="text-slate-300">⑂</span> {gh.get('forks', 0):,}</span>  # noqa: E501
-                    <span class="flex items-center gap-1"><span class="text-green-400">⊙</span> {gh.get('issues', 0):,} issues</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-yellow-400">★</span> {stars_str}</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-slate-300">⑂</span> {forks_str}</span>  # noqa: E501
+                    <span class="flex items-center gap-1"><span class="text-green-400">⊙</span> {issues_str} issues</span>  # noqa: E501
                 </div>
                 """
 

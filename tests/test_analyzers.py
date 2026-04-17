@@ -239,3 +239,22 @@ class TestDNAGenerator:
         md = gen.to_markdown(profile)
         assert "CodeDNA Profile" in md
         assert "DNA Signature" in md
+
+    def test_to_markdown_string_numerics(self):
+        gen = DNAGenerator()
+        profile = gen.generate(
+            repo_source="test",
+            languages={"languages": {"Python": {"files": 3, "lines": "20.5", "percentage": 80}}, "primary": "Python", "total_files": 3, "total_lines": 20},  # noqa: E501
+            structure={"total_files": 0, "total_dirs": 0, "max_depth": 0, "modules": []},
+            dependencies={"total_modules": 0, "total_edges": 0, "density": 0, "has_circular_deps": False, "cycles": []},  # noqa: E501
+            architecture={"primary_pattern": "Unknown", "detected_patterns": [], "traits": [], "coupling": "Low"},  # noqa: E501
+            smells={"smells": [], "total": 0, "severity_counts": {}, "health_score": "Healthy"},
+            developers={"total_contributors": 0, "contributors": [], "bus_factor": 0},
+            evolution={"total_commits": 0, "patterns": []},
+            github={"is_github": True, "stars": "1000", "forks": "bad", "issues": "2.0"},
+        )
+        md = gen.to_markdown(profile)
+        assert "CodeDNA Profile" in md
+        assert "1,000" in md # stars
+        assert "bad" in md # forks
+        assert "2 Issues" in md # issues
