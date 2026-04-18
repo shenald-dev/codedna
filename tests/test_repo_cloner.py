@@ -21,13 +21,14 @@ class TestRepoCloner(unittest.TestCase):
             "--ext-cmd=touch pwned",
             " -u http://evil.com",
             "\t--help",
+            "fd::",
         ]
 
         for source in malicious_sources:
             with self.subTest(source=source):
                 with self.assertRaises(ValueError) as cm:
                     self.cloner.clone(source)
-                self.assertIn("Invalid repository source", str(cm.exception))
+                self.assertTrue("Invalid repository source" in str(cm.exception) or "Unauthorized URL scheme" in str(cm.exception))
                 git.Repo.clone_from.assert_not_called()
 
     def test_clone_with_valid_source(self):
