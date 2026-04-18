@@ -86,10 +86,16 @@ class LanguageDetector:
                 counter[lang] += 1
                 total_files += 1
                 try:
-                    with file_path.open(encoding="utf-8", errors="ignore") as f:
-                        lines = sum(1 for _ in f)
+                    with file_path.open("rb") as f:
+                        lines = 0
+                        last_chunk = b''
+                        for chunk in iter(lambda: f.read(65536), b''):
+                            lines += chunk.count(b'\n')
+                            last_chunk = chunk
+                        if last_chunk and not last_chunk.endswith(b'\n'):
+                            lines += 1
                     line_counter[lang] += lines
-                except (OSError, UnicodeDecodeError):
+                except OSError:
                     pass
 
         if not counter:
