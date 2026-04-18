@@ -44,3 +44,9 @@ Observation / Pruned:
 Discovered a Cross-Site Scripting (XSS) vulnerability in `codedna/visualization/html_export.py` where user-controlled repository metadata (such as repo source, developer names, and risk signals) was directly interpolated into HTML templates without sanitization. This allowed execution of malicious scripts if untrusted profiles were rendered into dashboards. Added an adversarial test in `tests/test_visualization.py` to prevent regressions.
 Alignment / Deferred:
 Enforced HTML escaping for all profile data bindings within `HTMLExporter` using `html.escape` while correctly mapping the module as `html_lib` to avoid shadowing. Synchronized the changelog to reflect the security update and bumped the version to 1.0.9. No upgrades deferred.
+
+2026-04-18 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent introduced a fix to handle string formatting for numeric values within `_fmt_num` in `html_export.py` to prevent `ValueError` crashes. During adversarial QA, I discovered that the fallback branch returned unescaped string values `str(val)`, exposing an XSS vulnerability for malicious payload inputs like `<script>` in GitHub stats metrics (stars, forks, issues).
+Alignment / Deferred:
+Applied `html_lib.escape()` to the fallback `str(val)` return branch in `_fmt_num` to ensure all untrusted data rendered in the numeric formatters is sanitized. Added a targeted adversarial XSS test `test_export_github_stats_xss_escaping` to `tests/test_visualization.py`. Pruned zero files. Updated `CHANGELOG.md` and bumped the version to `1.0.10`.

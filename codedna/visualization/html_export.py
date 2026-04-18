@@ -175,7 +175,7 @@ class HTMLExporter:
                                 val = int(val)
                         except ValueError:
                             pass
-                    return f"{val:,}" if isinstance(val, (int, float)) else str(val)
+                    return f"{val:,}" if isinstance(val, (int, float)) else html_lib.escape(str(val))
 
                 stars_str = _fmt_num(gh.get('stars', 0))
                 forks_str = _fmt_num(gh.get('forks', 0))

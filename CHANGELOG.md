@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.10] - 2026-04-18
+
+### Fixed
+* **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in GitHub stats within `html_export.py` by ensuring non-numeric string values returned from the numeric formatter are properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs in GitHub metrics.
+
 ## [1.0.9] - 2026-04-17
 
 ### Fixed
