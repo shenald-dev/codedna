@@ -47,3 +47,10 @@ When interpolating API or untrusted parsed JSON data into numeric f-string forma
 
 Action:
 Always explicitly check `isinstance(val, (int, float))` or attempt a cast before applying numeric format specifiers to external/parsed data to prevent runtime crashes.
+## 2026-04-17 — Optimize import performance
+
+Learning:
+Found lazy imports (`import networkx`, `from git import Repo`, `from git.exc import InvalidGitRepositoryError`) inside loop iterations (`DependencyMapper.map`) and frequently called methods (`DeveloperAnalyzer.analyze`, `EvolutionEngine.analyze`, `RepoCloner.clone`). While lazy loading is generally useful for startup latency, repeating these in hot paths or core execution methods for analyzers creates unnecessary overhead during repository scans. Moving heavy library module instantiations entirely to module level removes this bottleneck completely. Furthermore, doing this in analyzers does not impact CLI startup, because the CLI lazy-loads the analyzers themselves.
+
+Action:
+Relocated the lazy load imports inside analyzer components (`networkx` in `dependency_mapper.py`, and `git` in `developer_analyzer.py`, `evolution_engine.py`, `repo_cloner.py`) to the module's top-level. This dramatically improves execution speed for repository scans while leaving startup latency (e.g., `codedna --help`) fully optimized.
