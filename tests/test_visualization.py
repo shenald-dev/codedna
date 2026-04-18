@@ -118,3 +118,21 @@ class TestHTMLExporter:
         assert "1,000" in html # stars
         assert "bad" in html # forks
         assert "2 issues" in html # issues
+
+    def test_export_github_stats_xss_escaping(self, mock_profile):
+        exporter = HTMLExporter()
+        mock_profile["github"]["stars"] = "<script>alert('stars')</script>"
+        mock_profile["github"]["forks"] = "<script>alert('forks')</script>"
+        mock_profile["github"]["issues"] = "<script>alert('issues')</script>"
+
+        html = exporter.export(mock_profile, "")
+
+        # Original XSS strings should not be in the output
+        assert "<script>alert('stars')</script>" not in html
+        assert "<script>alert('forks')</script>" not in html
+        assert "<script>alert('issues')</script>" not in html
+
+        # Escaped versions should be in the output
+        assert "&lt;script&gt;alert(&#x27;stars&#x27;)&lt;/script&gt;" in html
+        assert "&lt;script&gt;alert(&#x27;forks&#x27;)&lt;/script&gt;" in html
+        assert "&lt;script&gt;alert(&#x27;issues&#x27;)&lt;/script&gt;" in html
