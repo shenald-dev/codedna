@@ -66,6 +66,19 @@ class TestLanguageDetector:
         total_pct = sum(lang_data["percentage"] for lang_data in result["languages"].values())
         assert 99 <= total_pct <= 101  # Should sum to ~100%
 
+    def test_detects_lines_without_trailing_newline(self, tmp_path):
+        repo_dir = tmp_path / "repo_no_newline"
+        repo_dir.mkdir()
+        file_path = repo_dir / "test.py"
+        file_path.write_bytes(b"print('hello')")
+
+        detector = LanguageDetector()
+        result = detector.detect(repo_dir)
+
+        assert "Python" in result["languages"]
+        assert result["languages"]["Python"]["lines"] == 1
+        assert result["total_lines"] == 1
+
 
 class TestStructureAnalyzer:
     def test_analyze_structure(self, sample_repo):
