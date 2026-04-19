@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.11] - 2026-04-19
+
+### Changed
+* **Performance:** Move lazy imports to module level to eliminate the repeated `sys.modules` lookup overhead during large-scale repository scans.
+
 ## [1.0.10] - 2026-04-18
 
 ### Fixed
