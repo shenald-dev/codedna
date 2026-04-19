@@ -57,7 +57,7 @@ class RepoCloner:
              # Reject known dangerous schemes
             scheme = parsed.scheme.lower()
             # block some remote helpers and risky protocols, we already blocked ext::
-            if scheme in ("ext", "ftp", "ftps", "telnet"):
+            if scheme in ("ext", "ftp", "ftps", "telnet", "fd"):
                  raise ValueError(f"Unauthorized URL scheme: {parsed.scheme}")
 
         # Clone from URL
