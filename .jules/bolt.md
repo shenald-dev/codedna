@@ -75,3 +75,10 @@ Performing redundant sequential file system traversals to gather separate struct
 
 Action:
 Consolidated all structural analysis requirements into a single-pass DFS traversal using a stack. The analyzer now iteratively processes the file tree, updating dictionaries, tracking depths, and counting metrics simultaneously. This drops the operation from O(5N) to strictly O(N) and reduced execution time for the 20k file test from ~2.5s down to ~0.3s. Always aim to merge codebase scans into single-pass pipelines when parsing raw files.
+## $(date +%Y-%m-%d) — Performance Optimization: Eliminating Redundant O(N) Operations in Graph Building
+
+Learning:
+In `DependencyMapper`, the `build_mermaid` method was taking a `repo_path` and internally calling `self.map(repo_path)` to generate its data. This caused the CLI to execute the entire network graph parsing operation twice—once to get dependencies, and again to generate the mermaid graph, creating a severe performance bottleneck on large repositories.
+
+Action:
+To avoid redundant O(N) operations and expensive computations (like graph building or file parsing) in analyzers, pass pre-computed data structures to secondary functions (e.g., passing the result of `DependencyMapper.map` to `build_mermaid`) instead of recalculating them from the base repository path.

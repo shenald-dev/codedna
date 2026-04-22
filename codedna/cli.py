@@ -85,7 +85,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
             progress.update(task, description="🔗 Mapping dependencies...")
             mapper = DependencyMapper()
             dependencies = mapper.map(repo_path)
-            mermaid_graph = mapper.build_mermaid(repo_path)
+            mermaid_graph = mapper.build_mermaid(dependencies)
             progress.update(task, description=f"[green]✓[/] {dependencies.get('total_edges', 0)} dependency edges found")  # noqa: E501
 
             # ── Stage 5: Architecture Detection ──

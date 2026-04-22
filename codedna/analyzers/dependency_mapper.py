@@ -116,13 +116,12 @@ class DependencyMapper:
             "edges": edges[:100],  # Limit for output
         }
 
-    def build_mermaid(self, repo_path: Path) -> str:
-        """Generate a Mermaid diagram of the dependency graph."""
-        data = self.map(repo_path)
+    def build_mermaid(self, dependencies: dict) -> str:
+        """Generate a Mermaid diagram of the dependency graph from pre-computed data."""
         lines = ["graph LR"]
 
         seen = set()
-        for edge in data["edges"][:30]:  # Limit for readability
+        for edge in dependencies.get("edges", [])[:30]:  # Limit for readability
             src = edge["from"].replace(".", "_").replace("/", "_")
             tgt = edge["to"].replace(".", "_").replace("/", "_")
             key = f"{src}->{tgt}"
