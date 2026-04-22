@@ -105,7 +105,9 @@ class TestDependencyMapper:
         assert result["total_edges"] > 0
 
     def test_generates_mermaid(self, sample_repo):
-        mermaid = DependencyMapper().build_mermaid(sample_repo)
+        mapper = DependencyMapper()
+        data = mapper.map(sample_repo)
+        mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
 
 
