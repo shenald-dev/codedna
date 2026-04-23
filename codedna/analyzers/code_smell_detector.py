@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import bisect
 import re
 from pathlib import Path
 
@@ -71,24 +70,23 @@ class CodeSmellDetector:
                 })
 
             # ── TODO/FIXME/HACK markers ──
-            newline_positions = None
+            last_idx = 0
+            current_line = 1
             for match in MARKER_PATTERN.finditer(content):
-                if newline_positions is None:
-                    newline_positions = [m.start() for m in re.finditer(r'\n', content)]
-                line_no = bisect.bisect_right(newline_positions, match.start()) + 1
+                start_idx = match.start()
+                current_line += content.count('\n', last_idx, start_idx)
+                last_idx = start_idx
 
-                # Extract just the matched line directly to avoid full splitlines()
-                start_idx = 0 if line_no == 1 else newline_positions[line_no - 2] + 1
-                end_idx = (
-                    newline_positions[line_no - 1]
-                    if line_no <= len(newline_positions) else len(content)
-                )
-                line_text = content[start_idx:end_idx]
+                line_start = content.rfind('\n', 0, start_idx) + 1
+                line_end = content.find('\n', start_idx)
+                if line_end == -1:
+                    line_end = len(content)
+                line_text = content[line_start:line_end]
 
                 smells.append({
                     "type": "Code Marker",
                     "severity": "info",
-                    "file": f"{relative}:{line_no}",
+                    "file": f"{relative}:{current_line}",
                     "detail": f"{match.group(1).upper()} found: {line_text.strip()[:80]}",
                 })
 
