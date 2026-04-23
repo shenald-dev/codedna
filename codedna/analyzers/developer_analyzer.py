@@ -93,17 +93,31 @@ class DeveloperAnalyzer:
 
     def _detect_collaboration(self, contributor_files: dict) -> list[dict]:
         """Find pairs of developers who work on the same files."""
-        authors = list(contributor_files.keys())
-        pairs = []
+        file_to_authors = defaultdict(list)
+        for author, files in contributor_files.items():
+            for f in files:
+                file_to_authors[f].append(author)
 
-        for i, a1 in enumerate(authors):
-            for a2 in authors[i + 1:]:
-                shared = contributor_files[a1] & contributor_files[a2]
-                if len(shared) > 2:
-                    pairs.append({
-                        "pair": [a1, a2],
-                        "shared_files": len(shared),
-                    })
+        pair_counts = defaultdict(int)
+        for authors in file_to_authors.values():
+            num_authors = len(authors)
+            if num_authors > 1:
+                for i in range(num_authors):
+                    a1 = authors[i]
+                    for j in range(i + 1, num_authors):
+                        a2 = authors[j]
+                        if a1 > a2:
+                            pair_counts[(a2, a1)] += 1
+                        else:
+                            pair_counts[(a1, a2)] += 1
+
+        pairs = []
+        for (a1, a2), count in pair_counts.items():
+            if count > 2:
+                pairs.append({
+                    "pair": [a1, a2],
+                    "shared_files": count,
+                })
 
         pairs.sort(key=lambda x: x["shared_files"], reverse=True)
         return pairs

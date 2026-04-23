@@ -90,3 +90,17 @@ Calculating line numbers during regex parsing (`MARKER_PATTERN` and `SECRET_PATT
 
 Action:
 Replaced the `bisect.bisect_right` newline resolution in `code_smell_detector.py` and `security_detector.py` with sequential lazy counting. This acceleration allows CodeDNA to scale to massive files without hitting CPU latency bottlenecks during the regex scanning phase.
+
+## 2026-04-23 — Performance Optimization: O(A^2) Traversal Bottleneck in Developer Collaboration
+
+Learning:
+Calculating collaboration between developers by iterating over O(A^2) combinations of all authors and calculating set intersections of their modified files caused extreme slow-downs on repositories with many contributors.
+Action:
+Instead of `sum(1 for _ in pattern.finditer(content))` to count matches, use `len(pattern.findall(content))` which evaluates much faster natively in C. Inverted the mapping to track files to authors (`file -> list of authors`) and counted shared files by iterating over pairs of authors per file in a single pass. This drops the operation time dramatically by focusing on actual overlaps rather than evaluating mostly empty intersections.
+
+## 2026-04-23 — Performance Optimization: Regex Counting Bottleneck
+
+Learning:
+Using a generator expression like `sum(1 for _ in pattern.finditer(content))` to count regex matches incurs significant Python iteration overhead.
+Action:
+Use `len(pattern.findall(content))` to count regex matches, as `findall` computes the list natively in C and performs much faster when only the match count is needed.
