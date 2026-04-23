@@ -115,11 +115,11 @@ class CodeSmellDetector:
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""
         if ext == ".py":
-            return sum(1 for _ in PY_METHOD_PATTERN.finditer(content))
+            return len(PY_METHOD_PATTERN.findall(content))
         elif ext in (".js", ".ts", ".jsx", ".tsx"):
-            return sum(1 for _ in JS_METHOD_PATTERN.finditer(content))
+            return len(JS_METHOD_PATTERN.findall(content))
         elif ext == ".java":
-            return sum(1 for _ in JAVA_METHOD_PATTERN.finditer(content))
+            return len(JAVA_METHOD_PATTERN.findall(content))
         return 0
 
     def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int]]:
