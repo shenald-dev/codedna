@@ -50,3 +50,15 @@ class TestCodeSmellDetectorMinimal(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_detect_markers_edge_cases(self):
+        file_path = self.tmp_path / "test2.py"
+        file_path.write_text("TODO: fix this") # no newline
+        result = self.detector.detect(self.tmp_path)
+        smells = [s for s in result["smells"] if s["type"] == "Code Marker" and s["file"] == "test2.py:1"]
+        self.assertEqual(len(smells), 1)
+
+        file_path.write_text("\n\nTODO: fix this") # leading newlines
+        result = self.detector.detect(self.tmp_path)
+        smells = [s for s in result["smells"] if s["type"] == "Code Marker" and s["file"] == "test2.py:3"]
+        self.assertEqual(len(smells), 1)
