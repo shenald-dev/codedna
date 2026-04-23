@@ -104,3 +104,11 @@ Learning:
 Using a generator expression like `sum(1 for _ in pattern.finditer(content))` to count regex matches incurs significant Python iteration overhead.
 Action:
 Use `len(pattern.findall(content))` to count regex matches, as `findall` computes the list natively in C and performs much faster when only the match count is needed.
+
+## 2026-04-23 — Performance Optimization: O(V*E) Bottleneck in Betweenness Centrality
+
+Learning:
+Calculating exact betweenness centrality using `nx.betweenness_centrality(graph)` has a time complexity of O(V*E), which causes severe performance bottlenecks when building dependency maps for large codebases.
+
+Action:
+Used the `k` parameter to calculate an approximation based on a limited sample of nodes (`nx.betweenness_centrality(graph, k=min(50, len(graph.nodes)), seed=42)`). The `min()` check ensures small graphs don't trigger a `ValueError` for oversampling, and explicitly setting a `seed` guarantees deterministic outputs, preventing flaky tests.

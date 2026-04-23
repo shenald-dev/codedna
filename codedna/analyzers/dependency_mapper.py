@@ -89,7 +89,7 @@ class DependencyMapper:
         if len(graph.nodes) > 0:
             try:
                 pr = nx.pagerank(graph)
-                bc = nx.betweenness_centrality(graph)
+                bc = nx.betweenness_centrality(graph, k=min(50, len(graph.nodes)), seed=42)
                 centrality = {
                     node: {
                         "pagerank": round(pr.get(node, 0), 4),
