@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import bisect
 import json
 import re
 from pathlib import Path
@@ -56,12 +55,13 @@ class SecurityDetector:
                 continue
 
             # Check for secrets
-            newline_positions = None
             for secret_type, pattern in SECRET_PATTERNS.items():
                 hints = SECRET_HINTS.get(secret_type)
                 if hints and not any(hint in content for hint in hints):
                     continue
 
+                last_idx = 0
+                current_line = 1
                 for match in pattern.finditer(content):
                     # To avoid printing real secrets, we truncate/mask the matched value
                     matched_value = match.group(0)
@@ -70,19 +70,14 @@ class SecurityDetector:
                     else:
                         masked = "***"
 
-                    # Precompute newline positions for O(log N) line number lookups lazily
-                    # This avoids O(N^2) string slicing and count() overhead for files with many matches,  # noqa: E501
-                    # while keeping regex search over the full file to support multiline patterns.
-                    if newline_positions is None:
-                        newline_positions = [m.start() for m in re.finditer(r'\n', content)]
-
-                    # Get line number approximation using binary search
-                    line_no = bisect.bisect_right(newline_positions, match.start()) + 1
+                    start_idx = match.start()
+                    current_line += content.count('\n', last_idx, start_idx)
+                    last_idx = start_idx
 
                     vulnerabilities.append({
                         "type": "Hardcoded Secret",
                         "severity": "critical",
-                        "file": f"{relative}:{line_no}",
+                        "file": f"{relative}:{current_line}",
                         "detail": f"Detected {secret_type} ({masked})",
                     })
 
