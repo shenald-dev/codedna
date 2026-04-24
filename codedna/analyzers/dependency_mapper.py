@@ -54,6 +54,10 @@ class DependencyMapper:
     def map(self, repo_path: Path) -> dict:
         """Build dependency map for the repository.
 
+        Note: The betweenness centrality metric uses an approximation (k=50)
+        to ensure high-performance execution on large dependency graphs at the
+        trade-off of exact accuracy for less central nodes.
+
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
@@ -89,7 +93,7 @@ class DependencyMapper:
         if len(graph.nodes) > 0:
             try:
                 pr = nx.pagerank(graph)
-                bc = nx.betweenness_centrality(graph)
+                bc = nx.betweenness_centrality(graph, k=min(50, len(graph.nodes)), seed=42)
                 centrality = {
                     node: {
                         "pagerank": round(pr.get(node, 0), 4),
