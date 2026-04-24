@@ -54,6 +54,10 @@ class DependencyMapper:
     def map(self, repo_path: Path) -> dict:
         """Build dependency map for the repository.
 
+        Note: The betweenness centrality metric uses an approximation (k=50)
+        to ensure high-performance execution on large dependency graphs at the
+        trade-off of exact accuracy for less central nodes.
+
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
