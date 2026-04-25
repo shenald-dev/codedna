@@ -47,7 +47,7 @@ class DeveloperAnalyzer:
                 pass
 
         # Build contributor profiles
-        total_commits = sum(contributors.values()) or 1
+        total_commits = commit_count or 1
         contributor_list = []
         for author, count in contributors.most_common():
             role = self._classify_role(count, total_commits, len(contributor_files.get(author, set())))  # noqa: E501

@@ -112,3 +112,11 @@ Calculating exact betweenness centrality using `nx.betweenness_centrality(graph)
 
 Action:
 Used the `k` parameter to calculate an approximation based on a limited sample of nodes (`nx.betweenness_centrality(graph, k=min(50, len(graph.nodes)), seed=42)`). The `min()` check ensures small graphs don't trigger a `ValueError` for oversampling, and explicitly setting a `seed` guarantees deterministic outputs, preventing flaky tests.
+
+## 2026-04-25 — Optimization: Redundant Summation Replacement
+
+Learning:
+In `DeveloperAnalyzer`, we were tracking total commits by calling `sum(contributors.values())` which runs in O(N) time over the `contributors` dictionary keys. However, the exact total commit count is already accurately maintained by the `commit_count` variable incremented inside the previous iteration. Relying on aggregate functions like `sum()` inside post-processing steps introduces unnecessary complexity when a pre-calculated running total already exists.
+
+Action:
+Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be effectively tracked or is already tracked via an incrementing variable during the initial processing loop.
