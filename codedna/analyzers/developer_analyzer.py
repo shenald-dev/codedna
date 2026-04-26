@@ -50,12 +50,13 @@ class DeveloperAnalyzer:
         total_commits = commit_count or 1
         contributor_list = []
         for author, count in contributors.most_common():
-            role = self._classify_role(count, total_commits, len(contributor_files.get(author, set())))  # noqa: E501
+            files_touched_count = len(contributor_files.get(author, set()))
+            role = self._classify_role(count, total_commits, files_touched_count)  # noqa: E501
             contributor_list.append({
                 "name": author,
                 "commits": count,
                 "percentage": round((count / total_commits) * 100, 1),
-                "files_touched": len(contributor_files.get(author, set())),
+                "files_touched": files_touched_count,
                 "role": role,
             })
 
