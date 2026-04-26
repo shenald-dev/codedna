@@ -127,3 +127,11 @@ In `LanguageDetector.detect`, we were tracking total lines by calling `sum(line_
 
 Action:
 Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be tracked via an incrementing variable during the initial processing loop.
+
+## 2026-04-28 — Optimization: Redundant length calculation
+
+Learning:
+In `DeveloperAnalyzer`, we were calling `len(contributor_files.get(author, set()))` twice inside the inner loop of `analyze`. This creates unnecessary overhead by performing dictionary lookups and set instantiations redundantly.
+
+Action:
+To optimize performance in tight loops, avoid repeated dictionary `.get()` calls or length calculations for the same key; instead, cache the value in a local variable at the start of the iteration.
