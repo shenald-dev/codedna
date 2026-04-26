@@ -120,3 +120,10 @@ In `DeveloperAnalyzer`, we were tracking total commits by calling `sum(contribut
 
 Action:
 Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be effectively tracked or is already tracked via an incrementing variable during the initial processing loop.
+## 2026-04-26 — Optimization: Redundant Summation Replacement in Line Counting
+
+Learning:
+In `LanguageDetector.detect`, we were tracking total lines by calling `sum(line_counter.values())` twice, which runs in O(N) time. However, the exact total lines count can be accurately maintained by an `overall_lines` variable incremented inside the previous file-processing loop.
+
+Action:
+Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be tracked via an incrementing variable during the initial processing loop.

@@ -78,6 +78,7 @@ class LanguageDetector:
         counter: Counter = Counter()
         line_counter: Counter = Counter()
         total_files = 0
+        overall_lines = 0
 
         for file_path in self._walk_files(repo_path):
             ext = file_path.suffix.lower()
@@ -95,13 +96,14 @@ class LanguageDetector:
                         if last_chunk and not last_chunk.endswith(b'\n'):
                             lines += 1
                     line_counter[lang] += lines
+                    overall_lines += lines
                 except OSError:
                     pass
 
         if not counter:
             return {"languages": {}, "primary": "Unknown", "total_files": 0}
 
-        total_lines = sum(line_counter.values()) or 1
+        total_lines = overall_lines or 1
 
         languages = {}
         for lang, count in counter.most_common():
@@ -118,7 +120,7 @@ class LanguageDetector:
             "languages": languages,
             "primary": primary,
             "total_files": total_files,
-            "total_lines": sum(line_counter.values()),
+            "total_lines": overall_lines,
         }
 
     def _walk_files(self, root: Path):
