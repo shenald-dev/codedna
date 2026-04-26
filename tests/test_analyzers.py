@@ -6,6 +6,7 @@ import pytest
 from codedna.analyzers.architecture_detector import ArchitectureDetector
 from codedna.analyzers.code_smell_detector import CodeSmellDetector
 from codedna.analyzers.dependency_mapper import DependencyMapper
+from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
 from codedna.analyzers.dna_generator import DNAGenerator
 from codedna.analyzers.github_analyzer import GitHubAnalyzer
 from codedna.analyzers.language_detector import LanguageDetector
@@ -78,6 +79,29 @@ class TestLanguageDetector:
         assert "Python" in result["languages"]
         assert result["languages"]["Python"]["lines"] == 1
         assert result["total_lines"] == 1
+
+
+class TestDeveloperAnalyzer:
+    def test_developer_analyzer_performance(self):
+        import time
+        from pathlib import Path
+
+        # We will use the codedna repo itself to test performance
+        repo_path = Path(".")
+
+        analyzer = DeveloperAnalyzer()
+
+        start_time = time.time()
+        # Analyze up to 500 commits, which is the default
+        result = analyzer.analyze(repo_path, max_commits=500)
+        end_time = time.time()
+
+        execution_time = end_time - start_time
+
+        # It should complete in under 0.5 seconds on a normal machine,
+        # but we set a generous limit of 1.5 seconds to avoid flaky tests in CI
+        assert execution_time < 1.5, f"DeveloperAnalyzer performance regression: took {execution_time:.2f} seconds"
+        assert isinstance(result, dict)
 
 
 class TestStructureAnalyzer:
