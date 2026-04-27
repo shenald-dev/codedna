@@ -9,13 +9,12 @@ from rich.console import Console
 
 from .cache_manager import CacheManager
 
-console = Console()
-
 
 class RepoCloner:
     """Clones a Git repository to a local cache directory for analysis."""
 
     def __init__(self, cache_dir: str | None = None):
+        self.console = Console()
         if cache_dir is None:
             base_dir = Path(CacheManager().cache_dir)
             self.cache_dir = base_dir / "repos"
@@ -45,7 +44,7 @@ class RepoCloner:
 
         local_path = Path(source)
         if local_path.exists() and (local_path / ".git").exists():
-            console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
+            self.console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
             return local_path
 
         parsed = urllib.parse.urlparse(source)
@@ -69,10 +68,10 @@ class RepoCloner:
         dest = self.cache_dir / repo_name
 
         if dest.exists():
-            console.print(f"  ♻️  Using cached clone: [cyan]{dest}[/]")
+            self.console.print(f"  ♻️  Using cached clone: [cyan]{dest}[/]")
             return dest
 
-        console.print(f"  📥 Cloning [cyan]{source}[/] ...")
+        self.console.print(f"  📥 Cloning [cyan]{source}[/] ...")
         Repo.clone_from(source, str(dest), depth=100)
         return dest
 
