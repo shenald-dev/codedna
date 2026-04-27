@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.12] - 2026-04-26
+
+### Changed
+* **Performance:** Extracted the length calculation of `contributor_files.get(author, set())` into a variable within the main loop of `DeveloperAnalyzer.analyze` to eliminate redundant dictionary lookups and length computations.
+
 ## [1.0.11] - 2026-04-19
 
 ### Changed
