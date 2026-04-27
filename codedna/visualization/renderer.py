@@ -6,11 +6,12 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-console = Console()
-
 
 class Renderer:
     """Renders analysis results using Rich for beautiful terminal output."""
+
+    def __init__(self):
+        self.console = Console()
 
     def render_dna_profile(self, profile: dict) -> None:
         """Render the full DNA profile to the terminal."""
@@ -25,8 +26,8 @@ class Renderer:
 
     def _render_header(self, profile: dict) -> None:
         """Render the DNA header."""
-        console.print()
-        console.print(Panel(
+        self.console.print()
+        self.console.print(Panel(
             f"[bold cyan]🧬 CodeDNA Profile[/]\n\n"
             f"[white]Source:[/] [dim]{profile['metadata']['source']}[/]\n"
             f"[white]System:[/] [bold green]{profile['system_type']}[/]\n"
@@ -72,7 +73,7 @@ class Renderer:
                 f"[{color}]{bar}[/]",
             )
 
-        console.print(table)
+        self.console.print(table)
 
     def _render_architecture(self, profile: dict) -> None:
         """Render architecture analysis."""
@@ -98,7 +99,7 @@ class Renderer:
 
         lines.append(f"\n[bold]Coupling:[/] {arch.get('coupling', 'Unknown')}")
 
-        console.print(Panel(
+        self.console.print(Panel(
             "\n".join(lines),
             title="🏗️ Architecture",
             border_style="blue",
@@ -115,7 +116,7 @@ class Renderer:
         risks = profile.get("risks", [])
         risk_text = "\n".join(risks[:6]) if risks else "  No critical risks detected ✅"
 
-        console.print(Panel(
+        self.console.print(Panel(
             f"[bold {color}]Overall: {overall}[/]\n\n"
             f"🔴 Critical: {counts.get('critical', 0)}  "
             f"🟡 Warning: {counts.get('warning', 0)}  "
@@ -130,7 +131,7 @@ class Renderer:
         deps = profile.get("dependencies", {})
         circular = "Yes ⚠️" if deps.get("has_circular_deps") else "None ✅"
 
-        console.print(Panel(
+        self.console.print(Panel(
             f"Modules: [bold]{deps.get('total_modules', 0)}[/]\n"
             f"Connections: [bold]{deps.get('total_edges', 0)}[/]\n"
             f"Density: [bold]{deps.get('density', 0)}[/]\n"
@@ -155,15 +156,15 @@ class Renderer:
         for c in contribs:
             table.add_row(c["name"], c["role"], str(c["commits"]))
 
-        console.print(table)
-        console.print(f"  Bus Factor: [bold]{dev.get('bus_factor', '?')}[/]")
+        self.console.print(table)
+        self.console.print(f"  Bus Factor: [bold]{dev.get('bus_factor', '?')}[/]")
 
     def _render_evolution(self, profile: dict) -> None:
         """Render evolution timeline."""
         evo = profile.get("evolution", {})
         patterns = evo.get("patterns", [])
 
-        console.print(Panel(
+        self.console.print(Panel(
             f"Total Commits: [bold]{evo.get('total_commits', 0)}[/]\n"
             f"First Commit: [dim]{(evo.get('first_commit') or '?')[:10]}[/]\n"
             f"Patterns: [bold cyan]{', '.join(patterns) if patterns else 'Unknown'}[/]",
@@ -174,13 +175,13 @@ class Renderer:
     def _render_signature(self, profile: dict) -> None:
         """Render the DNA signature."""
         sig = profile.get("signature", "")
-        console.print(Panel(
+        self.console.print(Panel(
             f"[bold cyan]{sig}[/]",
             title="🧬 DNA Signature",
             border_style="bright_cyan",
             padding=(1, 2),
         ))
-        console.print()
+        self.console.print()
 
     def _lang_color(self, lang: str) -> str:
         colors = {

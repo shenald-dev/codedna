@@ -135,3 +135,11 @@ In `DeveloperAnalyzer`, we were calling `len(contributor_files.get(author, set()
 
 Action:
 To optimize performance in tight loops, avoid repeated dictionary `.get()` calls or length calculations for the same key; instead, cache the value in a local variable at the start of the iteration.
+
+## 2026-05-15 — Lazy-load Console instantiations for Renderer and RepoCloner
+
+Learning:
+When modules like `renderer.py` and `repo_cloner.py` have heavy instantiations (e.g., `console = Console()` from `rich`) at the module level, it increases startup time when those modules are imported, even if the class is not immediately instantiated. Moving the instantiation inside the `__init__` method defers the heavy load until it's actually required.
+
+Action:
+Removed `console = Console()` from the global module scope of `renderer.py` and `repo_cloner.py` and instantiated `self.console = Console()` inside their respective `__init__` methods.
