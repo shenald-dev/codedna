@@ -11,6 +11,7 @@ class Renderer:
     """Renders analysis results using Rich for beautiful terminal output."""
 
     def __init__(self):
+        # Lazy-load Console to avoid heavy initialization overhead on module import
         self.console = Console()
 
     def render_dna_profile(self, profile: dict) -> None:

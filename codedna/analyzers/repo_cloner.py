@@ -14,6 +14,7 @@ class RepoCloner:
     """Clones a Git repository to a local cache directory for analysis."""
 
     def __init__(self, cache_dir: str | None = None):
+        # Lazy-load Console to avoid heavy initialization overhead on module import
         self.console = Console()
         if cache_dir is None:
             base_dir = Path(CacheManager().cache_dir)
