@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -101,16 +102,9 @@ class DeveloperAnalyzer:
 
         pair_counts = defaultdict(int)
         for authors in file_to_authors.values():
-            num_authors = len(authors)
-            if num_authors > 1:
-                for i in range(num_authors):
-                    a1 = authors[i]
-                    for j in range(i + 1, num_authors):
-                        a2 = authors[j]
-                        if a1 > a2:
-                            pair_counts[(a2, a1)] += 1
-                        else:
-                            pair_counts[(a1, a2)] += 1
+            if len(authors) > 1:
+                for a1, a2 in itertools.combinations(sorted(authors), 2):
+                    pair_counts[(a1, a2)] += 1
 
         pairs = []
         for (a1, a2), count in pair_counts.items():
