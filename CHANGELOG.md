@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.13] - 2026-04-27
+
+### Changed
+* **Performance:** Moved `console = Console()` instantiations from the global module level in `repo_cloner.py` and `renderer.py` to their respective `__init__` methods. This defers the heavy load of initializing `rich.console.Console` until the classes are actually used, effectively improving the startup time of the CodeDNA CLI.
+
 ## [1.0.12] - 2026-04-26
 
 ### Changed
