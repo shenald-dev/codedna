@@ -45,6 +45,7 @@ class CodeSmellDetector:
                     "type": "Large File",
                     "severity": "warning" if line_count < 1000 else "critical",
                     "file": relative,
+                    "line": 1,
                     "detail": f"{line_count} lines (threshold: {MAX_FILE_LINES})",
                 })
 
@@ -56,16 +57,18 @@ class CodeSmellDetector:
                         "type": "God Class",
                         "severity": "critical",
                         "file": relative,
+                        "line": 1,
                         "detail": f"{method_count} methods detected (threshold: {GOD_CLASS_METHODS})",  # noqa: E501
                     })
 
             # ── Long Functions ──
             long_funcs = self._detect_long_functions(content, file_path.suffix)
-            for func_name, length in long_funcs:
+            for func_name, length, start_line in long_funcs:
                 smells.append({
                     "type": "Long Function",
                     "severity": "warning",
                     "file": relative,
+                    "line": start_line,
                     "detail": f"'{func_name}' has {length} lines (threshold: {MAX_FUNCTION_LINES})",
                 })
 
@@ -87,6 +90,7 @@ class CodeSmellDetector:
                     "type": "Code Marker",
                     "severity": "info",
                     "file": f"{relative}:{current_line}",
+                    "line": current_line,
                     "detail": f"{match.group(1).upper()} found: {line_text.strip()[:80]}",
                 })
 
@@ -97,6 +101,7 @@ class CodeSmellDetector:
                 "type": "Large Module",
                 "severity": "warning",
                 "file": mod_path,
+                "line": 1,
                 "detail": f"{count} files in module (threshold: {LARGE_MODULE_FILES})",
             })
 
@@ -122,7 +127,7 @@ class CodeSmellDetector:
             return len(JAVA_METHOD_PATTERN.findall(content))
         return 0
 
-    def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int]]:
+    def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int, int]]:
         """Detect functions exceeding the line threshold."""
         results = []
 
@@ -152,7 +157,7 @@ class CodeSmellDetector:
                     _, prev_name, prev_start = active_funcs.pop()
                     func_lines = current_line - prev_start - 1
                     if func_lines > MAX_FUNCTION_LINES:
-                        results.append((prev_name, func_lines))
+                        results.append((prev_name, func_lines, prev_start + 1))
 
                 if is_def:
                     name = match.group(2)
@@ -166,7 +171,7 @@ class CodeSmellDetector:
                 for _, name, start in active_funcs:
                     func_lines = total_lines - start - 1
                     if func_lines > MAX_FUNCTION_LINES:
-                        results.append((name, func_lines))
+                        results.append((name, func_lines, start + 1))
 
         return results
 
