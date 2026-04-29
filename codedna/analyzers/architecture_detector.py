@@ -57,23 +57,27 @@ class ArchitectureDetector:
         Returns:
             Dict with detected patterns, traits, and confidence scores.
         """
-        dir_names = set()
-        file_names = set()
+        all_names = set()
+        src_dirs = []
 
         for item in self._walk(repo_path):
             if item.is_dir():
-                dir_names.add(item.name.lower())
+                all_names.add(item.name.lower())
+                if item.name not in IGNORE_DIRS:
+                    try:
+                        depth = len(item.relative_to(repo_path).parts)
+                        src_dirs.append(depth)
+                    except ValueError:
+                        pass
             else:
-                file_names.add(item.name.lower())
+                all_names.add(item.name.lower())
                 # Also track relative paths for nested indicators
                 try:
                     rel = str(item.relative_to(repo_path)).replace("\\", "/").lower()
                     for part in rel.split("/"):
-                        dir_names.add(part)
+                        all_names.add(part)
                 except ValueError:
                     pass
-
-        all_names = dir_names | file_names
 
         # Detect architecture patterns
         detected = []
@@ -97,7 +101,16 @@ class ArchitectureDetector:
                     break
 
         # Determine coupling level
-        coupling = self._assess_coupling(repo_path)
+        if not src_dirs:
+            coupling = "Unknown"
+        else:
+            avg_depth = sum(src_dirs) / len(src_dirs)
+            if avg_depth > 4:
+                coupling = "High"
+            elif avg_depth > 2.5:
+                coupling = "Moderate"
+            else:
+                coupling = "Low"
 
         # Sort by confidence
         detected.sort(key=lambda x: x["confidence"], reverse=True)
@@ -110,27 +123,6 @@ class ArchitectureDetector:
             "traits": traits,
             "coupling": coupling,
         }
-
-    def _assess_coupling(self, repo_path: Path) -> str:
-        """Assess coupling level based on directory structure depth and spread."""
-        src_dirs = []
-        for item in self._walk(repo_path):
-            if item.is_dir() and item.name not in IGNORE_DIRS:
-                try:
-                    depth = len(item.relative_to(repo_path).parts)
-                    src_dirs.append(depth)
-                except ValueError:
-                    pass
-
-        if not src_dirs:
-            return "Unknown"
-
-        avg_depth = sum(src_dirs) / len(src_dirs)
-        if avg_depth > 4:
-            return "High"
-        elif avg_depth > 2.5:
-            return "Moderate"
-        return "Low"
 
     def _walk(self, root: Path, max_depth: int = 5):
         stack = [(root, 0)]
