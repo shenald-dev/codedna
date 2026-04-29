@@ -6,8 +6,7 @@ import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
+import git
 
 
 class DeveloperAnalyzer:
@@ -20,8 +19,8 @@ class DeveloperAnalyzer:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
         try:
-            repo = Repo(str(repo_path))
-        except InvalidGitRepositoryError:
+            repo = git.Repo(str(repo_path))
+        except git.exc.InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "contributors": []}
 
         contributors: Counter = Counter()

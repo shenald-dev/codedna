@@ -181,6 +181,28 @@ class TestSecurityDetector:
         assert result["has_secrets"] is True
 
 
+class TestDeveloperAnalyzer:
+    def test_detect_collaboration(self):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        analyzer = DeveloperAnalyzer()
+
+        # Mock up contributor files data:
+        # a and b share file1, file2, file3 (3 shared > 2 threshold)
+        # a and c share file4, file5 (2 shared = threshold not met)
+        contributor_files = {
+            "a": {"file1", "file2", "file3", "file4", "file5"},
+            "b": {"file1", "file2", "file3"},
+            "c": {"file4", "file5"}
+        }
+
+        collab = analyzer._detect_collaboration(contributor_files)
+
+        # Expected output is only ["a", "b"] with 3 shared files
+        assert len(collab) == 1
+        assert collab[0]["pair"] == ["a", "b"]
+        assert collab[0]["shared_files"] == 3
+
+
 class TestGitHubAnalyzer:
     def test_analyze_local(self):
         result = GitHubAnalyzer().analyze(".")

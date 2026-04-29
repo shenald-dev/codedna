@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.14] - 2026-04-29
+
+### Changed
+* **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
+* **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
+
 ## [1.0.13] - 2026-04-27
 
 ### Changed
