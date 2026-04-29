@@ -143,3 +143,11 @@ When modules like `renderer.py` and `repo_cloner.py` have heavy instantiations (
 
 Action:
 Removed `console = Console()` from the global module scope of `renderer.py` and `repo_cloner.py` and instantiated `self.console = Console()` inside their respective `__init__` methods.
+
+## 2026-05-16 — Performance Optimization: O(N) Traversal Bottleneck in Code Smell and Architecture Analysis
+
+Learning:
+Performing redundant sequential file system traversals to gather separate architectural or code smell metrics (e.g., assessing coupling in `ArchitectureDetector` or detecting large modules in `CodeSmellDetector`) creates severe disk I/O bottlenecks. In `ArchitectureDetector`, executing a separate `_walk` to assess coupling and in `CodeSmellDetector`, spawning a generator with a separate `sum` comprehension inside `_walk_dirs` caused unnecessary repetitive directory traversals and `stat` calls.
+
+Action:
+Consolidated the structural requirements into single-pass DFS traversals using stacks and loops. In `ArchitectureDetector`, I integrated the `src_dirs` tracking directly into the main `self._walk` loop, avoiding an entire second pass. In `CodeSmellDetector`, I integrated the file count directly into the `stack`-based tree traversal. Always aim to merge codebase scans into single-pass pipelines when iterating over file systems.
