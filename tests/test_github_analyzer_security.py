@@ -29,7 +29,7 @@ class TestGitHubAnalyzerSecurity(unittest.TestCase):
         self.assertFalse(res["is_github"])
 
     def test_github_analyzer_valid_url(self):
-        with patch("urllib.request.urlopen") as mock_urlopen:
+        with patch("codedna.analyzers.github_analyzer.urlopen") as mock_urlopen:
             mock_response = MagicMock()
             mock_response.__enter__.return_value.read.return_value = b'{"stargazers_count": 10}'
             mock_urlopen.return_value = mock_response
@@ -39,7 +39,7 @@ class TestGitHubAnalyzerSecurity(unittest.TestCase):
             self.assertEqual(res["stars"], 10)
 
     def test_github_analyzer_extra_slashes(self):
-        with patch("urllib.request.urlopen") as mock_urlopen:
+        with patch("codedna.analyzers.github_analyzer.urlopen") as mock_urlopen:
             mock_response = MagicMock()
             mock_response.__enter__.return_value.read.return_value = b'{"stargazers_count": 5}'
             mock_urlopen.return_value = mock_response

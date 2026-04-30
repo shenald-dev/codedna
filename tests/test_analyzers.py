@@ -224,7 +224,7 @@ class TestGitHubAnalyzer:
         mock_context_manager = MagicMock()
         mock_context_manager.__enter__.return_value = mock_response
 
-        with patch("urllib.request.urlopen", return_value=mock_context_manager):
+        with patch("codedna.analyzers.github_analyzer.urlopen", return_value=mock_context_manager):
             result = GitHubAnalyzer().analyze("https://github.com/microsoft/typescript")
 
         assert result["is_github"] is True
