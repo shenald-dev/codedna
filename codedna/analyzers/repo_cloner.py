@@ -32,7 +32,7 @@ class RepoCloner:
             Path to the cloned/resolved repository.
         """
         import os
-        import urllib.parse
+        from urllib.parse import unquote, urlparse
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
         # and looks like a valid URL or local path.
         source = source.strip()
@@ -47,7 +47,7 @@ class RepoCloner:
             self.console.print(f"  📂 Using local repository: [cyan]{local_path}[/]")
             return local_path
 
-        parsed = urllib.parse.urlparse(source)
+        parsed = urlparse(source)
 
         # Git supports diverse URI formats like SCP style (git@github.com:user/repo.git)
         # where urlparse might incorrectly identify the domain or windows drive as a scheme.
@@ -60,7 +60,7 @@ class RepoCloner:
                  raise ValueError(f"Unauthorized URL scheme: {parsed.scheme}")
 
         # Clone from URL
-        unquoted_path = urllib.parse.unquote(parsed.path or source)
+        unquoted_path = unquote(parsed.path or source)
         repo_name = os.path.basename(unquoted_path.rstrip("/")).replace(".git", "")
         if not repo_name or repo_name in (".", ".."):
             raise ValueError(f"Invalid repository name: {repo_name}")
