@@ -82,9 +82,10 @@ class ArchitectureDetector:
         # Detect architecture patterns
         detected = []
         for pattern_name, config in PATTERNS.items():
-            matches = [ind for ind in config["indicators"] if ind in all_names]
+            indicators = config["indicators"]
+            matches = [ind for ind in indicators if ind in all_names]
             if len(matches) >= config["min_matches"]:
-                confidence = round(len(matches) / len(config["indicators"]), 2)
+                confidence = round(len(matches) / len(indicators), 2)
                 detected.append({
                     "pattern": pattern_name,
                     "confidence": confidence,

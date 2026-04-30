@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-import urllib.parse
-import urllib.request
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 from .cache_manager import CacheManager
 
@@ -32,7 +32,7 @@ class GitHubAnalyzer:
         }
 
         try:
-            parsed = urllib.parse.urlparse(source)
+            parsed = urlparse(source)
         except Exception:
             return stats
 
@@ -62,11 +62,11 @@ class GitHubAnalyzer:
             api_url = f"https://api.github.com/repos/{owner}/{repo}"
 
             try:
-                req = urllib.request.Request(
+                req = Request(
                     api_url,
                     headers={"User-Agent": "CodeDNA-Analyzer"}
                 )
-                with urllib.request.urlopen(req, timeout=5) as response:
+                with urlopen(req, timeout=5) as response:
                     data = json.loads(response.read().decode())
 
                     stats.update({
