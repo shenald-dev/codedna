@@ -76,7 +76,11 @@ class CodeSmellDetector:
         }
 
     def _analyze_file(self, item: Path, repo_path: Path, smells: list[dict]) -> None:
-        """Analyze a single file for code smells."""
+        """Analyze a single file for code smells.
+
+        Assumes UTF-8 encoding and ignores decoding errors. Symlinks
+        are inherently resolved if they point to valid files within the repo.
+        """
         try:
             content = item.read_text(encoding="utf-8", errors="ignore")
             relative = str(item.relative_to(repo_path))
