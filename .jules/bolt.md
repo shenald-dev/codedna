@@ -151,3 +151,11 @@ Performing redundant sequential file system traversals to gather separate archit
 
 Action:
 Consolidated the structural requirements into single-pass DFS traversals using stacks and loops. In `ArchitectureDetector`, I integrated the `src_dirs` tracking directly into the main `self._walk` loop, avoiding an entire second pass. In `CodeSmellDetector`, I integrated the file count directly into the `stack`-based tree traversal. Always aim to merge codebase scans into single-pass pipelines when iterating over file systems.
+
+## 2026-05-18 — Performance & Maintainability Optimization: Single-Pass Traversal and Extracted Logic
+
+Learning:
+In `CodeSmellDetector`, the initial design executed two distinct O(N) traversals: one to parse file contents (`_walk_source`) and another to calculate module sizes (`_detect_large_modules`). The refactoring successfully merged these into a single O(N) stack-based DFS traversal. However, directly inlining the logic resulted in a "God Method" exhibiting the Arrow Anti-Pattern (deep nesting up to 8 levels of indentation).
+
+Action:
+Consolidated the multiple sequential traversals into a single pass and extracted the file processing logic from the inner loop into a dedicated `_analyze_file` helper method. This preserves the O(N) performance gain (cutting directory reads by 50%) while eliminating the extreme nesting and significantly improving code readability and maintainability.
