@@ -62,7 +62,6 @@ class DependencyMapper:
             Dict with graph stats, edges, and centrality metrics.
         """
         graph = nx.DiGraph()
-        edges: list[dict] = []
 
         for file_path in self._walk_source(repo_path):
             ext = file_path.suffix.lower()
@@ -85,7 +84,6 @@ class DependencyMapper:
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)
-                    edges.append({"from": module_name, "to": dep})
 
         # Compute centrality metrics
         centrality = {}
@@ -116,7 +114,7 @@ class DependencyMapper:
             "cycles": [list(c) for c in cycles[:10]],
             "has_circular_deps": len(cycles) > 0,
             "top_central_modules": centrality,
-            "edges": edges[:100],  # Limit for output
+            "edges": [{"from": u, "to": v} for u, v in itertools.islice(graph.edges, 100)],
         }
 
     def build_mermaid(self, dependencies: dict) -> str:
