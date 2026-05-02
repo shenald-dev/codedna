@@ -18,7 +18,9 @@ class StructureAnalyzer:
         """
         tree = {}
         modules = []
-        depth_stats = []
+        max_depth = 0
+        total_depth = 0
+        depth_count = 0
         total_dirs = 0
         total_files = 0
 
@@ -55,7 +57,9 @@ class StructureAnalyzer:
                         current_dict[f"📄 {item.name}"] = None
 
                     if item.suffix in (".py", ".js", ".ts", ".go", ".rs", ".java"):
-                        depth_stats.append(current_depth)
+                        max_depth = max(max_depth, current_depth)
+                        total_depth += current_depth
+                        depth_count += 1
 
                     if item.name in ("__init__.py", "package.json", "go.mod", "Cargo.toml", "build.gradle"):
                         try:
@@ -74,8 +78,8 @@ class StructureAnalyzer:
         return {
             "tree": tree,
             "modules": modules,
-            "max_depth": max(depth_stats) if depth_stats else 0,
-            "avg_depth": round(sum(depth_stats) / len(depth_stats), 1) if depth_stats else 0,
+            "max_depth": max_depth,
+            "avg_depth": round(total_depth / depth_count, 1) if depth_count > 0 else 0,
             "total_dirs": total_dirs,
             "total_files": total_files,
         }

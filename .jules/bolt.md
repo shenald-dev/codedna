@@ -167,3 +167,10 @@ Using `pattern.finditer(content)` to extract dependency matches in `DependencyMa
 
 Action:
 Replaced the loop `for match in pattern.finditer(content): dep = match.group(1)` with `for dep in pattern.findall(content):` in `DependencyMapper.map`. `pattern.findall` returns a list of matched strings natively in C, which halves execution time for regex dependency extraction on large files.
+## 2026-05-20 — Performance Optimization: Avoid Redundant Object Accumulation and Iteration
+
+Learning:
+Accumulating items in temporary arrays (`depth_stats`, `src_dirs`, `edges`) solely to calculate aggregates (like `max`, `sum`, or `len`) at the end introduces severe and unnecessary memory overhead, alongside the O(N) cost of functions like `sum()`. For example, in `StructureAnalyzer` and `ArchitectureDetector`, appending integer depths into lists to calculate their average wastes memory for each file/directory traversed. Additionally, in `DependencyMapper`, maintaining a secondary `edges` list mirrored the edges already safely persisted in the underlying `nx.DiGraph`.
+
+Action:
+Replaced the `depth_stats` and `src_dirs` lists with continuously updated scalar aggregates (`total_depth`, `max_depth`, `depth_count`). In `DependencyMapper`, the duplicate `edges` array was eliminated, and edges were extracted lazily and capped using `itertools.islice(graph.edges, 100)` directly from the NetworkX object. Always use running aggregates or leverage the capabilities of domain objects instead of allocating auxiliary unbounded arrays.

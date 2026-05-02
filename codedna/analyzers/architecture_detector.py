@@ -58,7 +58,8 @@ class ArchitectureDetector:
             Dict with detected patterns, traits, and confidence scores.
         """
         all_names = set()
-        src_dirs = []
+        total_src_dir_depth = 0
+        src_dir_count = 0
 
         for item in self._walk(repo_path):
             if item.is_dir():
@@ -66,7 +67,8 @@ class ArchitectureDetector:
                 if item.name not in IGNORE_DIRS:
                     try:
                         depth = len(item.relative_to(repo_path).parts)
-                        src_dirs.append(depth)
+                        total_src_dir_depth += depth
+                        src_dir_count += 1
                     except ValueError:
                         pass
             else:
@@ -102,10 +104,10 @@ class ArchitectureDetector:
                     break
 
         # Determine coupling level
-        if not src_dirs:
+        if src_dir_count == 0:
             coupling = "Unknown"
         else:
-            avg_depth = sum(src_dirs) / len(src_dirs)
+            avg_depth = total_src_dir_depth / src_dir_count
             if avg_depth > 4:
                 coupling = "High"
             elif avg_depth > 2.5:
