@@ -80,8 +80,7 @@ class DependencyMapper:
             graph.add_node(module_name)
 
             for pattern in IMPORT_PATTERNS[lang]:
-                for match in pattern.finditer(content):
-                    dep = match.group(1)
+                for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
