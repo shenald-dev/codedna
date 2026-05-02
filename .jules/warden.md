@@ -74,3 +74,9 @@ Observation / Pruned:
 The previous optimization agent successfully optimized the developer collaboration detection in `DeveloperAnalyzer` by replacing manual nested loops with `itertools.combinations`, changing the performance profile from O(A^2) loops over lists to an optimized C-level combination generator.
 Alignment / Deferred:
 Added adversarial unit tests to `tests/test_analyzers.py` to ensure the `_detect_collaboration` logic continues to form combinations correctly and strictly enforces the `> 2` threshold. Upgraded `pip` dependency as a safe patch-level bump. Updated `CHANGELOG.md` and bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.14.
+
+2026-05-19 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully consolidated traversals in `CodeSmellDetector` and resolved an Arrow Anti-Pattern. Scanned the codebase and test suite for dead code. Pruned an unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
+Alignment / Deferred:
+Updated `CHANGELOG.md` to reflect the dead code pruning. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.15. No dependency upgrades deferred.

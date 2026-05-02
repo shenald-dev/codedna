@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.15] - 2026-05-19
+
+### Changed
+* **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
+
 ## [1.0.14] - 2026-04-29
 
 ### Changed

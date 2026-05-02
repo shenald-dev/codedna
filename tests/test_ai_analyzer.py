@@ -16,7 +16,6 @@ def test_ai_analyzer_no_key(monkeypatch):
 def test_ai_analyzer_minimizer():
     """Test the AI payload minimizer truncates large components before LLM transmission."""
     analyzer = AIAnalyzer()
-    analyzer.api_key = "dummy"
 
     heavy_profile = {
         "metadata": {"version": "1.0"},
