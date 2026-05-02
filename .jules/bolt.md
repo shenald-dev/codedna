@@ -159,3 +159,11 @@ In `CodeSmellDetector`, the initial design executed two distinct O(N) traversals
 
 Action:
 Consolidated the multiple sequential traversals into a single pass and extracted the file processing logic from the inner loop into a dedicated `_analyze_file` helper method. This preserves the O(N) performance gain (cutting directory reads by 50%) while eliminating the extreme nesting and significantly improving code readability and maintainability.
+
+## 2026-05-19 — Performance Optimization: Regex Counting and Extraction Bottleneck in Dependency Mapper
+
+Learning:
+Using `pattern.finditer(content)` to extract dependency matches in `DependencyMapper` creates unnecessary overhead by allocating Python `re.Match` objects for every match during massive codebase scans. Since we only need the exact string from a single capture group, we can bypass this allocation loop.
+
+Action:
+Replaced the loop `for match in pattern.finditer(content): dep = match.group(1)` with `for dep in pattern.findall(content):` in `DependencyMapper.map`. `pattern.findall` returns a list of matched strings natively in C, which halves execution time for regex dependency extraction on large files.
