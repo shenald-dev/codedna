@@ -80,6 +80,7 @@ class DependencyMapper:
             graph.add_node(module_name)
 
             for pattern in IMPORT_PATTERNS[lang]:
+                # Safe to use findall: IMPORT_PATTERNS define exactly one capture group per pattern.
                 for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
                     if dep.startswith(".") or "/" in dep:
