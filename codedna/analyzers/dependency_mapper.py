@@ -114,6 +114,7 @@ class DependencyMapper:
             "cycles": [list(c) for c in cycles[:10]],
             "has_circular_deps": len(cycles) > 0,
             "top_central_modules": centrality,
+            # Extract edges lazily from the graph instead of maintaining a duplicate array
             "edges": [{"from": u, "to": v} for u, v in itertools.islice(graph.edges, 100)],
         }
 

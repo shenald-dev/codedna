@@ -58,6 +58,8 @@ class ArchitectureDetector:
             Dict with detected patterns, traits, and confidence scores.
         """
         all_names = set()
+        # Track depth via running scalar aggregates instead of a large array
+        # to avoid O(N) memory overhead and expensive sum() operations.
         total_src_dir_depth = 0
         src_dir_count = 0
 

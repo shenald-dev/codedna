@@ -18,6 +18,8 @@ class StructureAnalyzer:
         """
         tree = {}
         modules = []
+        # Track depth via running scalar aggregates instead of a large array
+        # to avoid O(N) memory overhead and expensive sum() operations.
         max_depth = 0
         total_depth = 0
         depth_count = 0
