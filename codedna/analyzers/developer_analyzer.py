@@ -29,22 +29,39 @@ class DeveloperAnalyzer:
         contributor_files: defaultdict = defaultdict(set)
         commit_count = 0
 
-        for commit in repo.iter_commits(max_count=max_commits):
-            author = commit.author.name or commit.author.email
-            contributors[author] += 1
-            commit_count += 1
+        try:
+            log_output = repo.git.log(
+                "--name-only",
+                "--format=COMMIT::%H::%aN::%aE::%ad",
+                "--date=short",
+                f"-n {max_commits}"
+            )
 
-            # Track monthly activity
-            month_key = commit.committed_datetime.strftime("%Y-%m")
-            monthly_commits[month_key] += 1
+            current_author = None
 
-            # Track file changes
-            try:
-                for file_path in commit.stats.files:
-                    file_changes[file_path] += 1
-                    contributor_files[author].add(file_path)
-            except Exception:
-                pass
+            for line in log_output.split('\n'):
+                line = line.strip()
+                if not line:
+                    continue
+
+                if line.startswith("COMMIT::"):
+                    parts = line.split("::")
+                    if len(parts) >= 5:
+                        name = parts[2]
+                        email = parts[3]
+                        date = parts[4]
+                        current_author = name or email
+                        contributors[current_author] += 1
+                        commit_count += 1
+
+                        if len(date) >= 7:
+                            month_key = date[:7]
+                            monthly_commits[month_key] += 1
+                elif current_author:
+                    file_changes[line] += 1
+                    contributor_files[current_author].add(line)
+        except Exception:
+            pass
 
         # Build contributor profiles
         total_commits = commit_count or 1

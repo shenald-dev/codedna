@@ -35,7 +35,7 @@ class EvolutionEngine:
         timeline = self._build_timeline(commits, snapshots)
 
         # Detect churn (files that change most frequently)
-        churn = self._compute_churn(commits)
+        churn = self._compute_churn(repo)
 
         # Detect evolution patterns
         patterns = self._detect_patterns(timeline)
@@ -63,7 +63,8 @@ class EvolutionEngine:
 
             # Count files at this point
             try:
-                file_count = sum(1 for _ in commit.tree.traverse() if _.type == "blob")
+                output = commit.repo.git.ls_tree("-r", commit.hexsha)
+                file_count = output.count('\n') + 1 if output else 0
             except Exception:
                 file_count = 0
 
@@ -87,20 +88,39 @@ class EvolutionEngine:
 
         return timeline[:snapshots]
 
-    def _compute_churn(self, commits: list) -> list[dict]:
+    def _compute_churn(self, repo: Repo) -> list[dict]:
         """Find files with the highest change frequency (churn)."""
         file_changes: Counter = Counter()
         file_additions: defaultdict = defaultdict(int)
         file_deletions: defaultdict = defaultdict(int)
 
-        for commit in commits[:200]:
-            try:
-                for filepath, stats in commit.stats.files.items():
+        try:
+            output = repo.git.log(
+                "--numstat",
+                "--format=COMMIT",
+                "-n 200",
+                "--no-renames"
+            )
+
+            for line in output.split('\n'):
+                line = line.strip()
+                if not line or line == "COMMIT":
+                    continue
+
+                parts = line.split('\t')
+                if len(parts) >= 3:
+                    ins, dels, filepath = parts[0], parts[1], parts[2]
+                    try:
+                        ins_int = int(ins) if ins != '-' else 0
+                        del_int = int(dels) if dels != '-' else 0
+                    except ValueError:
+                        ins_int, del_int = 0, 0
+
                     file_changes[filepath] += 1
-                    file_additions[filepath] += stats.get("insertions", 0)
-                    file_deletions[filepath] += stats.get("deletions", 0)
-            except Exception:
-                pass
+                    file_additions[filepath] += ins_int
+                    file_deletions[filepath] += del_int
+        except Exception:
+            pass
 
         return [
             {
