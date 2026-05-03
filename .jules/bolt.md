@@ -174,3 +174,10 @@ Accumulating items in temporary arrays (`depth_stats`, `src_dirs`, `edges`) sole
 
 Action:
 Replaced the `depth_stats` and `src_dirs` lists with continuously updated scalar aggregates (`total_depth`, `max_depth`, `depth_count`). In `DependencyMapper`, the duplicate `edges` array was eliminated, and edges were extracted lazily and capped using `itertools.islice(graph.edges, 100)` directly from the NetworkX object. Always use running aggregates or leverage the capabilities of domain objects instead of allocating auxiliary unbounded arrays.
+## 2026-05-22 — Performance Optimization: Eliminating N+1 Git Subprocesses
+
+Learning:
+Iterating over `git.Repo.iter_commits` in GitPython and subsequently accessing properties like `commit.stats.files` or `commit.tree.traverse()` triggers a severe N+1 performance bottleneck. Under the hood, GitPython executes individual `git diff` or `git ls-tree` subprocesses for *every single commit*. On a repository with 500 commits, this spawned over 500 subprocesses and took significant time (~1.15s overhead).
+
+Action:
+Instead of iterating through commits and reading properties, run a single, batched raw command like `repo.git.log('--numstat', '--format=COMMIT::%H::...', '-n 500')` to extract file changes and metadata in a single process. For tree traversals, `repo.git.ls_tree("-r", commit.hexsha)` is exponentially faster than Python-level tree iterators. By applying this batched logic in `DeveloperAnalyzer` and `EvolutionEngine`, performance improved radically (e.g. `DeveloperAnalyzer` execution dropped from ~1.15s to ~0.03s).
