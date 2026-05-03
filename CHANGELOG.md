@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.16] - 2026-05-03
+
+### Changed
+* **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
+* **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
+
 ## [1.0.15] - 2026-05-19
 
 ### Changed
