@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.17] - 2026-05-04
+
+### Changed
+* **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
+* **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
+
 ## [1.0.16] - 2026-05-03
 
 ### Changed
