@@ -96,7 +96,8 @@ class AIAnalyzer:
         clone = dict(profile)
         # Drop raw file lists if they exist
         if "structure_stats" in clone and "modules" in clone["structure_stats"]:
-            clone["structure_stats"]["modules"] = len(clone["structure_stats"]["modules"])
+            if isinstance(clone["structure_stats"]["modules"], list):
+                clone["structure_stats"]["modules"] = len(clone["structure_stats"]["modules"])
 
         # Keep only top 5 risks to avoid blowing up context token limits
         if "risks" in clone:
