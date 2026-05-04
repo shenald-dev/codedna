@@ -45,7 +45,11 @@ class CodeSmellDetector:
                     elif item.is_file():
                         file_count += 1
                         if item.suffix.lower() in source_exts:
-                            self._analyze_file(item, repo_path, smells)
+                            try:
+                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                    self._analyze_file(item, repo_path, smells)
+                            except OSError:
+                                pass
 
                 # ── Large Modules ──
                 if file_count > LARGE_MODULE_FILES and current != repo_path:

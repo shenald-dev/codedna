@@ -181,3 +181,11 @@ Iterating over `git.Repo.iter_commits` in GitPython and subsequently accessing p
 
 Action:
 Instead of iterating through commits and reading properties, run a single, batched raw command like `repo.git.log('--numstat', '--format=COMMIT::%H::...', '-n 500')` to extract file changes and metadata in a single process. For tree traversals, `repo.git.ls_tree("-r", commit.hexsha)` is exponentially faster than Python-level tree iterators. By applying this batched logic in `DeveloperAnalyzer` and `EvolutionEngine`, performance improved radically (e.g. `DeveloperAnalyzer` execution dropped from ~1.15s to ~0.03s).
+
+## 2026-05-23 — Performance Optimization: O(N) Blocking by Huge Files
+
+Learning:
+Loading and scanning extremely large files (e.g., massive minified bundles, data dumps) using regex in codebase analyzers (like `SecurityDetector`, `DependencyMapper`, `CodeSmellDetector`) blocks the CPU.
+
+Action:
+Introduced a file size threshold (`if item.stat().st_size <= 5 * 1024 * 1024`) during repository traversal to bypass files larger than 5MB. This skips the severe latency impact of processing huge binaries and data dumps while preserving accurate analysis for actual source code.
