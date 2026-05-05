@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import os
 import re
 from pathlib import Path
 
@@ -133,6 +134,7 @@ class DependencyMapper:
         return "\n".join(lines)
 
     def _walk_source(self, root: Path):
+        max_size = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
         stack = [root]
         while stack:
             current = stack.pop()
@@ -144,7 +146,7 @@ class DependencyMapper:
                         stack.append(item)
                     elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
                         try:
-                            if item.stat().st_size <= 5 * 1024 * 1024:
+                            if item.stat().st_size <= max_size:
                                 yield item
                         except OSError:
                             pass

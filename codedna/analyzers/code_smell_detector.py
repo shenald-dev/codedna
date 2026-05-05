@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -32,6 +33,7 @@ class CodeSmellDetector:
         smells: list[dict] = []
         source_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".go", ".rs", ".rb"}
 
+        max_size = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
         stack = [repo_path]
         while stack:
             current = stack.pop()
@@ -46,7 +48,7 @@ class CodeSmellDetector:
                         file_count += 1
                         if item.suffix.lower() in source_exts:
                             try:
-                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                if item.stat().st_size <= max_size:
                                     self._analyze_file(item, repo_path, smells)
                             except OSError:
                                 pass

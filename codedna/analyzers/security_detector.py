@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 
@@ -94,6 +95,7 @@ class SecurityDetector:
         }
 
     def _walk_source(self, root: Path):
+        max_size = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
         stack = [root]
         while stack:
             current = stack.pop()
@@ -108,7 +110,7 @@ class SecurityDetector:
                         # Also skip massive files (like large minified JS or massive data files)
                         if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
                             try:
-                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                if item.stat().st_size <= max_size:
                                     yield item
                             except OSError:
                                 pass
