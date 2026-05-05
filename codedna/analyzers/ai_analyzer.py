@@ -93,7 +93,8 @@ class AIAnalyzer:
 
     def _minimize_payload(self, profile: dict) -> dict:
         """Removes large arrays or deeply nested structures before sending to LLM."""
-        clone = dict(profile)
+        import copy
+        clone = copy.deepcopy(profile)
         # Drop raw file lists if they exist
         if "structure_stats" in clone and "modules" in clone["structure_stats"]:
             if isinstance(clone["structure_stats"]["modules"], list):
