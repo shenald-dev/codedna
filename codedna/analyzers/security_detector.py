@@ -105,8 +105,13 @@ class SecurityDetector:
                         stack.append(item)
                     elif item.is_file():
                         # Skip known binary/media/data files
+                        # Also skip massive files (like large minified JS or massive data files)
                         if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
-                            yield item
+                            try:
+                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                    yield item
+                            except OSError:
+                                pass
             except PermissionError:
                 pass
 

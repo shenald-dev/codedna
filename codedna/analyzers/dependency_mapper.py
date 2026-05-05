@@ -143,7 +143,11 @@ class DependencyMapper:
                     if item.is_dir():
                         stack.append(item)
                     elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
-                        yield item
+                        try:
+                            if item.stat().st_size <= 5 * 1024 * 1024:
+                                yield item
+                        except OSError:
+                            pass
             except PermissionError:
                 pass
 
