@@ -29,3 +29,20 @@ def test_ai_analyzer_minimizer():
     assert minimized["structure_stats"]["modules"] == 4
     assert len(minimized["risks"]) == 5
     assert "mermaid_graph" not in minimized
+
+def test_ai_analyzer_minimizer_no_mutation():
+    """Test the AI payload minimizer does not mutate the original profile."""
+    analyzer = AIAnalyzer()
+
+    heavy_profile = {
+        "metadata": {"version": "1.0"},
+        "structure_stats": {"modules": ["a", "b", "c", "d"]},
+        "risks": ["Risk 1", "Risk 2", "Risk 3", "Risk 4", "Risk 5", "Risk 6"],
+        "mermaid_graph": "graph TD; A-->B;"
+    }
+
+    _ = analyzer._minimize_payload(heavy_profile)
+
+    assert heavy_profile["structure_stats"]["modules"] == ["a", "b", "c", "d"]
+    assert len(heavy_profile["risks"]) == 6
+    assert "mermaid_graph" in heavy_profile
