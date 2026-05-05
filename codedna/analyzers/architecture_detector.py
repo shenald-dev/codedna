@@ -73,13 +73,6 @@ class ArchitectureDetector:
                         pass
             else:
                 all_names.add(item.name.lower())
-                # Also track relative paths for nested indicators
-                try:
-                    rel = str(item.relative_to(repo_path)).replace("\\", "/").lower()
-                    for part in rel.split("/"):
-                        all_names.add(part)
-                except ValueError:
-                    pass
 
         # Detect architecture patterns
         detected = []
