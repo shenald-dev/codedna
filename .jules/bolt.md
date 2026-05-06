@@ -197,3 +197,9 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
+
+2026-05-27 — Performance Optimization: Removing redundant relative path parts length calculation in ArchitectureDetector
+Learning:
+In `ArchitectureDetector.detect`, computing `len(item.relative_to(repo_path).parts)` on every directory inside the file traversal loop creates significant overhead due to `pathlib` tuple instantiations and path parsing. This is redundant because the depth is already tracked and incremented during the internal `_walk` stack traversal.
+Action:
+Updated the internal `_walk` generator to yield `(item, current_depth + 1)` alongside the item, completely bypassing the need for path arithmetic in the calling loop. This eliminates duplicate effort and speeds up directory analysis significantly.
