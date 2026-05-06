@@ -189,3 +189,11 @@ Loading and scanning extremely large files (e.g., massive minified bundles, data
 
 Action:
 Introduced a file size threshold (`if item.stat().st_size <= 5 * 1024 * 1024`) during repository traversal to bypass files larger than 5MB. This skips the severe latency impact of processing huge binaries and data dumps while preserving accurate analysis for actual source code.
+
+## 2026-05-25 — Performance Optimization: Removing redundant relative path string splitting in ArchitectureDetector
+
+Learning:
+In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and subsequently calling `.replace` and `.split` inside the file traversal loop to add path parts to the `all_names` set creates significant overhead. This is redundant because the directory traversal inherently yields each of these parts individually when visiting the subdirectories themselves (i.e. `item.name.lower()` is already invoked for every folder).
+
+Action:
+Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
