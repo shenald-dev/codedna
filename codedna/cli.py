@@ -58,7 +58,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.18[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
-    cloner = RepoCloner()
+    cloner = RepoCloner(console=console)
 
     try:
         with Progress(
@@ -151,7 +151,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
         # ── Render to terminal ──
         if not no_visualize:
-            Renderer().render_dna_profile(profile)
+            Renderer(console=console).render_dna_profile(profile)
 
         # ── Save outputs ──
         if output:

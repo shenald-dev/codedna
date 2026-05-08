@@ -61,16 +61,12 @@ class ArchitectureDetector:
         total_src_dir_depth = 0
         src_dir_count = 0
 
-        for item in self._walk(repo_path):
+        for item, depth in self._walk(repo_path):
             if item.is_dir():
                 all_names.add(item.name.lower())
                 if item.name not in IGNORE_DIRS:
-                    try:
-                        depth = len(item.relative_to(repo_path).parts)
-                        total_src_dir_depth += depth
-                        src_dir_count += 1
-                    except ValueError:
-                        pass
+                    total_src_dir_depth += depth
+                    src_dir_count += 1
             else:
                 all_names.add(item.name.lower())
 
@@ -130,8 +126,9 @@ class ArchitectureDetector:
                 for item in current_dir.iterdir():
                     if item.name in IGNORE_DIRS or item.name.startswith("."):
                         continue
-                    yield item
+                    item_depth = current_depth + 1
+                    yield item, item_depth
                     if item.is_dir():
-                        stack.append((item, current_depth + 1))
+                        stack.append((item, item_depth))
             except PermissionError:
                 pass
