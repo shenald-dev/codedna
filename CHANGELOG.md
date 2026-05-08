@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.19] - 2026-05-06
+
+### Changed
+* **Performance:** Removed redundant path parsing logic and string manipulation within the directory traversal in `ArchitectureDetector` by returning traversal depths directly from the stack, eliminating `ValueError` exceptions and improving file system scanning times.
+
+## [1.0.18] - 2026-05-05
+
+### Fixed
+* **Reliability:** Applied `copy.deepcopy` to the cloned payload in `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads.
+
 ## [1.0.17] - 2026-05-04
 
 ### Changed
