@@ -197,3 +197,11 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
+
+## 2026-05-26 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
+
+Learning:
+In `StructureAnalyzer`, repeatedly executing `sum(1 for p in items if p.is_file())` to calculate file counts for each module marker in a directory causes severe performance issues by running O(N) evaluations multiple times if there are multiple markers present.
+
+Action:
+Introduced lazy evaluation and caching via `file_count_cache` in the directory parsing loop. The calculation is only performed once per directory, the first time a marker needs it, effectively reducing redundant calculations and keeping the operation optimized.
