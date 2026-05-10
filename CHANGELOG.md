@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.19] - 2026-05-06
+
+### Changed
+* **Performance:** Removed the redundant `.relative_to` path string processing per file inside `ArchitectureDetector._walk`. Relying solely on `item.name.lower()` accurately captures necessary directory architectures natively, removing unnecessary O(N) path component parsing.
+* **Cleanup:** Verified clean code state using static analysis (`vulture`, `ruff`), leaving 0 unused files. Updated `pip` and `playwright` dependencies to latest safe patch releases.
+
+## [1.0.18] - 2026-05-05
+
+### Changed
+* **Quality Assurance:** Applied `copy.deepcopy` to the cloned payload in `AIAnalyzer._minimize_payload()` to prevent mutating the original `raw_dna_profile` and removed an unused `api_key` assignment in `tests/test_ai_analyzer.py`.
+
 ## [1.0.17] - 2026-05-04
 
 ### Changed

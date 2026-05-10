@@ -9,7 +9,7 @@ import click
 
 
 @click.group()
-@click.version_option(version="1.0.18", prog_name="codedna")
+@click.version_option(version="1.0.19", prog_name="codedna")
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
 
