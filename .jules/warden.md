@@ -98,3 +98,8 @@ Observation / Pruned:
 Discovered that `AIAnalyzer._minimize_payload()` mutated the original `raw_dna_profile` when removing values in the shallow copy. Applied `copy.deepcopy` to the cloned payload and pruned unused variable assignment in `tests/test_ai_analyzer.py` via `ruff`.
 Alignment / Deferred:
 Version bumped to 1.0.18 across all manifest files. `CHANGELOG.md` updated and changes prepared for release. No dependencies upgraded.
+2026-05-11 — Assessment & Lifecycle
+Observation / Pruned:
+Fixed `ArchitectureDetector` to yield depth natively from traversal to eliminate redundant path splitting. Fixed `StructureAnalyzer` to lazily evaluate `file_count` for modules, preventing unnecessary repeated internal iterations. Cleaned up temporary patch files `patch_arch.py` and `patch_struct.py` from repository root.
+Alignment / Deferred:
+Updated CHANGELOG.md, pyproject.toml, and codedna/cli.py to track version 1.0.19.
