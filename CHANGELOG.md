@@ -80,13 +80,13 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    But note: the base already has the changes from the ancestor to base. The head has the changes from the ancestor to head. The changes that are in the head but not in the base are (head - base). So adding that to the base gives:
 
-        base + (head - base) = head   ??? 
+        base + (head - base) = head   ???
 
    That is not right because we want to keep the base's changes that are not in the head? Actually, the base is the current state of the target, and we are adding the PR's changes (which are the head's changes relative to the base at the time of branching, but note the base has moved on).
 
    Actually, the standard 3-way merge algorithm is:
 
-        merged = base + (head - base) + (base - ancestor)   ??? 
+        merged = base + (head - base) + (base - ancestor)   ???
 
    Let me think with sets:
 
@@ -96,14 +96,14 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         But note: the head was created from the base at an earlier time? Actually, the head was created from the base at the ancestor? Not exactly.
 
-   However, the problem states: 
+   However, the problem states:
         Ancestor: common base
         Base (master): target branch (has newer changes from others) -> so base has diverged from ancestor by some changes.
         Head (PR branch): has the PR author's changes -> so head has diverged from ancestor by some changes (which may include some of the base's changes? no, because the head was branched off from the base at an earlier point?).
 
    Actually, the head branch was created from the base at a point that is the ancestor? Or the ancestor is the point where they diverged.
 
-   We are told: 
+   We are told:
         Ancestor: common ancestor both branches diverged from.
 
    So:
@@ -138,20 +138,20 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    The correct merge is:
 
-        merged = base + (head - base)   [if we are merging the head into the base] 
+        merged = base + (head - base)   [if we are merging the head into the base]
         but note: base already has the base's changes, and (head - base) is the PR's changes relative to the base at the time of the PR creation? Actually, no: the diff head vs base shows what is in the head that is not in the base.
 
    However, the base (master) has moved forward since the head was branched. So the base has changes that are not in the head. We want to keep those. And we want to add the head's changes that are not in the base.
 
    Therefore, the merged file should be:
 
-        base (which includes the base's changes) 
-        plus 
+        base (which includes the base's changes)
+        plus
         (head - base)   [the head's changes that are not in the base]
 
    But note: the base already includes the base's changes, and we are not removing anything from the base? We are only adding the head's changes that are missing in the base.
 
-   This is exactly: base + (head - base) = head? 
+   This is exactly: base + (head - base) = head?
 
    Let me clarify with an example:
 
@@ -163,7 +163,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
         Head (PR): changed to "hello foo"        -> so head = "hello foo"
 
         Then:
-          head - base = (changes in head not in base) = 
+          head - base = (changes in head not in base) =
             We see that base has "hello world", head has "hello foo".
             The common part is "hello", then base has " world", head has " foo".
             So head - base would be the part that is in head but not in base: which is " foo" (but note: we are doing line-based diff).
@@ -178,7 +178,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         @@ -1,5 +1,17 @@
          # Changelog
-         
+
         +## [1.0.20] - 2026-05-11
         +### Changed
         +* **Performance:** Fixed `ArchitectureDetector` to yield depth natively from traversal to eliminate redundant path splitting.
@@ -190,7 +190,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
         +* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
         +
          ## [1.0.17] - 2026-05-04
-         
+
          ### Changed
 
    This diff shows that the head has added two new version sections (for 1.0.20 on 2026-05-11 and 1.0.20 on 2026-05-06) and the base does not have these.
@@ -204,19 +204,19 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    How do we merge?
 
    We want to keep:
-        - The base's changes: which include the version 1.0.19 and all the changes under it and the previous versions that are in the base but not in the head? 
+        - The base's changes: which include the version 1.0.19 and all the changes under it and the previous versions that are in the base but not in the head?
         - The head's changes: which include the two 1.0.20 versions and the changes under them.
 
    However, note that the head also has the version 1.0.17 and below? Because the diff shows that after the added sections, we see "## [1.0.17] - 2026-05-04" which is the same as in the base.
 
    Therefore, the base has:
-        [1.0.19] ... 
+        [1.0.19] ...
         [1.0.17] ...
         [1.0.16] ... etc.
 
    The head has:
         [1.0.20] (two of them) ...
-        [1.0.17] ... 
+        [1.0.17] ...
         [1.0.16] ... etc.
 
    So the common part is from [1.0.17] downward.
@@ -257,9 +257,9 @@ We are given three versions: ancestor, base (master), and head (PR branch).
         +### Changed
         +* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
-   This suggests that the head branch has two different changes that were both released as 1.0.20? That doesn't make sense. But note: the base branch has a 1.0.19 and then the head branch has two 1.0.20 entries? 
+   This suggests that the head branch has two different changes that were both released as 1.0.20? That doesn't make sense. But note: the base branch has a 1.0.19 and then the head branch has two 1.0.20 entries?
 
-   However, looking at the base version we are given, it starts with 1.0.19 and then 1.0.17. So the base is missing 1.0.18? 
+   However, looking at the base version we are given, it starts with 1.0.19 and then 1.0.17. So the base is missing 1.0.18?
 
    Actually, the base version we are given in the problem statement for base (master) is:
 
@@ -270,7 +270,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         ## [1.0.17] - 2026-05-04
 
-        ... 
+        ...
 
    And the head version we are given in the problem statement for head (PR branch) is:
 
@@ -295,24 +295,24 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    However, note the Git Diff (Head changes vs base) shows:
 
         +## [1.0.20] - 2026-05-11
-        ... 
+        ...
         +## [1.0.20] - 2026-05-06
 
    And then it shows the base's content starting at ## [1.0.17] - 2026-05-04.
 
    Therefore, the base does not have these two 1.0.20 entries.
 
-   Now, what about the base's 1.0.19? The head does not have it? Actually, the head does not show 1.0.19 in the diff because the diff only shows what is added in the head relative to the base. The base's 1.0.19 is not in the head? 
+   Now, what about the base's 1.0.19? The head does not have it? Actually, the head does not show 1.0.19 in the diff because the diff only shows what is added in the head relative to the base. The base's 1.0.19 is not in the head?
 
-   But wait: the head branch was created from the base at an earlier time. So the head branch does not have the base's 1.0.19? Actually, no: the base's 1.0.19 was added after the head was branched? 
+   But wait: the head branch was created from the base at an earlier time. So the head branch does not have the base's 1.0.19? Actually, no: the base's 1.0.19 was added after the head was branched?
 
    How the branches diverged:
 
-        Ancestor: ... up to 1.0.17? 
-        Then the base branch (master) added 1.0.18 and 1.0.19? 
+        Ancestor: ... up to 1.0.17?
+        Then the base branch (master) added 1.0.18 and 1.0.19?
         The head branch (PR) was branched off before 1.0.18 and 1.0.19, so the head branch does not have 1.0.18 and 1.0.19.
 
-        Then the head branch added two 1.0.20 entries? 
+        Then the head branch added two 1.0.20 entries?
 
    But note: the head branch has a 1.0.20 entry dated 2026-05-06 and another dated 2026-05-11. The base branch has a 1.0.19 dated 2026-05-06.
 
@@ -320,7 +320,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    However, we are to keep all changes. So we must include both the base's 1.0.19 and the head's two 1.0.20 entries.
 
-   And we must order them by date and version. Typically, changelogs are in descending order by date, and for the same date, by version? But note: same date but different versions: 1.0.19 and 1.0.20 (with 1.0.20 being higher) so 1.0.20 should come before 1.0.19? 
+   And we must order them by date and version. Typically, changelogs are in descending order by date, and for the same date, by version? But note: same date but different versions: 1.0.19 and 1.0.20 (with 1.0.20 being higher) so 1.0.20 should come before 1.0.19?
 
    However, the head has two 1.0.20 entries: one on 2026-05-11 and one on 2026-05-06.
 
@@ -351,7 +351,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    Therefore, to build the merged file, we can:
 
-        Start with the base version (which has the base's changes, including 1.0.19 and below) 
+        Start with the base version (which has the base's changes, including 1.0.19 and below)
         and then insert the head's changes that are not in the base (which are the two 1.0.20 entries) at the appropriate place (by date and version).
 
    But note: the base version we are given in the problem statement for base (master) is truncated. We are not given the full file. Similarly for the head and ancestor.
@@ -362,14 +362,14 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    Therefore, the resolved file should be:
 
-        the base version (master) 
+        the base version (master)
         with the changes from the head branch that are not in the base (i.e., the Git Diff: Head changes vs base) inserted at the top (because the diff shows additions at the top).
 
    Why at the top? Because the diff shows:
 
         @@ -1,5 +1,17 @@
          # Changelog
-         
+
         +## [1.0.20] - 2026-05-11
         +### Changed
         +* **Performance:** Fixed `ArchitectureDetector` to yield depth natively from traversal to eliminate redundant path splitting.
@@ -415,13 +415,13 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    However, in the merged file we are building, we are inserting the head's two 1.0.20 entries at the top, and then we are including the base's content starting from the point that the diff shows: which is the line "## [1.0.17] - 2026-05-04".
 
-   But wait: the base version we are given has a [1.0.19] section between the head's inserted content and the [1.0.17] section? 
+   But wait: the base version we are given has a [1.0.19] section between the head's inserted content and the [1.0.17] section?
 
-   How can that be? The diff shows that the base version, at the point where the head's inserted content ends, has the line "## [1.0.17] - 2026-05-04". 
+   How can that be? The diff shows that the base version, at the point where the head's inserted content ends, has the line "## [1.0.17] - 2026-05-04".
 
-   This implies that the base version does not have the [1.0.19] section? 
+   This implies that the base version does not have the [1.0.19] section?
 
-   But the problem statement for the base (master) version says it starts with [1.0.19]. 
+   But the problem statement for the base (master) version says it starts with [1.0.19].
 
    There is a contradiction.
 
@@ -429,87 +429,87 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         Base (master): 71 lines changed (lines 3-101)
             # Changelog
-            
+
           - ## [1.0.17] - 2026-05-04
           + ## [1.0.19] - 2026-05-06
-            
+
             ### Changed
           - * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
           + * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
           - * **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
-          + 
-          - 
+          +
+          -
           + ## [1.0.17] - 2026-05-04
           - ## [1.0.16] - 2026-05-03
-          + 
-          - 
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
           - * **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
           + * **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
           - * **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
-          + 
-          - 
+          +
+          -
           + ## [1.0.16] - 2026-05-03
           - ## [1.0.15] - 2026-05-19
-          + 
-          - 
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
           - * **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
           + * **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
-          
+
           - ## [1.0.14] - 2026-04-29
           + ## [1.0.15] - 2026-05-19
-          
+
               ### Changed
           - * **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
           + * **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
           - * **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
-          + 
-          - 
+          +
+          -
           + ## [1.0.14] - 2026-04-29
           - ## [1.0.13] - 2026-04-27
-          + 
-          - 
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
           - * **Performance:** Moved `console = Console()` instantiations from the global module level in `repo_cloner.py` and `renderer.py` to their respective `__init__` methods. This defers the heavy load of initializing `rich.console.Console` until the classes are actually used, effectively improving the startup time of the CodeDNA CLI.
           + * **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
-          
+
           - ## [1.0.12] - 2026-04-26
           + ## [1.0.13] - 2026-04-27
-          
+
               ### Changed
           - * **Performance:** Extracted the length calculation of `contributor_files.get(author, set())` into a variable within the main loop of `DeveloperAnalyzer.analyze` to eliminate redundant dictionary lookups and length computations.
           + * **Performance:** Moved `console = Console()` instantiations from the global module level in `repo_cloner.py` and `renderer.py` to their respective `__init__` methods. This defers the heavy load of initializing `rich.console.Console` until the classes are actually used, effectively improving the startup time of the CodeDNA CLI.
-          
+
           - ## [1.0.11] - 2026-04-19
           + ## [1.0.12] - 2026-04-26
-          
+
               ### Changed
           - * **Performance:** Move lazy imports to module level to eliminate the repeated `sys.modules` lookup overhead during large-scale repository scans.
           + * **Performance:** Extracted the length calculation of `contributor_files.get(author, set())` into a variable within the main loop of `DeveloperAnalyzer.analyze` to eliminate redundant dictionary lookups and length computations.
-          
+
           - ## [1.0.10] - 2026-04-18
           + ## [1.0.11] - 2026-04-19
-          
+
           - ### Fixed
           + ### Changed
           - * **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in GitHub stats within `html_export.py` by ensuring non-numeric string values returned from the numeric formatter are properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs in GitHub metrics.
           + * **Performance:** Move lazy imports to module level to eliminate the repeated `sys.modules` lookup overhead during large-scale repository scans.
-          
+
           - ## [1.0.9] - 2026-04-17
           + ## [1.0.10] - 2026-04-18
-          
+
               ### Fixed
           - * **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in `html_export.py` by ensuring all profile data interpolated into the HTML templates is properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs.
           + * **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in GitHub stats within `html_export.py` by ensuring non-numeric string values returned from the numeric formatter are properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs in GitHub metrics.
 
-   This is the diff of the base (master) branch relative to the ancestor? 
+   This is the diff of the base (master) branch relative to the ancestor?
 
    Actually, the problem says: "Base (master): 71 lines changed (lines 3-101)" and then shows a diff.
 
