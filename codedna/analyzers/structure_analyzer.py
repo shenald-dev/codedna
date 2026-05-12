@@ -34,6 +34,7 @@ class StructureAnalyzer:
                 continue
 
             dirs_to_process = []
+            # Cache is safe because directory contents are read-only during analysis.
             file_count = None
 
             for item in items:
