@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.19] - 2026-05-06
+
+### Changed
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
+
 ## [1.0.17] - 2026-05-04
 
 ### Changed

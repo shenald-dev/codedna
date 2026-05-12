@@ -197,10 +197,13 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
-## 2026-05-26 — Performance Optimization: O(N) Traversal Bottleneck in StructureAnalyzer
+2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
+Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
+Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+## 2026-05-27 — Code Review Optimization: Managing Rebase and Tuple Destructuring
 
 Learning:
-In `StructureAnalyzer`, the file counting logic for module boundaries executed `sum(1 for p in items if p.is_file())` inside an inner loop. If a single directory contained multiple module markers (e.g., both `package.json` and `__init__.py`), the code would re-iterate over all items to count the files for *each* marker, introducing duplicate work and redundant traversal overhead.
+When rebasing a feature branch onto master, a previously passing feature might break due to underlying changes in utility methods. Specifically, changing `ArchitectureDetector._walk` in `master` to yield a tuple `(item, depth)` instead of just `item` caused `tests/test_architecture_detector.py` to raise `AttributeError: 'tuple' object has no attribute 'name'` in our branch post-merge.
 
 Action:
-Replaced the repeated iteration with lazy evaluation and caching. Introduced a `dir_file_count = None` variable outside the loop. When a marker is found, it calculates the count only if `dir_file_count is None`. This ensures the exact file count behavior is preserved while avoiding redundant O(N) internal traversals within the same directory.
+Always aggressively test the entire test suite immediately after a `git merge origin/master`. Update any list comprehensions iterating over the refactored method to correctly destructure the tuple (e.g., `for item, _ in items:`).
