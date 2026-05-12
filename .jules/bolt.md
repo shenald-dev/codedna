@@ -200,3 +200,11 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+
+## 2026-06-03 — Performance Optimization: Eliminating N+1 Git Subprocesses (Fixing Git Format Error)
+
+Learning:
+When running batched `git log` commands with a custom format (like literal string "COMMIT"), passing `--format=COMMIT` fails in modern Git versions with a `fatal: invalid --pretty format` error, returning empty output that gets silently caught in try/except blocks and causes inaccurate analysis.
+
+Action:
+Used `--format=format:COMMIT` in `EvolutionEngine._compute_churn` to correctly use Git`s format specifier. This fixes the error and allows the batch extraction of churn metrics.
