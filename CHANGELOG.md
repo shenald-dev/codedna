@@ -4,6 +4,7 @@
 
 ### Changed
 * **Performance:** Removed redundant path parsing logic and string manipulation within the directory traversal in `ArchitectureDetector` by returning traversal depths directly from the stack, eliminating `ValueError` exceptions and improving file system scanning times.
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
 ## [1.0.18] - 2026-05-05
 
