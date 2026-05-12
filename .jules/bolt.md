@@ -197,6 +197,6 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
-2024-05-10 — Yielding Depths during Directory Traversal
-Learning: In python when doing heavy file tree analysis, repeated string manipulations via pathlib like `item.relative_to(root).parts` are very costly and become a performance bottleneck when traversing thousands of files in large repositories.
-Action: Directly calculate and yield the integer depth from the generator traversing the directory stack, and then consume it in the main iteration loop to prevent duplicate parsing overhead.
+2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
+Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
+Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
