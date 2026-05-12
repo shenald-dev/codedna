@@ -1,6 +1,11 @@
 # Changelog
 
-## [1.0.19] - 2026-05-06
+## [Unreleased]
+
+### Changed
+* **Performance:** Replaced an $O(N^2)$ internal list comprehension loop `sum(1 for p in items if p.is_file())` with a single $O(N)$ scalar counter in `StructureAnalyzer` directory traversal, significantly improving performance in large directories.
+
+## [1.0.19] - 2026-05-25
 
 ### Changed
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
