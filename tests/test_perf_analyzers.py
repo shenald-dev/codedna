@@ -31,6 +31,7 @@ class TestAnalyzerPerformance(unittest.TestCase):
         result = self.detector.detect(self.tmp_path)
         end_time = time.time()
 
+
         # Time should be minimal, generally well under 0.1s for this structure
         self.assertLess(end_time - start_time, 0.5, "ArchitectureDetector is too slow")
         self.assertIn("primary_pattern", result)
@@ -40,6 +41,7 @@ class TestAnalyzerPerformance(unittest.TestCase):
         result = self.structure_analyzer.analyze(self.tmp_path)
         end_time = time.time()
 
+
         # Time should be minimal, generally well under 0.1s for this structure
         self.assertLess(end_time - start_time, 0.5, "StructureAnalyzer is too slow")
         self.assertIn("modules", result)
@@ -47,4 +49,3 @@ class TestAnalyzerPerformance(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-```
