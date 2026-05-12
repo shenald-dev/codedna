@@ -102,4 +102,10 @@ Version bumped to 1.0.18 across all manifest files. `CHANGELOG.md` updated and c
 Observation / Pruned:
 Fixed `ArchitectureDetector` to yield depth natively from traversal to eliminate redundant path splitting. Fixed `StructureAnalyzer` to lazily evaluate `file_count` for modules, preventing unnecessary repeated internal iterations. Cleaned up temporary patch files `patch_arch.py` and `patch_struct.py` from repository root.
 Alignment / Deferred:
-Updated CHANGELOG.md, pyproject.toml, and codedna/cli.py to track version 1.0.19.
+Updated CHANGELOG.md, pyproject.toml, and codedna/cli.py to track version 1.0.20.
+
+2026-05-06 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully removed the redundant string splitting overhead inside the file iteration loop in ArchitectureDetector._walk. During adversarial QA, I verified this logic directly tracks item.name.lower() to capture all path components accurately. Added test_architecture_detector.py to assert that correct traversal and folder ignoring remain intact. No dependencies were upgraded or dead code pruned.
+Alignment / Deferred:
+Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md updated to document the testing enhancements. No dependencies upgraded.

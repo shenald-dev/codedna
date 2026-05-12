@@ -1,11 +1,16 @@
 # Changelog
 
-## [1.0.19] - 2026-05-11
+## [1.0.20] - 2026-05-11
 
 ### Changed
 * **Performance:** Fixed `ArchitectureDetector` to yield depth natively from traversal to eliminate redundant path splitting.
 * **Performance:** Fixed `StructureAnalyzer` to lazily evaluate `file_count` for modules, preventing unnecessary repeated internal iterations.
 * **Cleanup:** Removed unused orphaned files and updated dependencies to latest secure minor versions.
+
+## [1.0.20] - 2026-05-06
+
+### Changed
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
 ## [1.0.17] - 2026-05-04
 
