@@ -205,3 +205,7 @@ Learning:
 
 Action:
 Replaced the internal list comprehension loop with a continuously updated scalar counter (`local_files`) tracked during the main iteration, eliminating the redundant inner loops and strictly improving traversal performance.
+
+## 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
+Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
+Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
