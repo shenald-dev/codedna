@@ -10,6 +10,12 @@ class Renderer:
     """Renders analysis results using Rich for beautiful terminal output."""
 
     def __init__(self, console=None):
+        """Initialize the Renderer.
+
+        Args:
+            console: Optional rich Console instance. If None, it will be lazily
+                     imported and instantiated to reduce module load time.
+        """
         if console is None:
             from rich.console import Console
             self.console = Console()
