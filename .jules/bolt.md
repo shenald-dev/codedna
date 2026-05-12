@@ -204,6 +204,3 @@ In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to comput
 
 Action:
 Instead of iterating over `items` again to count files, we can just maintain a counter (`current_dir_file_count`) inside the main `for item in items:` loop. When a module marker is found, we wait until the loop finishes, then append the computed count to the `modules` array.
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
