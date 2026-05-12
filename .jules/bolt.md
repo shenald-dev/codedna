@@ -200,3 +200,11 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+
+## 2026-05-26 — Fix: Test tuple unpacking after Generator API change
+
+Learning:
+When merging or rebasing a branch that alters the return type of a core generator API (e.g., from yielding an object `item` to yielding a tuple `(item, depth)`), downstream tests that rely on unpacking the generator output will fail with `AttributeError` or `ValueError` if not updated simultaneously.
+
+Action:
+Always run the full test suite (`python3 -m pytest tests/`) immediately after modifying the yield signatures of core traversal iterators to catch and update all affected list comprehensions and tuple destructuring instances across the codebase.
