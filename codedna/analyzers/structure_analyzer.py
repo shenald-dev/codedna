@@ -36,6 +36,7 @@ class StructureAnalyzer:
             dirs_to_process = []
             current_dir_file_count = 0
             has_module_markers = []
+            file_count = None
 
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
