@@ -101,6 +101,6 @@ Version bumped to 1.0.18 across all manifest files. `CHANGELOG.md` updated and c
 
 2026-05-06 — Assessment & Lifecycle
 Observation / Pruned:
-The previous optimization agent successfully removed the redundant `item.relative_to` and `.split()` logic from the `ArchitectureDetector._walk` traversal, eliminating significant string processing overhead for every file scanned. No dead code or unused dependencies were detected during subsequent lifecycle audits.
+The previous optimization agent successfully removed the redundant `item.relative_to` and `.split()` logic from the `ArchitectureDetector._walk` traversal, eliminating significant string processing overhead for every file scanned. During adversarial QA, I verified this logic directly tracks `item.name.lower()` to capture all path components accurately. Added `test_architecture_detector.py` to assert that correct traversal and folder ignoring remain intact. No dead code or unused dependencies were detected during subsequent lifecycle audits.
 Alignment / Deferred:
-Synchronized `CHANGELOG.md` to reflect the traversal optimization. Version bumped to 1.0.19. No dependency upgrades were performed or deferred.
+Synchronized `CHANGELOG.md` to reflect the traversal optimization. Version bumped to 1.0.19 across `pyproject.toml` and `codedna/cli.py`. No dependency upgrades were performed or deferred.

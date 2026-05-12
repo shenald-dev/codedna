@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.19] - 2026-05-06
+
+### Changed
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
+* **[Performance]:** Removed redundant path string splitting and `relative_to` processing in the `ArchitectureDetector` traversal, significantly lowering the overhead per file scanned.
+
 ## [1.0.17] - 2026-05-04
 
 ### Changed
@@ -93,6 +99,3 @@
 * **Code Quality:** Removed stale unused imports globally utilizing aggressive `ruff check --fix` policies.
 * **Cleanup:** Removed unused orphaned scripts such as `update_security_detector.py`.
 * **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
-
-## [1.0.19] - 2026-05-06
-* **[Performance]:** Removed redundant path string splitting and `relative_to` processing in the `ArchitectureDetector` traversal, significantly lowering the overhead per file scanned.
