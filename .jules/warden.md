@@ -98,3 +98,9 @@ Observation / Pruned:
 Discovered that `AIAnalyzer._minimize_payload()` mutated the original `raw_dna_profile` when removing values in the shallow copy. Applied `copy.deepcopy` to the cloned payload and pruned unused variable assignment in `tests/test_ai_analyzer.py` via `ruff`.
 Alignment / Deferred:
 Version bumped to 1.0.18 across all manifest files. `CHANGELOG.md` updated and changes prepared for release. No dependencies upgraded.
+
+2026-05-06 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully removed the redundant string splitting overhead inside the file iteration loop in ArchitectureDetector._walk. During adversarial QA, I verified this logic directly tracks item.name.lower() to capture all path components accurately. Added test_architecture_detector.py to assert that correct traversal and folder ignoring remain intact. No dependencies were upgraded or dead code pruned.
+Alignment / Deferred:
+Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md updated to document the testing enhancements. No dependencies upgraded.
