@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.20] - 2026-05-13
+
+### Changed
+* **Testing:** Fixed a failing test related to tuple unpacking in `ArchitectureDetector._walk` and verified repository stability. Codebase audited for dead code and dependency entropy; no pruning required.
+
 ## [1.0.19] - 2026-05-06
 
 ### Changed
