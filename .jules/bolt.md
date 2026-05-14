@@ -200,3 +200,10 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+## 2026-05-26 — Fix Git log format bug in DeveloperAnalyzer and EvolutionEngine
+
+Learning:
+When using GitPython to execute batched `git log` commands with a custom literal string format, modern Git versions reject the un-prefixed version with a 'fatal: invalid --pretty format' error.
+
+Action:
+Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) instead of `format:` or just `--format=COMMIT`.
