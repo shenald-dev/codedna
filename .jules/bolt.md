@@ -200,3 +200,11 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+
+## 2026-05-26 — Fix: Git log formatting in GitPython
+
+Learning:
+In Git, if you pass a custom format string via `--format=<string>` and it does *not* contain a `%` placeholder (like `--format=COMMIT`), Git will fail with a `fatal: invalid --pretty format: COMMIT` error. Git only auto-infers custom string formats if they contain a `%`.
+
+Action:
+Explicitly prepend `tformat:` to literal string formats in `git log` commands via GitPython (e.g., `--format=tformat:COMMIT`) to ensure Git interprets it correctly and avoids runtime crashes.

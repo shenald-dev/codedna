@@ -97,7 +97,7 @@ class EvolutionEngine:
         try:
             output = repo.git.log(
                 "--numstat",
-                "--format=COMMIT",
+                "--format=tformat:COMMIT",
                 "-n 200",
                 "--no-renames"
             )
