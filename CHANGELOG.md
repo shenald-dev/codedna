@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.20] - 2026-05-12
+
+### Changed
+* **Testing:** Ensured codebase integrity after tuple unpacking test fixes. Pruned zero files.
+
 ## [1.0.19] - 2026-05-06
 
 ### Changed
