@@ -104,3 +104,8 @@ Observation / Pruned:
 The previous optimization agent successfully removed the redundant string splitting overhead inside the file iteration loop in ArchitectureDetector._walk. During adversarial QA, I verified this logic directly tracks item.name.lower() to capture all path components accurately. Added test_architecture_detector.py to assert that correct traversal and folder ignoring remain intact. No dependencies were upgraded or dead code pruned.
 Alignment / Deferred:
 Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md updated to document the testing enhancements. No dependencies upgraded.
+2026-05-17 — Assessment & Lifecycle
+Observation / Pruned:
+The previous agent correctly fixed a bug in test_architecture_detector.py where the generator unpacking was incorrect, fixing the test suite.
+Alignment / Deferred:
+Updated CHANGELOG.md to reflect the fix and bumped version to 1.0.20. No dependency upgrades deferred.
