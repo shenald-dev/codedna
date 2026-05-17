@@ -200,3 +200,10 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+## 2025-03-13 — Git Format Issue
+
+Learning:
+Modern Git versions reject `--format=COMMIT` without the `tformat:` prefix with a "fatal: invalid --pretty format" error. In CodeDNA analyzers, `try-except` blocks silently caught this as a `GitCommandError`, completely breaking contributor and evolution analysis without failing the test suite.
+
+Action:
+Always use `--format=tformat:...` when passing custom literal format strings to `git.log()` via GitPython, and verify git commands locally outside of broad try-except blocks to catch silent failures early.
