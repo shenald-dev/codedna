@@ -1,7 +1,7 @@
 {
   "metadata": {
     "source": ".",
-    "analyzed_at": "2026-04-08T16:22:04.785425",
+    "analyzed_at": "2026-05-17T16:10:38.423503",
     "version": "1.0.0"
   },
   "signature": "LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1",
@@ -9,24 +9,24 @@
   "languages": {
     "languages": {
       "Python": {
-        "files": 33,
-        "lines": 3095,
-        "percentage": 76.0
+        "files": 28,
+        "lines": 3250,
+        "percentage": 71.7
       },
       "Markdown": {
         "files": 5,
-        "lines": 463,
-        "percentage": 11.4
+        "lines": 768,
+        "percentage": 16.9
       },
       "JSON": {
         "files": 4,
         "lines": 165,
-        "percentage": 4.1
+        "percentage": 3.6
       },
       "TOML": {
         "files": 1,
         "lines": 58,
-        "percentage": 1.4
+        "percentage": 1.3
       },
       "YAML": {
         "files": 1,
@@ -35,13 +35,13 @@
       },
       "HTML": {
         "files": 1,
-        "lines": 255,
-        "percentage": 6.3
+        "lines": 256,
+        "percentage": 5.6
       }
     },
     "primary": "Python",
-    "total_files": 45,
-    "total_lines": 4070
+    "total_files": 40,
+    "total_lines": 4531
   },
   "architecture": {
     "primary_pattern": "Monolith",
@@ -54,39 +54,36 @@
     "coupling": "Low"
   },
   "structure_stats": {
-    "total_files": 58,
-    "total_dirs": 13,
+    "total_files": 41,
+    "total_dirs": 6,
     "max_depth": 2,
     "modules": 4
   },
   "dependencies": {
-    "total_modules": 94,
-    "total_edges": 141,
-    "density": 0.0161,
+    "total_modules": 88,
+    "total_edges": 128,
+    "density": 0.0167,
     "has_circular_deps": false,
     "circular_count": 0
   },
   "health": {
-    "overall": "Critical",
+    "overall": "Needs Attention",
     "severity_counts": {
       "critical": 1,
-      "warning": 4,
-      "info": 21
+      "warning": 6,
+      "info": 13
     },
     "coupling": "Low",
     "circular_deps": false
   },
   "risks": [
-    "\ud83d\udd34 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)",
-    "\ud83d\udd34 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')",
-    "\ud83d\udd34 Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected RSA Private Key (----***----)",
-    "\ud83d\udd34 Hardcoded Secret in `codedna/analyzers/security_detector.py:28`: Detected RSA Private Key (----***----)",
-    "\ud83d\udd34 Hardcoded Secret in `codedna/analyzers/security_detector.py:15`: Detected SSH Private Key (----***----)",
-    "\ud83d\udd34 Hardcoded Secret in `codedna/analyzers/security_detector.py:29`: Detected SSH Private Key (----***----)",
-    "\ud83d\udd34 God Class in `tests/test_analyzers.py`: 21 methods detected (threshold: 15)",
+    "\ud83d\udd34 God Class in `tests/test_analyzers.py`: 24 methods detected (threshold: 15)",
     "\ud83d\udfe1 Long Function in `codedna/cli.py`",
+    "\ud83d\udfe1 Long Function in `codedna/analyzers/developer_analyzer.py`",
     "\ud83d\udfe1 Long Function in `codedna/analyzers/dna_generator.py`",
-    "\ud83d\udfe1 Long Function in `codedna/analyzers/code_smell_detector.py`"
+    "\ud83d\udfe1 Long Function in `codedna/analyzers/dna_generator.py`",
+    "\ud83d\udfe1 Long Function in `codedna/visualization/html_export.py`",
+    "\ud83d\udfe1 Long Function in `codedna/visualization/html_export.py`"
   ],
   "developer_genome": {
     "total_contributors": 1,
@@ -102,53 +99,16 @@
   },
   "evolution": {
     "total_commits": 1,
-    "first_commit": "2026-04-08T16:43:37+05:30",
-    "last_commit": "2026-04-08T16:43:37+05:30",
+    "first_commit": "2026-05-12T22:39:11+05:30",
+    "last_commit": "2026-05-12T22:39:11+05:30",
     "patterns": [
       "Insufficient data"
     ]
   },
   "security": {
-    "vulnerabilities": [
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "tests/test_analyzers.py:27",
-        "detail": "Detected AWS Access Key (AKIA***MPLE)"
-      },
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "tests/test_analyzers.py:27",
-        "detail": "Detected Generic API Key / Token (KEY ***PLE')"
-      },
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "codedna/analyzers/security_detector.py:14",
-        "detail": "Detected RSA Private Key (----***----)"
-      },
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "codedna/analyzers/security_detector.py:28",
-        "detail": "Detected RSA Private Key (----***----)"
-      },
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "codedna/analyzers/security_detector.py:15",
-        "detail": "Detected SSH Private Key (----***----)"
-      },
-      {
-        "type": "Hardcoded Secret",
-        "severity": "critical",
-        "file": "codedna/analyzers/security_detector.py:29",
-        "detail": "Detected SSH Private Key (----***----)"
-      }
-    ],
-    "total_critical": 6,
-    "has_secrets": true
+    "vulnerabilities": [],
+    "total_critical": 0,
+    "has_secrets": false
   },
   "github": {
     "is_github": false,
@@ -158,5 +118,5 @@
     "description": "",
     "homepage": ""
   },
-  "mermaid_graph": "graph LR\n    test_git --> time\n    test_git --> git\n    test_arch --> time\n    test_arch --> pathlib\n    test_arch --> codedna_analyzers_architecture_detector\n    test_deps --> time\n    test_deps --> pathlib\n    test_deps --> codedna_analyzers_dependency_mapper\n    test_perf --> time\n    test_perf --> pathlib\n    test_perf --> codedna_analyzers_developer_analyzer\n    test_perf --> codedna_analyzers_evolution_engine\n    test_perf2 --> time\n    test_perf2 --> pathlib\n    test_perf2 --> codedna_analyzers_structure_analyzer\n    test_perf2 --> codedna_analyzers_language_detector\n    test_perf3 --> time\n    test_perf3 --> pathlib\n    test_perf3 --> codedna_analyzers_structure_analyzer\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest\n    tests_test_minimal --> pathlib\n    tests_test_minimal --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> pytest\n    tests_test_analyzers --> json\n    tests_test_analyzers --> codedna_analyzers_architecture_detector\n    tests_test_analyzers --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> codedna_analyzers_dependency_mapper\n    tests_test_analyzers --> codedna_analyzers_dna_generator"
+  "mermaid_graph": "graph LR\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest\n    tests_test_minimal --> pathlib\n    tests_test_minimal --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> pytest\n    tests_test_analyzers --> json\n    tests_test_analyzers --> codedna_analyzers_architecture_detector\n    tests_test_analyzers --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> codedna_analyzers_dependency_mapper\n    tests_test_analyzers --> codedna_analyzers_dna_generator\n    tests_test_analyzers --> codedna_analyzers_github_analyzer\n    tests_test_analyzers --> codedna_analyzers_language_detector\n    tests_test_analyzers --> codedna_analyzers_security_detector\n    tests_test_analyzers --> codedna_analyzers_structure_analyzer\n    tests_test_analyzers --> codedna_analyzers_developer_analyzer\n    tests_test_analyzers --> unittest_mock\n    tests_test_visualization --> pytest\n    tests_test_visualization --> codedna_visualization_html_export\n    tests_test_github_analyzer_security --> unittest\n    tests_test_github_analyzer_security --> unittest_mock\n    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer\n    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer\n    tests_test_repo_cloner --> sys\n    tests_test_repo_cloner --> unittest\n    tests_test_repo_cloner --> git\n    tests_test_repo_cloner --> unittest_mock\n    tests_test_repo_cloner --> codedna_analyzers_repo_cloner\n    tests_test_architecture_detector --> shutil\n    tests_test_architecture_detector --> tempfile"
 }

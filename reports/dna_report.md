@@ -1,7 +1,7 @@
 # 🧬 CodeDNA Profile
 
 > Analyzed: `.`
-> Date: 2026-04-08
+> Date: 2026-05-17
 
 
 ---
@@ -17,58 +17,38 @@
 
 | Language | Files | Lines | Share |
 |----------|-------|-------|-------|
-| Python | 33 | 3,095 | 76.0% `███████████████` |
-| Markdown | 5 | 463 | 11.4% `██` |
-| JSON | 4 | 165 | 4.1% `█` |
-| TOML | 1 | 58 | 1.4% `█` |
+| Python | 28 | 3,250 | 71.7% `██████████████` |
+| Markdown | 5 | 768 | 16.9% `███` |
+| JSON | 4 | 165 | 3.6% `█` |
+| TOML | 1 | 58 | 1.3% `█` |
 | YAML | 1 | 34 | 0.8% `█` |
-| HTML | 1 | 255 | 6.3% `█` |
+| HTML | 1 | 256 | 5.6% `█` |
 
-## 🩺 Health Score: **Critical**
+## 🩺 Health Score: **Needs Attention**
 
 - 🔴 Critical: 1
-- 🟡 Warning: 4
-- 🔵 Info: 21
+- 🟡 Warning: 6
+- 🔵 Info: 13
 
 ## ⚠️ Risk Signals
 
-- 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected AWS Access Key (AKIA***MPLE)
-- 🔴 Hardcoded Secret in `tests/test_analyzers.py:27`: Detected Generic API Key / Token (KEY ***PLE')
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:14`: Detected RSA Private Key (----***----)
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:28`: Detected RSA Private Key (----***----)
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:15`: Detected SSH Private Key (----***----)
-- 🔴 Hardcoded Secret in `codedna/analyzers/security_detector.py:29`: Detected SSH Private Key (----***----)
-- 🔴 God Class in `tests/test_analyzers.py`: 21 methods detected (threshold: 15)
+- 🔴 God Class in `tests/test_analyzers.py`: 24 methods detected (threshold: 15)
 - 🟡 Long Function in `codedna/cli.py`
+- 🟡 Long Function in `codedna/analyzers/developer_analyzer.py`
+- 🟡 Long Function in `codedna/analyzers/dna_generator.py`
+- 🟡 Long Function in `codedna/analyzers/dna_generator.py`
+- 🟡 Long Function in `codedna/visualization/html_export.py`
+- 🟡 Long Function in `codedna/visualization/html_export.py`
 
 ## 🔗 Dependency Graph
 
-- Modules: **94**
-- Connections: **141**
-- Density: **0.0161**
+- Modules: **88**
+- Connections: **128**
+- Density: **0.0167**
 - Circular Dependencies: **None ✅**
 
 ```mermaid
 graph LR
-    test_git --> time
-    test_git --> git
-    test_arch --> time
-    test_arch --> pathlib
-    test_arch --> codedna_analyzers_architecture_detector
-    test_deps --> time
-    test_deps --> pathlib
-    test_deps --> codedna_analyzers_dependency_mapper
-    test_perf --> time
-    test_perf --> pathlib
-    test_perf --> codedna_analyzers_developer_analyzer
-    test_perf --> codedna_analyzers_evolution_engine
-    test_perf2 --> time
-    test_perf2 --> pathlib
-    test_perf2 --> codedna_analyzers_structure_analyzer
-    test_perf2 --> codedna_analyzers_language_detector
-    test_perf3 --> time
-    test_perf3 --> pathlib
-    test_perf3 --> codedna_analyzers_structure_analyzer
     tests_test_minimal --> shutil
     tests_test_minimal --> tempfile
     tests_test_minimal --> unittest
@@ -80,6 +60,25 @@ graph LR
     tests_test_analyzers --> codedna_analyzers_code_smell_detector
     tests_test_analyzers --> codedna_analyzers_dependency_mapper
     tests_test_analyzers --> codedna_analyzers_dna_generator
+    tests_test_analyzers --> codedna_analyzers_github_analyzer
+    tests_test_analyzers --> codedna_analyzers_language_detector
+    tests_test_analyzers --> codedna_analyzers_security_detector
+    tests_test_analyzers --> codedna_analyzers_structure_analyzer
+    tests_test_analyzers --> codedna_analyzers_developer_analyzer
+    tests_test_analyzers --> unittest_mock
+    tests_test_visualization --> pytest
+    tests_test_visualization --> codedna_visualization_html_export
+    tests_test_github_analyzer_security --> unittest
+    tests_test_github_analyzer_security --> unittest_mock
+    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer
+    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer
+    tests_test_repo_cloner --> sys
+    tests_test_repo_cloner --> unittest
+    tests_test_repo_cloner --> git
+    tests_test_repo_cloner --> unittest_mock
+    tests_test_repo_cloner --> codedna_analyzers_repo_cloner
+    tests_test_architecture_detector --> shutil
+    tests_test_architecture_detector --> tempfile
 ```
 
 ## 👥 Developer Genome
@@ -95,7 +94,7 @@ graph LR
 ## 📈 Evolution
 
 - Total Commits: **1**
-- First Commit: 2026-04-08
+- First Commit: 2026-05-12
 - Patterns: Insufficient data
 
 ## 🧬 DNA Signature
