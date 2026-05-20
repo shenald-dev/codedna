@@ -203,3 +203,10 @@ Action: Refactored _walk in ArchitectureDetector to yield depth directly instead
 2026-05-26 — Fix GitPython Crash due to Invalid Git Format String
 Learning: Using `--format=COMMIT` in `git log` without a `tformat:` prefix or `%` variables causes modern Git versions to crash with `fatal: invalid --pretty format`, resulting in an unhandled `GitCommandError` that silently breaks analysis.
 Action: Always explicitly use `tformat:` prefix for literal string separators in Git formatting commands.
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
