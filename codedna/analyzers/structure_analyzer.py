@@ -34,7 +34,7 @@ class StructureAnalyzer:
                 continue
 
             dirs_to_process = []
-            # Cache assumes `items` is not mutated during the current directory's loop.
+            # Cache assumes `items` is not mutated during the current directory\'s loop.
             file_count_cache = None
 
             for item in items:
