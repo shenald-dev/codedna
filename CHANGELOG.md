@@ -1,10 +1,12 @@
 # Changelog
 
-## [1.0.20] - 2026-05-16
+## [1.0.20] - 2026-05-20
+
+
 
 ### Changed
-* **Testing:** Verified fix for `TestArchitectureDetectorWalk` tuple unpacking issue caused by optimization to `ArchitectureDetector._walk`.
-* **Cleanup:** Verified no dead code or unneeded dependency upgrades required.
+
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. Verified no dead code or unneeded dependency upgrades required.
 
 ## [1.0.19] - 2026-05-06
 
