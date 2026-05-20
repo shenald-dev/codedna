@@ -208,3 +208,10 @@ Git versions reject the un-prefixed --format=COMMIT version with a 'fatal: inval
 
 Action:
 Always strictly use the prefix tformat: for Git log custom literal string formats.
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
