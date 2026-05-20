@@ -1,7 +1,6 @@
 # Changelog
 
-## [1.0.20] - 2026-05-06
-
+## [1.0.21] - 2026-05-20
 ### Changed
 * **Performance:** Removed the redundant `.relative_to` path string processing per file inside `ArchitectureDetector._walk` and optimized the file counting in `StructureAnalyzer`.
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
