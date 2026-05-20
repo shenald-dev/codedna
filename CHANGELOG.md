@@ -1,9 +1,9 @@
 # Changelog
 
-## [1.0.20] - 2026-05-12
+## [1.0.20] - 2026-05-20
 
 ### Changed
-* **Testing:** Ensured codebase integrity after tuple unpacking test fixes. Pruned zero files.
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
 
 ## [1.0.19] - 2026-05-06
 
