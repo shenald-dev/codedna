@@ -204,3 +204,11 @@ In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to comput
 
 Action:
 Instead of iterating over `items` again to count files, we can just maintain a counter (`current_dir_file_count`) inside the main `for item in items:` loop. When a module marker is found, we wait until the loop finishes, then append the computed count to the `modules` array.
+
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
