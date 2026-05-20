@@ -1,10 +1,21 @@
 # Changelog
 
+
+
+## [1.0.19] - 2026-05-20
+
+### Changed
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
+
 ## [1.0.19] - 2026-05-06
 
 ### Changed
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
+
 * **[Performance]:** Removed redundant path string splitting and `relative_to` processing in the `ArchitectureDetector` traversal, significantly lowering the overhead per file scanned.
+
+
 
 ## [1.0.17] - 2026-05-04
 

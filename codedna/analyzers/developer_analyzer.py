@@ -32,7 +32,7 @@ class DeveloperAnalyzer:
         try:
             log_output = repo.git.log(
                 "--name-only",
-                "--format=COMMIT::%H::%aN::%aE::%ad",
+                "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
                 "--date=short",
                 f"-n {max_commits}"
             )
