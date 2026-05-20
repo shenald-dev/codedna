@@ -1,9 +1,10 @@
 # Changelog
 
-## [1.0.20] - 2026-05-17
+
+## [1.0.20] - 2026-05-20
 
 ### Changed
-* **Testing:** Fixed the `TestArchitectureDetectorWalk.test_walk_redundant_path_splitting_optimization` test by correctly unpacking the yielded `(item, depth)` tuple to fix the failing test suite after the previous generator traversal optimization.
+* **Testing:** Fixed the `TestArchitectureDetectorWalk.test_walk_redundant_path_splitting_optimization` test by correctly unpacking the yielded `(item, depth)` tuple to fix the failing test suite after the previous generator traversal optimization. No dead code pruned.
 
 ## [1.0.19] - 2026-05-06
 
