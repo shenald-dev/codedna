@@ -4,6 +4,7 @@
 
 ### Changed
 * **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+* **Bugfix:** Prepend custom git log format strings with `tformat:` rather than `format:` to guarantee safe iteration over output records without newline bugs.
 
 ## [1.0.19] - 2026-05-06
 
