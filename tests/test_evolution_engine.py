@@ -47,3 +47,35 @@ def test_analyze_no_error_on_invalid_repo(tmp_path):
     result = engine.analyze(tmp_path)
     assert "error" in result
     assert result["error"] == "Not a Git repository"
+
+def test_compute_churn_git_exception_handling():
+    engine = EvolutionEngine()
+    repo_mock = MagicMock(spec=Repo)
+    repo_mock.git = MagicMock()
+
+    # Simulate an exception raised by git.log, e.g. GitCommandError
+    repo_mock.git.log.side_effect = Exception("git command failed")
+
+    churn = engine._compute_churn(repo_mock)
+
+    # The method should catch the exception and return an empty list
+    assert churn == []
+
+def test_compute_churn_invalid_format_parsing():
+    engine = EvolutionEngine()
+    repo_mock = MagicMock(spec=Repo)
+    repo_mock.git = MagicMock()
+
+    # Mock output with missing columns to test parsing robustness
+    mock_log_output = "COMMIT\n10\tfile1.py\nCOMMIT\n-\t-\tfile2.py"
+    repo_mock.git.log.return_value = mock_log_output
+
+    churn = engine._compute_churn(repo_mock)
+
+    # Verify it doesn't crash and handles the '-' and missing columns correctly
+    assert len(churn) == 1
+    file2_churn = churn[0]
+    assert file2_churn["file"] == "file2.py"
+    assert file2_churn["changes"] == 1
+    assert file2_churn["total_additions"] == 0
+    assert file2_churn["total_deletions"] == 0

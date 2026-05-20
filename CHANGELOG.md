@@ -3,7 +3,7 @@
 ## [1.0.20] - 2026-05-20
 
 ### Changed
-* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+* **Fix:** Resolved `git log` formatting crash in `EvolutionEngine` for modern Git versions by replacing `--format=COMMIT` with `--format=format:COMMIT`.
 
 ## [1.0.19] - 2026-05-06
 
