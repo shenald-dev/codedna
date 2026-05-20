@@ -27,86 +27,41 @@ class EvolutionEngine:
         except InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "timeline": []}
 
-        commits = list(repo.iter_commits(max_count=500))
-        if not commits:
+        try:
+            output = repo.git.log(
+                "--numstat",
+                "--format=tformat:COMMIT::%H::%aI::%s",
+                "-n", "500",
+                "--no-renames"
+            )
+        except Exception:
             return {"timeline": [], "patterns": []}
 
-        # Build timeline snapshots
-        timeline = self._build_timeline(commits, snapshots)
+        commits_data = []
+        current_commit = None
 
-        # Detect churn (files that change most frequently)
-        churn = self._compute_churn(repo)
-
-        # Detect evolution patterns
-        patterns = self._detect_patterns(timeline)
-
-        return {
-            "total_commits": len(commits),
-            "first_commit": commits[-1].committed_datetime.isoformat() if commits else None,
-            "last_commit": commits[0].committed_datetime.isoformat() if commits else None,
-            "timeline": timeline,
-            "churn_hotspots": churn[:10],
-            "patterns": patterns,
-        }
-
-    def _build_timeline(self, commits: list, snapshots: int) -> list[dict]:
-        """Build time-based snapshots of the project's evolution."""
-        if len(commits) < 2:
-            return []
-
-        step = max(1, len(commits) // snapshots)
-        timeline = []
-
-        for i in range(0, len(commits), step):
-            commit = commits[i]
-            date = commit.committed_datetime.strftime("%Y-%m-%d")
-
-            # Count files at this point
-            try:
-                output = commit.repo.git.ls_tree("-r", commit.hexsha)
-                file_count = output.count('\n') + 1 if output else 0
-            except Exception:
-                file_count = 0
-
-            # Count insertions/deletions
-            try:
-                stats = commit.stats.total
-                additions = stats.get("insertions", 0)
-                deletions = stats.get("deletions", 0)
-            except Exception:
-                additions = 0
-                deletions = 0
-
-            timeline.append({
-                "date": date,
-                "commit": commit.hexsha[:8],
-                "message": commit.message.strip().split("\n")[0][:60],
-                "file_count": file_count,
-                "additions": additions,
-                "deletions": deletions,
-            })
-
-        return timeline[:snapshots]
-
-    def _compute_churn(self, repo: Repo) -> list[dict]:
-        """Find files with the highest change frequency (churn)."""
         file_changes: Counter = Counter()
         file_additions: defaultdict = defaultdict(int)
         file_deletions: defaultdict = defaultdict(int)
 
-        try:
-            output = repo.git.log(
-                "--numstat",
-                "--format=tformat:COMMIT",
-                "-n 200",
-                "--no-renames"
-            )
+        for line in output.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
 
-            for line in output.split('\n'):
-                line = line.strip()
-                if not line or line == "COMMIT":
-                    continue
-
+            if line.startswith("COMMIT::"):
+                parts = line.split("::", 3)
+                if len(parts) >= 4:
+                    current_commit = {
+                        "hexsha": parts[1],
+                        "date": parts[2][:10],
+                        "iso_date": parts[2],
+                        "message": parts[3].strip().split("\n")[0][:60],
+                        "additions": 0,
+                        "deletions": 0,
+                    }
+                    commits_data.append(current_commit)
+            elif current_commit is not None:
                 parts = line.split('\t')
                 if len(parts) >= 3:
                     ins, dels, filepath = parts[0], parts[1], parts[2]
@@ -116,13 +71,42 @@ class EvolutionEngine:
                     except ValueError:
                         ins_int, del_int = 0, 0
 
-                    file_changes[filepath] += 1
-                    file_additions[filepath] += ins_int
-                    file_deletions[filepath] += del_int
-        except Exception:
-            pass
+                    current_commit["additions"] += ins_int
+                    current_commit["deletions"] += del_int
 
-        return [
+                    if len(commits_data) <= 200:
+                        file_changes[filepath] += 1
+                        file_additions[filepath] += ins_int
+                        file_deletions[filepath] += del_int
+
+        if not commits_data:
+            return {"timeline": [], "patterns": []}
+
+        # Build timeline snapshots
+        timeline = []
+        if len(commits_data) >= 2:
+            step = max(1, len(commits_data) // snapshots)
+            for i in range(0, len(commits_data), step):
+                c = commits_data[i]
+
+                try:
+                    tree_output = repo.git.ls_tree("-r", c["hexsha"])
+                    file_count = tree_output.count('\n') + 1 if tree_output else 0
+                except Exception:
+                    file_count = 0
+
+                timeline.append({
+                    "date": c["date"],
+                    "commit": c["hexsha"][:8],
+                    "message": c["message"],
+                    "file_count": file_count,
+                    "additions": c["additions"],
+                    "deletions": c["deletions"],
+                })
+                if len(timeline) == snapshots:
+                    break
+
+        churn = [
             {
                 "file": f,
                 "changes": c,
@@ -131,6 +115,17 @@ class EvolutionEngine:
             }
             for f, c in file_changes.most_common(15)
         ]
+
+        patterns = self._detect_patterns(timeline)
+
+        return {
+            "total_commits": len(commits_data),
+            "first_commit": commits_data[-1]["iso_date"],
+            "last_commit": commits_data[0]["iso_date"],
+            "timeline": timeline,
+            "churn_hotspots": churn[:10],
+            "patterns": patterns,
+        }
 
     def _detect_patterns(self, timeline: list[dict]) -> list[str]:
         """Detect evolutionary patterns from the timeline."""
