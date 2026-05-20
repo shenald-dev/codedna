@@ -202,3 +202,11 @@ Learning:
 In `ArchitectureDetector.detect`, computing `len(item.relative_to(repo_path).parts)` on every directory inside the file traversal loop creates significant overhead due to `pathlib` tuple instantiations and path parsing. This is redundant because the depth is already tracked and incremented during the internal `_walk` stack traversal.
 Action:
 Updated the internal `_walk` generator to yield `(item, current_depth + 1)` alongside the item, completely bypassing the need for path arithmetic in the calling loop. This eliminates duplicate effort and speeds up directory analysis significantly.
+
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
