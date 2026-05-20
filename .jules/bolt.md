@@ -195,13 +195,7 @@ Introduced a file size threshold (`if item.stat().st_size <= 5 * 1024 * 1024`) d
 Learning:
 In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and subsequently calling `.replace` and `.split` inside the file traversal loop to add path parts to the `all_names` set creates significant overhead. This is redundant because the directory traversal inherently yields each of these parts individually when visiting the subdirectories themselves (i.e. `item.name.lower()` is already invoked for every folder).
 
-Action:
-Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
-
-## 2026-05-18 — Fix git log formatting issue
+## 2026-05-18 — Git Log Formatting Bug Fix
 
 Learning:
 Git log commands using plain `--format=COMMIT` throw a fatal error on some Git versions ("invalid --pretty format"), which may be silently caught and masked in the codebase, leading to empty fallback data.
