@@ -66,6 +66,7 @@ class ArchitectureDetector:
                 all_names.add(item.name.lower())
                 total_src_dir_depth += depth
                 src_dir_count += 1
+
             else:
                 all_names.add(item.name.lower())
 
