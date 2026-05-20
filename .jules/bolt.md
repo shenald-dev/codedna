@@ -207,3 +207,11 @@ Modern Git versions reject `--format=COMMIT` without the `tformat:` prefix with 
 
 Action:
 Always use `--format=tformat:...` when passing custom literal format strings to `git.log()` via GitPython, and verify git commands locally outside of broad try-except blocks to catch silent failures early.
+
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
