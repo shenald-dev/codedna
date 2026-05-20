@@ -127,6 +127,7 @@ class ArchitectureDetector:
                     if item.name in IGNORE_DIRS or item.name.startswith("."):
                         continue
                     # Yield item along with its effective depth (child depth is current_depth + 1)
+                    # to avoid redundant O(N) recomputation using `item.relative_to` in callers
                     yield item, current_depth + 1
                     if item.is_dir():
                         stack.append((item, current_depth + 1))

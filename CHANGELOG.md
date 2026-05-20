@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.20] - 2026-05-20
+
+### Changed
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
 ## [1.0.19] - 2026-05-06
 
 ### Changed
