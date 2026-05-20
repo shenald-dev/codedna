@@ -200,6 +200,11 @@ Removed the `try/except ValueError` block containing `.relative_to(repo_path)` a
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
-2026-05-13 — Use tformat semantic for git log parsing
-Learning: Using `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
-Action: Always explicitly use `tformat:` when parsing raw git logs programmatically to ensure predictable termination newlines.
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+Using the `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability, predictable termination newlines, and avoid suppressed exceptions.
