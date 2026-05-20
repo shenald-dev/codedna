@@ -1,9 +1,9 @@
 # Changelog
 
-## [1.0.20] - 2026-05-13
+## [1.0.20] - 2026-05-20
 
 ### Changed
-* **Testing:** Fixed a failing test related to tuple unpacking in `ArchitectureDetector._walk` and verified repository stability. Codebase audited for dead code and dependency entropy; no pruning required.
+* **Testing:** Fixed a bug where `repo.git.log` calls failed on modern Git versions by prepending custom format strings with `tformat:`. No dead code pruned.
 
 ## [1.0.19] - 2026-05-06
 
