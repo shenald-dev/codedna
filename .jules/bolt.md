@@ -210,3 +210,11 @@ Strictly prepend custom format strings with `tformat:` when making `git log` cal
 2025-02-21 — Optimize Evolution Engine & Make File Size Configurable
 Learning: Evolution Engine iter_commits was spawning O(N) Git subprocesses, creating a severe bottleneck. Also, a hardcoded 5MB limit in analyzer modules prevented custom handling of massive files.
 Action: Use batched raw git commands (`repo.git.log` with `tformat`) and read `CODEDNA_MAX_FILE_SIZE` from the environment.
+
+## 2026-05-21 — Configure Max File Size
+
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
+
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.

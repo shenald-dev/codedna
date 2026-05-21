@@ -11,7 +11,7 @@ import networkx as nx
 
 from .language_detector import IGNORE_DIRS
 
-CODEDNA_MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
@@ -147,7 +147,7 @@ class DependencyMapper:
                         stack.append(item)
                     elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
                         try:
-                            if item.stat().st_size <= CODEDNA_MAX_FILE_SIZE:
+                            if item.stat().st_size <= MAX_FILE_SIZE:
                                 yield item
                         except OSError:
                             pass
