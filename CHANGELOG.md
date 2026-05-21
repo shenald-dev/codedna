@@ -3,7 +3,8 @@
 ## [1.0.20] - 2026-05-20
 
 ### Changed
-* **Testing:** Fixed a bug where `repo.git.log` calls failed on modern Git versions by prepending custom format strings with `tformat:`. No dead code pruned.
+* **Performance:** Extracted hardcoded `5 * 1024 * 1024` file size limits into a configurable `os.environ.get("CODEDNA_MAX_FILE_SIZE")` threshold across `SecurityDetector`, `CodeSmellDetector`, and `DependencyMapper` to allow users to override the maximum scanning size.
+* **Testing:** Fixed a bug where `repo.git.log` calls failed on modern Git versions by explicitly prepending custom format strings with `tformat:`. No dead code pruned.
 
 ## [1.0.19] - 2026-05-06
 

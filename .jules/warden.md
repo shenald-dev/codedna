@@ -107,6 +107,6 @@ Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md 
 
 2026-05-20 — Assessment & Lifecycle
 Observation / Pruned:
-The previous optimization agent successfully fixed a bug where `repo.git.log` calls failed on modern Git versions by explicitly prepending custom format strings with `tformat:`. Scanned the codebase and test suite for dead code. Pruned zero files.
+The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands to prevent fatal format errors, and extracted a configurable `CODEDNA_MAX_FILE_SIZE` threshold to optimize huge file bypassing. Scanned the codebase and test suite for dead code. Pruned zero files.
 Alignment / Deferred:
-Updated `CHANGELOG.md` to reflect the testing enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.20. No dependency upgrades deferred.
+Updated `CHANGELOG.md` to reflect the reliability and performance enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.20. No dependency upgrades deferred.
