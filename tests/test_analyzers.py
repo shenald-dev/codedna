@@ -295,3 +295,44 @@ class TestDNAGenerator:
         assert "1,000" in md # stars
         assert "bad" in md # forks
         assert "2 Issues" in md # issues
+
+class TestDeveloperAnalyzerCustomFormat:
+    def test_git_log_format_tformat(self, tmp_path):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        from unittest.mock import MagicMock, patch
+
+        analyzer = DeveloperAnalyzer()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT::abc::Dev::dev@test.com::2026-05-19\nfile1.py\n"
+
+        with patch("codedna.analyzers.developer_analyzer.git.Repo", return_value=mock_repo):
+            analyzer.analyze(tmp_path, max_commits=5)
+
+            mock_repo.git.log.assert_called_with(
+                "--name-only",
+                "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
+                "--date=short",
+                "-n 5"
+            )
+
+class TestEvolutionEngineCustomFormat:
+    def test_git_log_format_tformat(self):
+        from unittest.mock import MagicMock
+        from codedna.analyzers.evolution_engine import EvolutionEngine
+
+        analyzer = EvolutionEngine()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT\n1\t2\tfile1.py\n"
+
+        analyzer._compute_churn(mock_repo)
+
+        mock_repo.git.log.assert_called_with(
+            "--numstat",
+            "--format=tformat:COMMIT",
+            "-n 200",
+            "--no-renames"
+        )
