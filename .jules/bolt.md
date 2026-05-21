@@ -214,3 +214,11 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+
+## 2026-05-26 — Reliability: Safe parsing of environment variables
+
+Learning:
+When extracting integer limits from environment variables (e.g., `int(os.environ.get(...))`), passing a malformed string (like "invalid") will raise a `ValueError` during module import and crash the entire application before it can run.
+
+Action:
+Always wrap environment variable parsing into integers or floats with a `try...except ValueError` block to ensure a safe fallback to the default value if the user provides malformed input.
