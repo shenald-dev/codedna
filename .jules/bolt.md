@@ -215,3 +215,10 @@ In Git, if you pass a custom format string via `--format=<string>` and it does *
 
 Action:
 Explicitly prepend `tformat:` to literal string formats in `git log` commands via GitPython (e.g., `--format=tformat:COMMIT`) to ensure Git interprets it correctly and avoids runtime crashes.
+## 2026-05-21 — Configure Max File Size
+
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
+
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
