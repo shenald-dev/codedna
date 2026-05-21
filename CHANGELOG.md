@@ -5,7 +5,17 @@
 ### Changed
 * **Performance:** Replaced an $O(N^2)$ internal list comprehension loop `sum(1 for p in items if p.is_file())` with a single $O(N)$ scalar counter in `StructureAnalyzer` directory traversal, significantly improving performance and avoiding long hangs in large directories containing many module markers.
 
-## [1.0.19] - 2026-05-25
+## [1.0.21] - 2026-05-21
+
+### Changed
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
+
+## [1.0.20] - 2026-05-20
+
+### Changed
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
+## [1.0.19] - 2026-05-06
 
 ### Changed
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
