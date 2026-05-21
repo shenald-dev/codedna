@@ -62,10 +62,13 @@ class ArchitectureDetector:
         src_dir_count = 0
 
         for item, depth in self._walk(repo_path):
-            all_names.add(item.name.lower())
-            if item.is_dir() and item.name not in IGNORE_DIRS:
-                total_src_dir_depth += depth
-                src_dir_count += 1
+            if item.is_dir():
+                all_names.add(item.name.lower())
+                if item.name not in IGNORE_DIRS:
+                    total_src_dir_depth += depth
+                    src_dir_count += 1
+            else:
+                all_names.add(item.name.lower())
 
         # Detect architecture patterns
         detected = []
@@ -123,6 +126,7 @@ class ArchitectureDetector:
                 for item in current_dir.iterdir():
                     if item.name in IGNORE_DIRS or item.name.startswith("."):
                         continue
+                    # Yield item along with its effective depth (child depth is current_depth + 1)
                     yield item, current_depth + 1
                     if item.is_dir():
                         stack.append((item, current_depth + 1))

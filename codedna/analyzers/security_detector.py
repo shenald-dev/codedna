@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
+
+MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
@@ -108,7 +111,7 @@ class SecurityDetector:
                         # Also skip massive files (like large minified JS or massive data files)
                         if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
                             try:
-                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                if item.stat().st_size <= MAX_FILE_SIZE:
                                     yield item
                             except OSError:
                                 pass
