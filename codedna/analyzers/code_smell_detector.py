@@ -8,7 +8,11 @@ from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
 
-MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+try:
+    # Maximum file size to scan (default: 5MB). Configurable via CODEDNA_MAX_FILE_SIZE.
+    MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+except ValueError:
+    MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Thresholds
 MAX_FILE_LINES = 500
