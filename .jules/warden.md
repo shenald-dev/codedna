@@ -111,5 +111,16 @@ Observation / Pruned:
 The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`. Scanned the codebase and test suite for dead code. Pruned zero files. Test suite passed successfully.
 
 Alignment / Deferred:
-
 No dependency updates required as pyproject.toml dependencies are current. Released v1.0.20.
+
+
+
+2026-05-21 — Assessment & Lifecycle
+
+Observation / Pruned:
+
+The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands across `DeveloperAnalyzer` and `EvolutionEngine`, preventing fatal format errors on modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
+
+Alignment / Deferred:
+
+Updated `CHANGELOG.md` to reflect the reliability enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.21. No dependency upgrades deferred.
