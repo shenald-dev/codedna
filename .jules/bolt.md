@@ -212,4 +212,14 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
+## 2026-05-21 — Configure Max File Size
+
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
+
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
 >>>>>>> origin/master
