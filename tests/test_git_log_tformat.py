@@ -10,4 +10,3 @@ def test_git_log_tformat():
     )
     assert result.returncode == 0
     assert "COMMIT" in result.stdout
-```
