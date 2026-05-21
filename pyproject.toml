@@ -6,7 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "codedna"
 
 
-version = "1.0.19"
+
+
+
+version = "1.0.21"
 
 description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
 readme = "README.md"
