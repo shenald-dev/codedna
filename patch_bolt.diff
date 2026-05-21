@@ -1,16 +1,4 @@
 <<<<<<< SEARCH
-<<<<<<< HEAD
-## 2026-05-26 — Performance Optimization: Removing O(N) internal iterations during StructureAnalyzer recursive traversal
-
-Learning:
-In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to compute the number of files in a directory that is already being iterated over introduces unnecessary O(N) operations.
-
-Action:
-Instead of iterating over `items` again to count files, we can just maintain a counter (`current_dir_file_count`) inside the main `for item in items:` loop. When a module marker is found, we wait until the loop finishes, then append the computed count to the `modules` array.
-=======
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
 ## 2026-05-19 — Git Log Formatting Bug Fix
 
 Learning:
@@ -18,7 +6,13 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
->>>>>>> origin/master
+## 2026-05-21 — Configure Max File Size
+
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
+
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
 =======
 ## 2026-05-19 — Git Log Formatting Bug Fix
 
@@ -28,11 +22,11 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
 
-## 2026-05-26 — Performance Optimization: Removing O(N) internal iterations during StructureAnalyzer recursive traversal
+## 2026-05-21 — Configure Max File Size
 
 Learning:
-In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to compute the number of files in a directory that is already being iterated over introduces unnecessary O(N) operations.
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
 
 Action:
-Instead of iterating over `items` again to count files, we can just maintain a counter (`current_dir_file_count`) inside the main `for item in items:` loop. When a module marker is found, we wait until the loop finishes, then append the computed count to the `modules` array.
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
 >>>>>>> REPLACE
