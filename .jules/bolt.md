@@ -215,3 +215,10 @@ When running batched `git log` commands with a custom format (like literal strin
 
 Action:
 Used `--format=format:COMMIT` in `EvolutionEngine._compute_churn` to correctly use Git`s format specifier. This fixes the error and allows the batch extraction of churn metrics.
+## 2026-05-21 — Configure Max File Size
+
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
+
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
