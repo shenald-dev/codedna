@@ -207,4 +207,11 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 Using the `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
 
 Action:
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+Using the `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
+
+Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability, predictable termination newlines, and avoid suppressed exceptions.
