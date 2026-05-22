@@ -222,3 +222,18 @@ When extracting integer limits from environment variables (e.g., `int(os.environ
 
 Action:
 Always wrap environment variable parsing into integers or floats with a `try...except ValueError` block to ensure a safe fallback to the default value if the user provides malformed input.
+
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
