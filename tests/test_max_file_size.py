@@ -50,3 +50,4 @@ def test_large_file_skip(tmp_path, monkeypatch):
     # Clean up by reloading without the env var
     monkeypatch.delenv("CODEDNA_MAX_FILE_SIZE", raising=False)
     importlib.reload(codedna.analyzers.dependency_mapper)
+```
