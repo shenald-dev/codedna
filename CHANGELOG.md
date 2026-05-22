@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.22] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+
 ## [1.0.21] - 2026-05-21
 
 ### Changed
