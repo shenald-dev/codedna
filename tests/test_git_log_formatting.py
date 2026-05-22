@@ -38,3 +38,4 @@ class TestGitLogFormatting:
             assert isinstance(result["patterns"], list)
         except git.exc.GitCommandError as e:
             pytest.fail(f"git log command failed in EvolutionEngine: {e}")
+```
