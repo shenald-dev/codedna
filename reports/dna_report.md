@@ -1,7 +1,7 @@
 # 🧬 CodeDNA Profile
 
 > Analyzed: `.`
-> Date: 2026-05-17
+> Date: 2026-05-22
 
 
 ---
@@ -17,12 +17,12 @@
 
 | Language | Files | Lines | Share |
 |----------|-------|-------|-------|
-| Python | 28 | 3,250 | 71.7% `██████████████` |
-| Markdown | 5 | 768 | 16.9% `███` |
-| JSON | 4 | 165 | 3.6% `█` |
-| TOML | 1 | 58 | 1.3% `█` |
-| YAML | 1 | 34 | 0.8% `█` |
-| HTML | 1 | 256 | 5.6% `█` |
+| Python | 29 | 3,276 | 65.1% `█████████████` |
+| Markdown | 5 | 1,285 | 25.5% `█████` |
+| JSON | 4 | 125 | 2.5% `█` |
+| TOML | 1 | 58 | 1.2% `█` |
+| YAML | 1 | 34 | 0.7% `█` |
+| HTML | 1 | 256 | 5.1% `█` |
 
 ## 🩺 Health Score: **Needs Attention**
 
@@ -42,13 +42,15 @@
 
 ## 🔗 Dependency Graph
 
-- Modules: **88**
-- Connections: **128**
-- Density: **0.0167**
+- Modules: **89**
+- Connections: **133**
+- Density: **0.017**
 - Circular Dependencies: **None ✅**
 
 ```mermaid
 graph LR
+    fix_bolt --> sys
+    fix_bolt --> re
     tests_test_minimal --> shutil
     tests_test_minimal --> tempfile
     tests_test_minimal --> unittest
@@ -77,30 +79,29 @@ graph LR
     tests_test_repo_cloner --> git
     tests_test_repo_cloner --> unittest_mock
     tests_test_repo_cloner --> codedna_analyzers_repo_cloner
-    tests_test_architecture_detector --> shutil
-    tests_test_architecture_detector --> tempfile
 ```
 
 ## 👥 Developer Genome
 
-- Contributors: **1**
+- Contributors: **2**
 - Bus Factor: **1**
-- Primary Architect: **Shenal D**
+- Primary Architect: **google-labs-jules[bot]**
 
 | Developer | Role | Commits |
 |-----------|------|---------|
-| Shenal D | Primary Architect | 1 |
+| google-labs-jules[bot] | Primary Architect | 6 |
+| Shenal D | Core Maintainer | 4 |
 
 ## 📈 Evolution
 
-- Total Commits: **1**
+- Total Commits: **10**
 - First Commit: 2026-05-12
-- Patterns: Insufficient data
+- Patterns: Stable Evolution
 
 ## 🧬 DNA Signature
 
 ```
-LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1
+LANG:PYT | ARCH:MON | SIZE:MD | TEAM:DUO | HEALTH:1
 ```
 
 ---

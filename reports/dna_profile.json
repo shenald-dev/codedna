@@ -1,47 +1,47 @@
 {
   "metadata": {
     "source": ".",
-    "analyzed_at": "2026-05-17T16:10:38.423503",
+    "analyzed_at": "2026-05-22T02:51:16.117410",
     "version": "1.0.0"
   },
-  "signature": "LANG:PYT | ARCH:MON | SIZE:MD | TEAM:SOLO | HEALTH:1",
+  "signature": "LANG:PYT | ARCH:MON | SIZE:MD | TEAM:DUO | HEALTH:1",
   "system_type": "Monolith",
   "languages": {
     "languages": {
       "Python": {
-        "files": 28,
-        "lines": 3250,
-        "percentage": 71.7
+        "files": 29,
+        "lines": 3276,
+        "percentage": 65.1
       },
       "Markdown": {
         "files": 5,
-        "lines": 768,
-        "percentage": 16.9
+        "lines": 1285,
+        "percentage": 25.5
       },
       "JSON": {
         "files": 4,
-        "lines": 165,
-        "percentage": 3.6
+        "lines": 125,
+        "percentage": 2.5
       },
       "TOML": {
         "files": 1,
         "lines": 58,
-        "percentage": 1.3
+        "percentage": 1.2
       },
       "YAML": {
         "files": 1,
         "lines": 34,
-        "percentage": 0.8
+        "percentage": 0.7
       },
       "HTML": {
         "files": 1,
         "lines": 256,
-        "percentage": 5.6
+        "percentage": 5.1
       }
     },
     "primary": "Python",
-    "total_files": 40,
-    "total_lines": 4531
+    "total_files": 41,
+    "total_lines": 5034
   },
   "architecture": {
     "primary_pattern": "Monolith",
@@ -54,15 +54,15 @@
     "coupling": "Low"
   },
   "structure_stats": {
-    "total_files": 41,
+    "total_files": 42,
     "total_dirs": 6,
     "max_depth": 2,
     "modules": 4
   },
   "dependencies": {
-    "total_modules": 88,
-    "total_edges": 128,
-    "density": 0.0167,
+    "total_modules": 89,
+    "total_edges": 133,
+    "density": 0.017,
     "has_circular_deps": false,
     "circular_count": 0
   },
@@ -86,23 +86,28 @@
     "\ud83d\udfe1 Long Function in `codedna/visualization/html_export.py`"
   ],
   "developer_genome": {
-    "total_contributors": 1,
+    "total_contributors": 2,
     "bus_factor": 1,
-    "primary_architect": "Shenal D",
+    "primary_architect": "google-labs-jules[bot]",
     "top_contributors": [
       {
-        "name": "Shenal D",
+        "name": "google-labs-jules[bot]",
         "role": "Primary Architect",
-        "commits": 1
+        "commits": 6
+      },
+      {
+        "name": "Shenal D",
+        "role": "Core Maintainer",
+        "commits": 4
       }
     ]
   },
   "evolution": {
-    "total_commits": 1,
+    "total_commits": 10,
     "first_commit": "2026-05-12T22:39:11+05:30",
-    "last_commit": "2026-05-12T22:39:11+05:30",
+    "last_commit": "2026-05-22T08:15:51+05:30",
     "patterns": [
-      "Insufficient data"
+      "Stable Evolution"
     ]
   },
   "security": {
@@ -118,5 +123,5 @@
     "description": "",
     "homepage": ""
   },
-  "mermaid_graph": "graph LR\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest\n    tests_test_minimal --> pathlib\n    tests_test_minimal --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> pytest\n    tests_test_analyzers --> json\n    tests_test_analyzers --> codedna_analyzers_architecture_detector\n    tests_test_analyzers --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> codedna_analyzers_dependency_mapper\n    tests_test_analyzers --> codedna_analyzers_dna_generator\n    tests_test_analyzers --> codedna_analyzers_github_analyzer\n    tests_test_analyzers --> codedna_analyzers_language_detector\n    tests_test_analyzers --> codedna_analyzers_security_detector\n    tests_test_analyzers --> codedna_analyzers_structure_analyzer\n    tests_test_analyzers --> codedna_analyzers_developer_analyzer\n    tests_test_analyzers --> unittest_mock\n    tests_test_visualization --> pytest\n    tests_test_visualization --> codedna_visualization_html_export\n    tests_test_github_analyzer_security --> unittest\n    tests_test_github_analyzer_security --> unittest_mock\n    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer\n    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer\n    tests_test_repo_cloner --> sys\n    tests_test_repo_cloner --> unittest\n    tests_test_repo_cloner --> git\n    tests_test_repo_cloner --> unittest_mock\n    tests_test_repo_cloner --> codedna_analyzers_repo_cloner\n    tests_test_architecture_detector --> shutil\n    tests_test_architecture_detector --> tempfile"
+  "mermaid_graph": "graph LR\n    fix_bolt --> sys\n    fix_bolt --> re\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest\n    tests_test_minimal --> pathlib\n    tests_test_minimal --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> pytest\n    tests_test_analyzers --> json\n    tests_test_analyzers --> codedna_analyzers_architecture_detector\n    tests_test_analyzers --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> codedna_analyzers_dependency_mapper\n    tests_test_analyzers --> codedna_analyzers_dna_generator\n    tests_test_analyzers --> codedna_analyzers_github_analyzer\n    tests_test_analyzers --> codedna_analyzers_language_detector\n    tests_test_analyzers --> codedna_analyzers_security_detector\n    tests_test_analyzers --> codedna_analyzers_structure_analyzer\n    tests_test_analyzers --> codedna_analyzers_developer_analyzer\n    tests_test_analyzers --> unittest_mock\n    tests_test_visualization --> pytest\n    tests_test_visualization --> codedna_visualization_html_export\n    tests_test_github_analyzer_security --> unittest\n    tests_test_github_analyzer_security --> unittest_mock\n    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer\n    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer\n    tests_test_repo_cloner --> sys\n    tests_test_repo_cloner --> unittest\n    tests_test_repo_cloner --> git\n    tests_test_repo_cloner --> unittest_mock\n    tests_test_repo_cloner --> codedna_analyzers_repo_cloner"
 }

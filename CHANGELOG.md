@@ -95,12 +95,12 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    We can think of the merge as:
 
-        M = A 
-            + (changes that are only in B) 
-            + (changes that are only in H) 
+        M = A
+            + (changes that are only in B)
+            + (changes that are only in H)
             + (resolved changes for the conflicting parts)
 
-   How to get the changes only in B? 
+   How to get the changes only in B?
         = (B - A) - (H - A)   [but note: set difference doesn't work directly for lines]
 
    Instead, we can use:
@@ -110,8 +110,8 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    But we are not given the diff between A and B, or A and H.
 
-   However, we are given the full content of A, B, and H (though truncated). Since the truncation is in the middle and the same for all, 
-   we can assume that the truncation is consistent and we are only concerned with the non-truncated parts? 
+   However, we are given the full content of A, B, and H (though truncated). Since the truncation is in the middle and the same for all,
+   we can assume that the truncation is consistent and we are only concerned with the non-truncated parts?
    But note: the problem says the files are truncated in the middle, so we cannot rely on the full content.
 
    Given the complexity and the truncation, we must rely on the provided Git Diff (Head changes vs base) and the context of what changed.
@@ -122,84 +122,84 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         Base (master): 93 lines changed (lines 3-116)
             # Changelog
-            
+
           - ## [1.0.19] - 2026-05-06
           + ## [1.0.22] - 2026-05-22
-            
+
             ### Changed
           - * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
           + * **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
-            
+
           - ## [1.0.17] - 2026-05-04
           + ## [1.0.21] - 2026-05-21
-            
+
             ### Changed
           - * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
           + * **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
           - * **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
-          +  
-          -  
+          +
+          -
           + ## [1.0.20] - 2026-05-20
           - ## [1.0.16] - 2026-05-03
-          +  
-          -  
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
           + * **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
-          +  
+          +
           - * **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
           + ## [1.0.19] - 2026-05-06
-            
+
           - ## [1.0.15] - 2026-05-19
           + ### Changed
-          -  
+          -
           + * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
           - ### Changed
-          +  
+          +
           - * **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
           + ## [1.0.17] - 2026-05-04
-            
+
           - ## [1.0.14] - 2026-04-29
           + ### Changed
-          -  
+          -
           + * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
           - ### Changed
           + * **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
           - * **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
-          +  
+          +
           - * **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
           + ## [1.0.16] - 2026-05-03
-            
+
           - ## [1.0.13] - 2026-04-27
           + ### Changed
-          -  
+          -
           + * **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
           - ### Changed
           + * **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
           - * **Performance:** Moved `console = Console()` instantiations from the global module level in `repo_cloner.py` and `renderer.py` to their respective `__init__` methods. This defers the heavy load of initializing `rich.console.Console` until the classes are actually used, effectively improving the startup time of the CodeDNA CLI.
-          +  
-          -  
+          +
+          -
           + ## [1.0.15] - 2026-05-19
           - ## [1.0.12] - 2026-04-26
-          +  
-          -  
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
           - * **Performance:** Extracted the length calculation of `contributor_files.get(author, set())` into a variable within the main loop of `DeveloperAnalyzer.analyze` to eliminate redundant dictionary lookups and length computations.
-          +  
-          -  
+          +
+          -
           + ## [1.0.14] - 2026-04-29
           - ## [1.0.11] - 2026-04-19
-          +  
-          -  
+          +
+          -
           + ### Changed
           - ### Changed
           + * **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
           - * **Performance:** Move lazy imports to module level to eliminate the repeated `sys.modules` lookup overhead during large-scale repository scans.
           + * **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
-            
+
           - ## [1.0.10] - 2026-04-18
           + ## [1.0.13] - 2026-04-27
 
@@ -207,84 +207,84 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         Head (fix-git-log-formatting-1094412282004803506): 96 lines changed (lines 3-101)
             # Changelog
-            
+
           - ## [1.0.19] - 2026-05-06
           +         ## [1.0.22] - 2026-05-22
-            
+
           - ### Changed
           +         ### Changed
           - * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
           +         * **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
-            
+
           - ## [1.0.17] - 2026-05-04
           +         ## [1.0.21] - 2026-05-21
-            
+
           - ### Changed
           +         ### Changed
           - * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
           +         * **Reliability:** Fixed `git log` crashes on modern Git versions by upd
           - * **Cleanup:** Pruned the mocked and invalid test `tests/test_perf_analyzers.py`. Updated minor and patch dependencies.
-          +  
-          -  
+          +
+          -
           +         // ... 6304 characters truncated (middle section) ...
           - ## [1.0.16] - 2026-05-03
-          +  
-          -  
+          +
+          -
           +         .
           - ### Changed
           +         * **Cleanup:** Removed unused orphaned scripts such as `update_security_detector.py`.
           - * **Performance:** Replaced unbounded temporary arrays with running scalar aggregates across `ArchitectureDetector`, `StructureAnalyzer`, `DeveloperAnalyzer`, and `LanguageDetector`. This eliminates unnecessary memory overhead and avoids redundant `O(N)` aggregate function calls (e.g., `sum()`, `len()`).
           +         * **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
           - * **Cleanup:** Verified clean architecture via Vulture and retained latest non-breaking dependency versions.
-          -  
+          -
           - ## [1.0.15] - 2026-05-19
-          -  
+          -
           - ### Changed
           - * **Cleanup:** Pruned unused `api_key` attribute assignment in `tests/test_ai_analyzer.py` discovered via static analysis.
-          -  
+          -
           - ## [1.0.14] - 2026-04-29
-          -  
+          -
           - ### Changed
           - * **Performance:** Optimized `_detect_collaboration` in `DeveloperAnalyzer` to use `itertools.combinations` instead of manual nested loops, improving performance when calculating developer pair collaborations.
           - * **Testing:** Added test coverage for `_detect_collaboration` threshold logic.
-          -  
+          -
           - ## [1.0.13] - 2026-04-27
-          -  
+          -
           - ### Changed
           - * **Performance:** Moved `console = Console()` instantiations from the global module level in `repo_cloner.py` and `renderer.py` to their respective `__init__` methods. This defers the heavy load of initializing `rich.console.Console` until the classes are actually used, effectively improving the startup time of the CodeDNA CLI.
-          -  
+          -
           - ## [1.0.12] - 2026-04-26
-          -  
+          -
           - ### Changed
           - * **Performance:** Extracted the length calculation of `contributor_files.get(author, set())` into a variable within the main loop of `DeveloperAnalyzer.analyze` to eliminate redundant dictionary lookups and length computations.
-          -  
+          -
           - ## [1.0.11] - 2026-04-19
-          -  
+          -
           - ### Changed
           - * **Performance:** Move lazy imports to module level to eliminate the repeated `sys.modules` lookup overhead during large-scale repository scans.
-          -  
+          -
           - ## [1.0.10] - 2026-04-18
-          -  
+          -
           - ### Fixed
           - * **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in GitHub stats within `html_export.py` by ensuring non-numeric string values returned from the numeric formatter are properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs in GitHub metrics.
-          -  
+          -
           - ## [1.0.9] - 2026-04-17
-          -  
+          -
           - ### Fixed
           - * **Security:** Prevented Cross-Site Scripting (XSS) vulnerabilities in `html_export.py` by ensuring all profile data interpolated into the HTML templates is properly escaped using `html.escape`. Added adversarial testing to verify escaping of malicious inputs.
-          -  
+          -
           - ## [1.0.8] - 2026-04-16
-          -  
+          -
           - ### Changed
           - * **Performance:** Optimized CLI startup time via lazy loading by moving heavy module imports inside the specific methods where they are used.
-          -  
+          -
           - ## [1.0.7] - 2026-04-16
-          -  
+          -
           - ### Changed
           - * **Reliability:** Capped the execution of `nx.simple_cycles` in `DependencyMapper` to a maximum of 10 cycles. This prevents infinite-seeming hangs and out-of-memory (OOM) crashes on heavily coupled, dense dependency graphs where cycle generation is exponential.
-          -  
+          -
           - ## [1.0.6] - 2026-04-16
-          -  
+          -
           - ### Changed
 
    However, note that the head version provided in the "File Versions" section is truncated and shows indentation (with spaces) for the version headers.
@@ -337,7 +337,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
         ## [1.0.19] - 2026-05-06
 
         ### Changed
-        * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the 
+        * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the
 
    The ancestor does not have the indentation.
 
@@ -358,7 +358,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    We are given:
 
-        Ancestor: 
+        Ancestor:
           Starts with "# Changelog", then a blank line, then "## [1.0.19] - 2026-05-06", then "### Changed", then a truncated line.
 
         Base (master):
@@ -391,17 +391,17 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    How to merge?
 
-        We want to keep the content changes from both branches (which are the same: updating the version numbers and the changelog entries to the latest) 
-        and we also want to keep the indentation change from the head branch? 
+        We want to keep the content changes from both branches (which are the same: updating the version numbers and the changelog entries to the latest)
+        and we also want to keep the indentation change from the head branch?
 
-        But note: the base branch did not change the indentation, so if we take the head branch's indentation and the base branch's content, 
+        But note: the base branch did not change the indentation, so if we take the head branch's indentation and the base branch's content,
         we get the content of the base branch but with the indentation of the head branch.
 
-        However, the head branch's content is the same as the base branch's content? 
+        However, the head branch's content is the same as the base branch's content?
 
         Let's compare the base and head content (ignoring indentation):
 
-          Base: 
+          Base:
             ## [1.0.22] - 2026-05-22
             ### Changed
             * **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
@@ -415,8 +415,8 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         Therefore, the only difference between base and head in the content is the indentation.
 
-        But wait: the head branch's "What Changed" section also includes more changes? Actually, the head branch's "What Changed" section is truncated, 
-        but the base branch's "What Changed" section is also truncated. However, the Git Diff (Head changes vs base) shows that the head branch has 
+        But wait: the head branch's "What Changed" section also includes more changes? Actually, the head branch's "What Changed" section is truncated,
+        but the base branch's "What Changed" section is also truncated. However, the Git Diff (Head changes vs base) shows that the head branch has
         the same changes as the base branch in terms of content, but with indentation.
 
         However, note the head branch's "What Changed" section also lists:
@@ -424,10 +424,10 @@ We are given three versions: ancestor, base (master), and head (PR branch).
           ## [1.0.9] - 2026-04-17
           ... etc.
 
-        while the base branch's "What Changed" section does not go back that far? 
+        while the base branch's "What Changed" section does not go back that far?
 
-        Actually, the base branch's "What Changed" section starts from 1.0.22 and goes back to 1.0.10, and the head branch's "What Changed" 
-        section also starts from 1.0.22 and goes back to 1.0.6? 
+        Actually, the base branch's "What Changed" section starts from 1.0.22 and goes back to 1.0.10, and the head branch's "What Changed"
+        section also starts from 1.0.22 and goes back to 1.0.6?
 
         But the truncation makes it hard.
 
@@ -467,7 +467,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
                 ... and so on for the entire changelog, with every line after the blank line indented by 8 spaces.
 
-   However, note that the Git Diff (Head changes vs base) shows that the head branch has 17 lines (from the diff header: +1,17) while the base had 100 lines? 
+   However, note that the Git Diff (Head changes vs base) shows that the head branch has 17 lines (from the diff header: +1,17) while the base had 100 lines?
    But that is because the diff is truncated. Actually, the full file is longer.
 
    Since we are not given the full content, we must output the resolved file as we would have it.
@@ -478,12 +478,12 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    We are given the three versions in truncated form. However, the truncation is marked and the same for all.
 
-   We can assume that the truncation is exactly the same in the ancestor, base, and head for the middle part? 
+   We can assume that the truncation is exactly the same in the ancestor, base, and head for the middle part?
    But the head branch has indentation, so the truncation in the head branch would be indented.
 
    Alternatively, we can reconstruct the resolved file by:
 
-        Taking the base branch's content (which is the target branch and has the latest version updates) 
+        Taking the base branch's content (which is the target branch and has the latest version updates)
         and then applying the head branch's indentation change (which is: indent every line after the first two lines by 8 spaces).
 
    Steps for reconstruction:
@@ -491,21 +491,21 @@ We are given three versions: ancestor, base (master), and head (PR branch).
         1. Start with the base branch's content (as provided in the "Base (master) — target branch" section, but note it's truncated).
         2. However, we don't have the full base branch content.
 
-   Given the constraints, and since the problem states that the base branch has 93 lines changed (lines 3-116) and the head branch has 96 lines changed (lines 3-101), 
+   Given the constraints, and since the problem states that the base branch has 93 lines changed (lines 3-116) and the head branch has 96 lines changed (lines 3-101),
    we can assume that the file structure is:
 
         Line 1: "# Changelog"
         Line 2: (empty)
         Lines 3 to end: the changelog content.
 
-   The base branch changed lines 3-116 (so 114 lines? but note: 116-3+1 = 114, but they say 93 lines changed -> meaning 93 lines were altered in that range? 
+   The base branch changed lines 3-116 (so 114 lines? but note: 116-3+1 = 114, but they say 93 lines changed -> meaning 93 lines were altered in that range?
    Actually, the diff might show additions and deletions).
 
    But note: the problem says "93 lines changed (lines 3-116)" meaning that the changes occurred in the range of lines 3 to 116.
 
    Similarly, the head branch changed lines 3-101.
 
-   Since we are to output the complete resolved file, and we don't have the full content, we must rely on the provided truncated versions and the fact that 
+   Since we are to output the complete resolved file, and we don't have the full content, we must rely on the provided truncated versions and the fact that
    the truncation is consistent.
 
    However, the problem also provides the Git Diff (Head changes vs base) which is truncated, but we know the head branch indented the entire changelog.
@@ -518,13 +518,13 @@ We are given three versions: ancestor, base (master), and head (PR branch).
           Line 2: (empty)
           Then, for every line in the base branch's content from line 3 to the end, we indent it by 8 spaces.
 
-        Why the base branch's content? Because the base branch has the latest version updates (which are the same as the head branch's content updates) 
+        Why the base branch's content? Because the base branch has the latest version updates (which are the same as the head branch's content updates)
         and we want to keep those. The head branch's indentation change is applied on top.
 
-        But note: the head branch's content is the same as the base branch's content (as we saw in the version headers and the first change) 
+        But note: the head branch's content is the same as the base branch's content (as we saw in the version headers and the first change)
         so we can use the base branch's content and then indent.
 
-   However, what if there are differences in the content beyond what we see? 
+   However, what if there are differences in the content beyond what we see?
 
         The problem states: "Keep ALL meaningful changes from BOTH branches".
 
@@ -551,8 +551,8 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    So we indent by 8 spaces.
 
-   But wait: what if the base branch's content has lines that are not meant to be indented? 
-        The entire changelog after the header should be indented? 
+   But wait: what if the base branch's content has lines that are not meant to be indented?
+        The entire changelog after the header should be indented?
 
         Looking at the head branch's provided content, it seems that every line after the blank line is indented.
 
@@ -563,25 +563,25 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    However, we do not have the full base branch content. We only have a truncated version.
 
-   But note: the problem says to output the complete resolved file content. 
-   Since we are not given the full content, we must assume that the truncation is the same in the base branch and we are to output the truncated version 
-   with the indentation applied? 
+   But note: the problem says to output the complete resolved file content.
+   Since we are not given the full content, we must assume that the truncation is the same in the base branch and we are to output the truncated version
+   with the indentation applied?
 
-   However, the problem also says: "Preserve all valid code from both branches". 
+   However, the problem also says: "Preserve all valid code from both branches".
 
    Given the instructions, and that we are to output only the resolved file content, we must output what we can reconstruct.
 
-   But note: the problem provides the full content of the three versions in truncated form. 
-   We are allowed to use that to reconstruct the resolved file for the non-truncated parts, and for the truncated parts we have to hope that 
+   But note: the problem provides the full content of the three versions in truncated form.
+   We are allowed to use that to reconstruct the resolved file for the non-truncated parts, and for the truncated parts we have to hope that
    the truncation is consistent and we can apply the same rule.
 
    However, the truncation marker is the same: "// ... X characters truncated (middle section) ..."
 
    We can do:
 
-        We take the base branch's content as provided in the "Base (master) — target branch" section, 
-        but we note that it is truncated in the middle. We then apply the indentation to the non-truncated parts and leave the truncation marker as is? 
-        But the truncation marker is a comment and we don't want to indent it? 
+        We take the base branch's content as provided in the "Base (master) — target branch" section,
+        but we note that it is truncated in the middle. We then apply the indentation to the non-truncated parts and leave the truncation marker as is?
+        But the truncation marker is a comment and we don't want to indent it?
 
    Actually, the truncation marker is not part of the file. It is just an annotation in the problem statement.
 
