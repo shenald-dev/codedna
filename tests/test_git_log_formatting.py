@@ -11,6 +11,7 @@ def git_repo(tmp_path):
     src.mkdir()
     (src / "main.py").write_text("print('hello')\n")
 
+
     subprocess.run(["git", "init", "-b", "main"], cwd=str(tmp_path), check=True, capture_output=True)
     subprocess.run(["git", "config", "user.name", "Test User"], cwd=str(tmp_path), check=True, capture_output=True)
     subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=str(tmp_path), check=True, capture_output=True)
@@ -38,4 +39,3 @@ class TestGitLogFormatting:
             assert isinstance(result["patterns"], list)
         except git.exc.GitCommandError as e:
             pytest.fail(f"git log command failed in EvolutionEngine: {e}")
-```
