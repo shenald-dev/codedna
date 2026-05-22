@@ -317,10 +317,11 @@ class TestDeveloperAnalyzerCustomFormat:
                 "-n 5"
             )
 
+from codedna.analyzers.evolution_engine import EvolutionEngine
+
 class TestEvolutionEngineCustomFormat:
     def test_git_log_format_tformat(self):
-        from unittest.mock import MagicMock
-        from codedna.analyzers.evolution_engine import EvolutionEngine
+        from unittest.mock import MagicMock, patch
 
         analyzer = EvolutionEngine()
 
