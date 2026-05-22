@@ -8,9 +8,12 @@ from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
 
+import logging
+
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
+    logging.warning("Invalid CODEDNA_MAX_FILE_SIZE environment variable. Falling back to 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Thresholds
