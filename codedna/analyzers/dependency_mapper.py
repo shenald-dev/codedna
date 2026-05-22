@@ -11,7 +11,11 @@ import networkx as nx
 
 from .language_detector import IGNORE_DIRS
 
-MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+try:
+    MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+except ValueError:
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+
 
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
