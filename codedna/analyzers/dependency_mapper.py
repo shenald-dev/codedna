@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import logging
 import os
 import re
 from pathlib import Path
@@ -14,6 +15,7 @@ from .language_detector import IGNORE_DIRS
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
+    logging.warning("Invalid CODEDNA_MAX_FILE_SIZE. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
@@ -87,6 +89,9 @@ class DependencyMapper:
             for pattern in IMPORT_PATTERNS[lang]:
                 for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
+                    if "." not in dep and "/" not in dep:
+                        continue
+
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)
@@ -161,6 +166,9 @@ class DependencyMapper:
         return path.replace("\\", "/").rsplit(".", 1)[0]
 
     def _normalize_import(self, dep: str) -> str:
-        if dep.startswith("./") or dep.startswith("../"):
-            return dep.lstrip("./")
+        while dep.startswith("./") or dep.startswith("../"):
+            if dep.startswith("./"):
+                dep = dep[2:]
+            else:
+                dep = dep[3:]
         return dep

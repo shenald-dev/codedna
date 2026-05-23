@@ -228,3 +228,10 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+## 2026-05-23 — Bug Fix: Dependency Mapper String Manipulation
+
+Learning:
+DependencyMapper was failing to filter external libraries correctly due to a missing `continue` and corrupted relative paths when using `.lstrip("./")`, polluting graph structures. `lstrip("./")` strips all occurrences of `.` and `/` characters from the string, corrupting paths like `../.env` into `env`. Always use regex or explicit prefix replacement for path cleaning.
+
+Action:
+Replaced `.lstrip("./")` with explicit `dep[2:]` and `dep[3:]` slicing for `./` and `../` prefixes, and added a robust filter for external dependencies by correctly skipping dependencies lacking `.` and `/` characters.
