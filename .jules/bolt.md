@@ -228,3 +228,11 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-23 — Bug Fix: str.lstrip behavior
+
+Learning:
+Using `str.lstrip("./")` strips all combinations of those characters from the start of the string, corrupting paths like `../.env` into `env`.
+
+Action:
+Use exact prefix removal methods like regex substitution `re.sub(r"^(\.\.?/)+", "", dep)` instead.
