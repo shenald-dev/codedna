@@ -228,3 +228,9 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-24 — Correctness: Avoid using lstrip for path prefix removal
+
+Learning: Using `str.lstrip("./")` to remove relative path prefixes like `./` or `../` treats the argument as a set of characters, which incorrectly strips any combination of those characters from the string start (e.g., corrupting `../.env` into `env`).
+
+Action: Use exact prefix removal methods like `re.sub(r"^(?:\./|\.\./)+", "", path)` or explicit slicing instead of `lstrip()` when normalizing file paths to prevent data corruption.
