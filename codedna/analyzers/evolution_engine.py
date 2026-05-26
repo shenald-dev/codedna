@@ -6,6 +6,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from git import Repo
+import re
+
 from git.exc import InvalidGitRepositoryError
 
 
@@ -26,8 +28,6 @@ class EvolutionEngine:
             repo = Repo(str(repo_path))
         except InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "timeline": []}
-
-        import re
 
         try:
             log_output = repo.git.log(

@@ -161,6 +161,4 @@ class DependencyMapper:
         return path.replace("\\", "/").rsplit(".", 1)[0]
 
     def _normalize_import(self, dep: str) -> str:
-        if dep.startswith("./") or dep.startswith("../"):
-            return dep.lstrip("./")
-        return dep
+        return re.sub(r"^(?:\.\./|\./)+", "", dep)

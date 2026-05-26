@@ -5,6 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from git import Repo
+import os
+from urllib.parse import unquote, urlparse
+
 from rich.console import Console
 
 from .cache_manager import CacheManager
@@ -31,8 +34,6 @@ class RepoCloner:
         Returns:
             Path to the cloned/resolved repository.
         """
-        import os
-        from urllib.parse import unquote, urlparse
         # Security: Prevent Git command injection by ensuring source doesn't start with '-'
         # and looks like a valid URL or local path.
         source = source.strip()
