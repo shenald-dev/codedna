@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
 from git import Repo
-import re
-
 from git.exc import InvalidGitRepositoryError
 
 

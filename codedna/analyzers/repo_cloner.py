@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
-from git import Repo
 import os
+from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from git import Repo
 from rich.console import Console
 
 from .cache_manager import CacheManager
