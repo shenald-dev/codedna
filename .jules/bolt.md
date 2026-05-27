@@ -214,8 +214,7 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
-<<<<<<< HEAD
-=======
+
 ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
 Learning:
@@ -230,4 +229,3 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
->>>>>>> origin/master
