@@ -9,7 +9,10 @@ name = "codedna"
 
 
 
-version = "1.0.21"
+
+
+
+version = "1.0.23"
 
 description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
 readme = "README.md"
