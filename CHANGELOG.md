@@ -1,14 +1,27 @@
 We are given three versions: ancestor, base (master), and head (PR branch).
  The task is to perform a 3-way merge, keeping all meaningful changes from both branches.
 
- Steps:
- 1. We note that the base (master) and head (PR branch) both have changes relative to the ancestor.
- 2. We must combine the changes from both branches, resolving conflicts by:
-    - Keeping all changes that are not in conflict.
-    - For conflicting changes (same lines changed in both branches), we follow the rules:
-        a. If they add different things (so we can have both), keep both.
-        b. If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch.
-        c. If the base added something the head doesn't have, incorporate it.
+## [1.0.23] - 2026-05-24
+
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+
+## [1.0.22] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+
+## [1.0.21] - 2026-05-21
+
+### Changed
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
+
+## [1.0.20] - 2026-05-20
+
+### Changed
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
+## [1.0.19] - 2026-05-06
 
  However, note that the provided diff is from head changes vs base (i.e., showing what the head branch changed relative to the base).
 
