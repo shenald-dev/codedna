@@ -204,14 +204,35 @@ Action: Refactored _walk in ArchitectureDetector to yield depth directly instead
 
 Learning:
 Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
-Using the `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
 
 Action:
-## 2026-05-19 — Git Log Formatting Bug Fix
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+## 2026-05-21 — Configure Max File Size
 
 Learning:
-Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
-Using the `format:` prefix with `git log` forces separator semantics, causing missing newlines which break downstream parsers.
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
 
 Action:
-Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability, predictable termination newlines, and avoid suppressed exceptions.
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
