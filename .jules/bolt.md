@@ -222,4 +222,13 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+<<<<<<< HEAD
 >>>>>>> origin/master
+=======
+## 2026-05-18 — Git Log Formatting Bug Fix
+
+Learning:
+Git log commands using plain `--format=COMMIT` throw a fatal error on some Git versions ("invalid --pretty format"), which may be silently caught and masked in the codebase, leading to empty fallback data.
+
+Action:
+Strictly use `--format=tformat:COMMIT` when formatting string in git.log commands to avoid silent failures and retain correct semantics.
