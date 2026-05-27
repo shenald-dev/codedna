@@ -116,3 +116,15 @@ Observation / Pruned:
 The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands across `DeveloperAnalyzer` and `EvolutionEngine`, preventing fatal format errors on modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
 Alignment / Deferred:
 Updated `CHANGELOG.md` to reflect the reliability enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.21. No dependency upgrades deferred.
+
+2026-05-22 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent extracted `MAX_FILE_SIZE` into module scope but missed the required `try...except ValueError` block when casting the environment variable to an integer. This caused an uncaught ValueError if a malformed string was provided. Scanned the codebase for dead code and found none.
+Alignment / Deferred:
+Applied the required `try...except ValueError` blocks in `security_detector.py`, `dependency_mapper.py`, and `code_smell_detector.py` to ensure a safe fallback. Version bumped to 1.0.22.
+
+2026-05-24 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully removed N+1 git subprocess overhead in EvolutionEngine by using a batched git log call. Scanned the codebase for dead code and found none.
+Alignment / Deferred:
+No dependency upgrades deferred. Bumped version to 1.0.23.
