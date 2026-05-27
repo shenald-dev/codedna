@@ -117,6 +117,9 @@ class TestDependencyMapper:
         assert mapper._normalize_import("../../.env") == ".env"
         assert mapper._normalize_import("./.gitignore") == ".gitignore"
         assert mapper._normalize_import("foo.py") == "foo.py"
+        assert mapper._normalize_import("") == ""
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("../../") == ""
 
 
 class TestCodeSmellDetector:
