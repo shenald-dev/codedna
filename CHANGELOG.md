@@ -3,8 +3,11 @@
 ## [1.0.20] - 2026-05-20
 
 ### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
 * **Performance:** Extracted hardcoded `5 * 1024 * 1024` file size limits into a configurable `os.environ.get("CODEDNA_MAX_FILE_SIZE")` threshold across `SecurityDetector`, `CodeSmellDetector`, and `DependencyMapper` to allow users to override the maximum scanning size.
-* **Testing:** Fixed a bug where `repo.git.log` calls failed on modern Git versions by explicitly prepending custom format strings with `tformat:`. No dead code pruned.
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
 
 ## [1.0.19] - 2026-05-06
 
