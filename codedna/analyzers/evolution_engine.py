@@ -39,7 +39,6 @@ class EvolutionEngine:
 
         commits_data = []
         current_commit = None
-
         file_changes: Counter = Counter()
         file_additions: defaultdict = defaultdict(int)
         file_deletions: defaultdict = defaultdict(int)
