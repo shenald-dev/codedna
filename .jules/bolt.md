@@ -229,6 +229,10 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
-## 2024-05-25 — DependencyMapper Data Loss Bug Fix
-Learning: Using `str.lstrip()` for path prefix removal is inherently unsafe because it treats the argument as a set of characters, not a prefix string, leading to data loss (e.g., `../.env` becoming `env`).
-Action: Always use regex substitution (e.g., `re.sub(r'^(?:\.\./|\./)+', '', path)`) or `str.removeprefix()` for exact string prefix stripping to ensure data integrity.
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
