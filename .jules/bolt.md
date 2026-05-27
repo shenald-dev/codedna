@@ -239,3 +239,10 @@ Action: Always use `removeprefix`, regex `re.sub(r"^(?:\.\./|\./)+", "", dep)`, 
 2024-05-26 — Add test case for path stripping logic
 Learning: Always test edge cases in path parsing, especially files starting with `.`, when stripping prefixes like `./` or `../`.
 Action: Add explicit test cases covering edge cases (e.g. `.env`, `../.env`) when updating parsing logic.
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
