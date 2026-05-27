@@ -213,7 +213,15 @@ Learning:
 Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
 
 Action:
-Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)` ) to module-level scope so they are parsed only once rather than redundantly per file.
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
 ## 2026-05-26 — Fix Git log format bug in DeveloperAnalyzer and EvolutionEngine
 
@@ -222,3 +230,11 @@ When using GitPython to execute batched `git log` commands with a custom literal
 
 Action:
 Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) instead of `format:` or just `--format=COMMIT`.
+
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
