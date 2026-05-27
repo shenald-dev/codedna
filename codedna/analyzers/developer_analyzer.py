@@ -30,6 +30,7 @@ class DeveloperAnalyzer:
         commit_count = 0
 
         try:
+            # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             log_output = repo.git.log(
                 "--name-only",
                 "--format=tformat:COMMIT::%H::%aN::%aE::%ad",

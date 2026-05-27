@@ -125,6 +125,7 @@ class EvolutionEngine:
         file_deletions: defaultdict = defaultdict(int)
 
         try:
+            # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             output = repo.git.log(
                 "--numstat",
                 "--format=tformat:COMMIT",
