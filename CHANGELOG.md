@@ -5,6 +5,16 @@
 ### Changed
 * **Performance:** Replaced an $O(N^2)$ internal list comprehension loop `sum(1 for p in items if p.is_file())` with a single $O(N)$ scalar counter in `StructureAnalyzer` directory traversal, significantly improving performance and avoiding long hangs in large directories containing many module markers.
 
+## [1.0.23] - 2026-05-24
+
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+
+## [1.0.22] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+
 ## [1.0.21] - 2026-05-21
 
 ### Changed
