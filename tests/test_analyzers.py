@@ -120,6 +120,8 @@ class TestDependencyMapper:
         assert mapper._normalize_import("") == ""
         assert mapper._normalize_import("./") == ""
         assert mapper._normalize_import("../../") == ""
+        assert mapper._normalize_import(".") == "."
+        assert mapper._normalize_import("..") == ".."
 
 
 class TestCodeSmellDetector:
