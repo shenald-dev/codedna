@@ -7,3 +7,4 @@ def test_normalize_import():
     assert mapper._normalize_import("../module") == "module"
     assert mapper._normalize_import("../../module") == "module"
     assert mapper._normalize_import("../.env") == ".env"
+    assert mapper._normalize_import("../..config") == "..config"
