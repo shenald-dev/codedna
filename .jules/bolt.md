@@ -215,6 +215,7 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+<<<<<<< HEAD
 
 ## 2026-05-26 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
 
@@ -223,3 +224,27 @@ In `StructureAnalyzer`, repeatedly executing `sum(1 for p in items if p.is_file(
 
 Action:
 Introduced lazy evaluation and caching via `file_count_cache` in the directory parsing loop. The calculation is only performed once per directory, the first time a marker needs it, effectively reducing redundant calculations and keeping the operation optimized.
+=======
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+>>>>>>> origin/master
