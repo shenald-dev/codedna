@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import itertools
+import os
 import re
 from pathlib import Path
 
 import networkx as nx
 
 from .language_detector import IGNORE_DIRS
+
+try:
+    MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+except ValueError:
+    MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
@@ -144,7 +150,7 @@ class DependencyMapper:
                         stack.append(item)
                     elif item.is_file() and item.suffix.lower() in LANG_EXTENSIONS:
                         try:
-                            if item.stat().st_size <= 5 * 1024 * 1024:
+                            if item.stat().st_size <= MAX_FILE_SIZE:
                                 yield item
                         except OSError:
                             pass
@@ -156,5 +162,5 @@ class DependencyMapper:
 
     def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
-            return dep.lstrip("./")
+            return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
