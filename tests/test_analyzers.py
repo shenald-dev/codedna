@@ -94,6 +94,14 @@ class TestStructureAnalyzer:
 
 
 class TestDependencyMapper:
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./file") == "file"
+        assert mapper._normalize_import("../file") == "file"
+        assert mapper._normalize_import("../../file") == "file"
+        assert mapper._normalize_import("../.env") == ".env"
+        assert mapper._normalize_import("./") == ""
+
     def test_map_dependencies(self, sample_repo):
         result = DependencyMapper().map(sample_repo)
         assert "total_modules" in result
