@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.21] - 2026-05-21
+
+### Changed
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
+
 ## [1.0.20] - 2026-05-20
 
 ### Changed
@@ -15,8 +20,6 @@
 
 ### Fixed
 * **Reliability:** Applied `copy.deepcopy` to the cloned payload in `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads.
-
-## [1.0.17] - 2026-05-04
 
 ### Changed
 * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.
