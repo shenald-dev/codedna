@@ -1,7 +1,16 @@
 # Changelog
 
-## [1.0.22] - 2026-05-22
+## [1.0.24] - 2026-05-24
 
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse.
+
+## [1.0.23] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings.
+
+## [1.0.22] - 2026-05-21
 ### Changed
 * **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`.
 
