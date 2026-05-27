@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 @@ -1,199 +1,17 @@
 -## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
 +We are given a merge conflict in a markdown file. We have three versions: ancestor, base (master), and head (PR branch).
@@ -18,7 +17,7 @@
 -Learning: Running multiple complex regular expressions sequentially over every file's content is a severe performance bottleneck. Profiling `SecurityDetector` revealed that `pattern.finditer` took ~76% of the execution time, scanning for secrets that often have known, fixed prefixes (like `AKIA` or `sk_live_`).
 -Action: For heavily repeated regex scans, I added a fast-path literal substring check (`SECRET_HINTS`) before executing the expensive regex. Files lacking the literal substring immediately skip the regex. This drastically reduced the execution time of `SecurityDetector.detect` by avoiding the regex engine entirely on the vast majority of files.
 +
-=======
+
 ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
 
 Learning:
@@ -228,9 +227,8 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
-<<<<<<< HEAD
->>>>>>> origin/master
-=======
+
+
 ## 2026-05-21 — Configure Max File Size
 
 Learning:
@@ -238,4 +236,27 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
->>>>>>> origin/master
+
+
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
