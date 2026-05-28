@@ -14,7 +14,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
  However, looking at the provided diff (Head changes vs base) we see:
 
    @@ -228,3 +228,11 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
-   
+
    Action:
    Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
    +
@@ -38,11 +38,11 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
  Let me re-read the context:
 
- Base (master): 
+ Base (master):
    - It says: "Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly."
-   - Then it adds two sections: 
+   - Then it adds two sections:
         ## 2026-05-27 — Fix lstrip Path Prefix Bug
-        ... 
+        ...
         ## 2026-05-27 — Performance & Reliability Optimizations
 
  Head (fix-dependency-mapper-lstrip-6668746938085030043):
@@ -213,7 +213,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    But the head's change ended right after the Fix lstrip section, and the base's change ended after the Performance section.
 
    Therefore, the ancestor's text after the loop replacement line was:
-        [some text that was replaced by the Fix lstrip section in both branches?] 
+        [some text that was replaced by the Fix lstrip section in both branches?]
         Actually, no: the ancestor did not have the Fix lstrip section or the Performance section.
 
    The ancestor had, after the loop replacement line, some text that we don't have in full (because it was truncated in the provided versions). But we know that both the base and the head replaced that text with their own sections.
@@ -222,14 +222,14 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    However, in the base version, after the loop replacement line, we see:
         ## 2026-05-27 — Fix lstrip Path Prefix Bug
-        ... 
+        ...
         ## 2026-05-27 — Performance & Reliability Optimizations
-        ... 
+        ...
         ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine   [this is present in the base version?]
 
    Let me check the base version provided in the context:
 
-        ... 
+        ...
         Action:
         Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
@@ -244,12 +244,29 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    And then, does it have the next section? The context doesn't show, but the head version shows:
 
-        ... 
+        ...
         Action:
         Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
         ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
         ...
 
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
+
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
+
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
+
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
    So it appears that in the ancestor, the section after the loop replacement line was:
         ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
         ...
@@ -257,8 +274,8 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    And both the base and the head have inserted their new sections between the loop replacement line and that 2026-05-21 section.
 
    Therefore, the resolved file should have, after the loop replacement line:
-        [the Fix lstrip section] 
-        [the Performance section from base] 
+        [the Fix lstrip section]
+        [the Performance section from base]
         [then the original ancestor text that came after the loop replacement line, which is the 2026-05-21 section and beyond]
 
    But note: the head version did not have the Performance section, so after the Fix lstrip section, the head version went directly to the 2026-05-21 section.
@@ -349,7 +366,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    The head's added lines (8 lines) would be the Fix lstrip section (7 lines? because the head's context shows 8 lines changed: lines 232-239, which is 8 lines) but note the head's change in the diff was:
 
         @@ -228,3 +228,11 @@
-        ... 
+        ...
         Action:
         Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
         +
@@ -404,7 +421,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
         @@ -228,3 +228,11 @@
          Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
-         
+
          Action:
          Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
         +
@@ -436,7 +453,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    But the head's change only added up to the end of the Fix lstrip section (so line 235 in the diff above) and then the next line (236) would be the same as the ancestor's line 231 (which was the line after the three lines that were removed).
 
-   The ancestor's line 231 was: 
+   The ancestor's line 231 was:
         ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
    So in the head, after the added 11 lines (which end at line 238 in the new file?), the next line is the 2026-05-21 section.
@@ -449,7 +466,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
    But note: the base version in the context shows an empty line before the Performance section? Actually, in the base version snippet:
 
-        ... 
+        ...
         Action:
         Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
         ## 2026-05-27 — Performance & Reliability Optimizations
