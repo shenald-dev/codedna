@@ -1,513 +1,241 @@
-We are given a 3-way merge scenario for the file `.jules/bolt.md`.
- We have:
-   - Ancestor: the common base
-   - Base (master): the target branch (with newer changes from others)
-   - Head (fix-normalize-import-path-corruption-...): the PR branch (with the PR author's changes)
+## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
 
- The diff provided (Head changes vs base) shows that the Head branch has 230 lines (from the original) and the Base branch has 12 lines in the same region (lines 1-230 in Head vs 1-12 in Base).
+Learning:
+An O(N^2) algorithmic bottleneck existed in `CodeSmellDetector._detect_long_functions` when parsing deeply nested functions or processing large Python files. The previous implementation utilized nested loops that iterated ahead through remaining lines for every function discovered, causing analysis time to jump from sub-second to over 35 seconds on deeply nested blocks.
 
- However, note that the diff is showing the changes from Head to Base? Actually, the diff header says:
-   @@ -1,230 +1,12 @@
- meaning that in the Base (the target) we are replacing 230 lines (from the Head version) with 12 lines.
+Action:
+Replaced the lookahead nested loop with a single-pass O(N) stack-based approach that tracks active functions and their indentation levels. The execution time for the stress test on deeply nested mock repositories was reduced from ~35 seconds down to ~0.04 seconds, greatly improving the scalability of the analysis phase.
 
- But wait: the context says:
-   Base (master): 11 lines changed (lines 232-242) ... [and then shows some content]
-   Head: 230 lines changed (lines 2-231)
+2026-04-02 — Security Scanner Performance Bottleneck
+Learning: Running multiple complex regular expressions sequentially over every file's content is a severe performance bottleneck. Profiling `SecurityDetector` revealed that `pattern.finditer` took ~76% of the execution time, scanning for secrets that often have known, fixed prefixes (like `AKIA` or `sk_live_`).
+Action: For heavily repeated regex scans, I added a fast-path literal substring check (`SECRET_HINTS`) before executing the expensive regex. Files lacking the literal substring immediately skip the regex. This drastically reduced the execution time of `SecurityDetector.detect` by avoiding the regex engine entirely on the vast majority of files.
 
- However, the diff provided is for the entire file? Actually, the diff provided is for the changes from Head to Base? Let me read the diff:
+## 2026-04-03 — Reliability: Exponential Time Trap in NetworkX Cycles Detection
 
-   @@ -1,230 +1,12 @@
-   ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
-   -
-   -Learning:
-   ... [a lot of lines removed] ...
-   + ## 2026-05-27 — Fix lstrip Path Prefix Bug
-   + ... [and then two more sections]
+Learning:
+In `DependencyMapper`, the `nx.simple_cycles` function was being fully evaluated using `list(nx.simple_cycles(graph))`. In directed graphs, especially large or highly coupled codebases, the number of simple cycles can grow exponentially. Fully evaluating the generator caused catastrophic performance bottlenecks and potential OOM errors during the mapping phase.
 
- So the Base branch (master) has replaced the 230 lines of the Head branch (which were the original 230 lines from the ancestor, but note the Head branch has modifications) with 12 lines that are two new sections.
+Action:
+Modified the circular dependency detection to lazily evaluate the cycle generator, capping the extraction to a maximum of 10 cycles using `itertools.islice(nx.simple_cycles(graph), 10)`. Wrapped this in a defensive try/except block to ensure the analysis pipeline remains robust even if graph parsing fails or times out.
 
- However, note that the Head branch itself has 230 lines changed (from lines 2-231) meaning that the Head branch has modified a large portion of the file.
+2026-04-04 — O(N) string allocation bottleneck in code_smell_detector.py
+Learning: Using `content.splitlines()` on massive files forces Python to allocate a vast array of small strings, causing extreme memory overhead and a slow O(N) garbage collection cycle. In parsing large codebase files, relying on `re.finditer` with `re.MULTILINE` to target strictly what matters (`def` and `class` blocks), and calculating newline counts lazily via `content.count('\n', start, end)` drops peak memory allocation from ~82MB down to ~8KB and speeds up parsing by 15x.
+Action: In all future AST, code smell, and static analyzers, strongly prefer lazy token matching and math-based line number resolution over eager file splitting.
 
- The problem: we have a true conflict because both branches modified the same region.
+## 2026-04-09 — Fixed False Positive Hardcoded Secrets
 
- We are to keep ALL meaningful changes from both branches.
+Learning:
+Security scanners like `SecurityDetector` will often flag their own source code or dummy secrets used in test suites as actual vulnerabilities.
 
- Steps:
+Action:
+Always obfuscate hardcoded dummy secrets and regex pattern strings using runtime concatenation (e.g., `'AKIA' + 'IOS...'`) to prevent the tool from self-reporting false positives when scanning the repository it belongs to.
+## 2026-04-15 — Startup Time Optimization in CLI
+Learning: Global imports of heavy libraries like `rich` and many analyzer modules in `codedna/cli.py` were adding ~0.25 seconds of startup latency, even when simply querying the `--help` menu.
+Action: Moved all non-essential analyzer and visualization imports (e.g., `rich.console`, `CodeSmellDetector`, `LanguageDetector`) from the global scope in `codedna/cli.py` into the `analyze` command function itself. This defers their execution until the actual heavy command runs, reducing `--help` execution time from ~0.24s down to ~0.06s.
 
- 1. The Base branch (master) has two new sections:
-      ## 2026-05-27 — Fix lstrip Path Prefix Bug
-      ... (content)
-      ## 2026-05-27 — Performance & Reliability Optimizations
-      ... (content)
+## 2026-04-22 — Optimize import performance
 
- 2. The Head branch (PR) has a lot of content (230 lines) that includes:
-      - The original ancestor content (with some modifications) but note the diff shows that the Head branch has changes in the middle (truncated in the diff we see).
+Learning:
+Found lazy imports (`import bisect`, `import json`) deep inside loop iterations (`CodeSmellDetector.detect`) and frequently called methods (`SecurityDetector._check_package_manifest`). While useful for startup time, repeating these in hot paths or loops creates unnecessary overhead.
 
- However, note the diff provided (Head changes vs base) is showing that the Base branch has replaced the entire Head branch's 230 lines with 12 lines.
+Action:
+Relocated standard library imports to the module level to improve execution speed for repetitive repository scans without negatively impacting startup latency.
+## 2026-04-17 — Prevent formatting exceptions on parsed JSON data
 
- But wait: the Head branch's version of the file (the PR branch) has 230 lines in that region (which are the changes the PR author made) and the Base branch has 12 lines in that region.
+Learning:
+When interpolating API or untrusted parsed JSON data into numeric f-string formats (like `{val:,}` for commas or `{val:.2f}` for precision), python will raise a `ValueError` if the data is a string instead of a float/int. Data retrieved from sources like GitHub API or JSON payload can unexpectedly return strings.
 
- How to resolve?
+Action:
+Always explicitly check `isinstance(val, (int, float))` or attempt a cast before applying numeric format specifiers to external/parsed data to prevent runtime crashes.
+## 2026-04-17 — Optimize import performance
 
- According to the rules:
-   - We must keep ALL meaningful changes from both branches.
+Learning:
+Found lazy imports (`import networkx`, `from git import Repo`, `from git.exc import InvalidGitRepositoryError`) inside loop iterations (`DependencyMapper.map`) and frequently called methods (`DeveloperAnalyzer.analyze`, `EvolutionEngine.analyze`, `RepoCloner.clone`). While lazy loading is generally useful for startup latency, repeating these in hot paths or core execution methods for analyzers creates unnecessary overhead during repository scans. Moving heavy library module instantiations entirely to module level removes this bottleneck completely. Furthermore, doing this in analyzers does not impact CLI startup, because the CLI lazy-loads the analyzers themselves.
 
- Since the Base branch has replaced the Head branch's 230 lines with 12 lines, we must incorporate:
-   - The 12 lines from the Base branch (which are two new sections) AND
-   - The 230 lines from the Head branch (which are the PR author's changes) but note that the Head branch's 230 lines are not the same as the ancestor.
+Action:
+Relocated the lazy load imports inside analyzer components (`networkx` in `dependency_mapper.py`, and `git` in `developer_analyzer.py`, `evolution_engine.py`, `repo_cloner.py`) to the module's top-level. This dramatically improves execution speed for repository scans while leaving startup latency (e.g., `codedna --help`) fully optimized.
 
- However, note that the Head branch's 230 lines are the PR author's version of that region (which includes their changes) and the Base branch's 12 lines are the target branch's version.
+## 2026-04-18 — Performance Optimization: O(N) Iteration Bottleneck in Line Counting
 
- But the problem is: the same region (lines 1-230 in the Head branch and lines 1-12 in the Base branch) are conflicting.
+Learning:
+Iterating line-by-line and decoding strings in Python (`sum(1 for _ in f)`) is an unnecessarily slow O(N) bottleneck for large file parsing, taking ~0.33s for 1M lines. Counting newlines in memory using binary chunk blocks (`chunk.count(b'\n')`) pushes the iteration into optimized C code, dropping execution time to ~0.012s.
 
- We cannot simply concatenate because they are replacing the same region.
+Action:
+Replaced the `sum(1 for _ in f)` with chunked byte reading and counted occurrences of `b'\n'` in `LanguageDetector.detect()`. I also accounted for the last line if the final chunk does not end with a newline to prevent overcounting bugs. This optimization accelerates Language Detection on massive codebases by over 25x.
 
- We must decide what to put in the merged file for that region.
+## 2026-04-18 — Bug fix: Missing Trailing Newline in Line Counter
+Learning:
+When iterating in binary mode with `chunk.count(b'\n')`, files without a trailing newline will have their last line silently ignored.
+Action:
+To ensure parity with text-mode line counting, check if the last read chunk exists and doesn't end with a newline `last_chunk and not last_chunk.endswith(b'\n')`, then manually add `1` to the line count. I added a dedicated test `test_detects_lines_without_trailing_newline` in `test_analyzers.py` to lock this behavior.
+## 2026-04-22 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
 
- The rules say:
-   - When both modify the same code:
-        * If they add different things (different imports, different functions), keep BOTH
-        * If they modify the same logic, prefer the HEAD branch (PR author's intent) unless the base has an obvious bug fix or security patch
-        * If the base added something the head doesn't have, incorporate it
+Learning:
+Performing redundant sequential file system traversals to gather separate structural metrics (e.g., building file trees, detecting modules, counting files, mapping depth) creates a severe disk I/O bottleneck. In `StructureAnalyzer`, executing five separate O(N) walks (`_build_tree`, `_detect_modules`, `_compute_depth`, `_walk_dirs`, `_walk`) caused analyzing a 20,000-file repository to take over 2.5 seconds due to repetitive `stat` calls and directory iterators.
 
- In this case, the Base branch has added two new sections (about lstrip bug and performance optimizations) and the Head branch has a large set of changes (which include many sections, as seen in the truncated middle).
+Action:
+Consolidated all structural analysis requirements into a single-pass DFS traversal using a stack. The analyzer now iteratively processes the file tree, updating dictionaries, tracking depths, and counting metrics simultaneously. This drops the operation from O(5N) to strictly O(N) and reduced execution time for the 20k file test from ~2.5s down to ~0.3s. Always aim to merge codebase scans into single-pass pipelines when parsing raw files.
+## 2026-04-22 — Performance Optimization: Eliminating Redundant O(N) Operations in Graph Building
 
- Since the Base branch's changes are two new sections and the Head branch's changes are a large set of modifications (which include many sections, but note the Head branch's version of the file in that region is 230 lines that are not the same as the ancestor), we must try to combine them.
+Learning:
+In `DependencyMapper`, the `build_mermaid` method was taking a `repo_path` and internally calling `self.map(repo_path)` to generate its data. This caused the CLI to execute the entire network graph parsing operation twice—once to get dependencies, and again to generate the mermaid graph, creating a severe performance bottleneck on large repositories.
 
- However, note: the Head branch's 230 lines are not just the ancestor plus some changes? Actually, the Head branch's diff (from ancestor) is not provided, but we know the Head branch changed lines 2-231 (230 lines) and the Base branch changed lines 232-242 (11 lines) — wait, that doesn't match the diff.
+Action:
+To avoid redundant O(N) operations and expensive computations (like graph building or file parsing) in analyzers, pass pre-computed data structures to secondary functions (e.g., passing the result of `DependencyMapper.map` to `build_mermaid`) instead of recalculating them from the base repository path.
 
- Let me re-read the context:
+## 2026-04-22 — Performance Optimization: O(N) Iteration Bottleneck in Line Resolution
 
-   Base (master): 11 lines changed (lines 232-242)
-   Head: 230 lines changed (lines 2-231)
+Learning:
+Calculating line numbers during regex parsing (`MARKER_PATTERN` and `SECRET_PATTERNS`) using `bisect` over an array of newline positions generated by `re.finditer(r'\n', content)` was an unnecessary O(N^2) bottleneck for large files. Creating the array of newline positions requires traversing the entire file string, even if matches occur early. Using lazy line counting via `content.count('\n', last_idx, start_idx)` over sequential matches pushes the iteration to optimized C code and prevents full-file traversals, dropping execution time for regex matching on large files from ~0.48s to ~0.05s.
 
- This suggests that the changes are in different parts of the file? But the diff provided (Head changes vs base) is for the entire file? Actually, the diff provided is labeled as "Git Diff (Head changes vs base)" and shows:
+Action:
+Replaced the `bisect.bisect_right` newline resolution in `code_smell_detector.py` and `security_detector.py` with sequential lazy counting. This acceleration allows CodeDNA to scale to massive files without hitting CPU latency bottlenecks during the regex scanning phase.
 
-   @@ -1,230 +1,12 @@
+## 2026-04-23 — Performance Optimization: O(A^2) Traversal Bottleneck in Developer Collaboration
 
- meaning that in the Head branch, the file had 230 lines from line 1 to 230, and in the Base branch, that same region is now 12 lines.
+Learning:
+Calculating collaboration between developers by iterating over O(A^2) combinations of all authors and calculating set intersections of their modified files caused extreme slow-downs on repositories with many contributors.
+Action:
+Instead of `sum(1 for _ in pattern.finditer(content))` to count matches, use `len(pattern.findall(content))` which evaluates much faster natively in C. Inverted the mapping to track files to authors (`file -> list of authors`) and counted shared files by iterating over pairs of authors per file in a single pass. This drops the operation time dramatically by focusing on actual overlaps rather than evaluating mostly empty intersections.
 
- But the context says the Base branch changed lines 232-242? That doesn't match.
+## 2026-04-23 — Performance Optimization: Regex Counting Bottleneck
 
- There seems to be a discrepancy.
+Learning:
+Using a generator expression like `sum(1 for _ in pattern.finditer(content))` to count regex matches incurs significant Python iteration overhead.
+Action:
+Use `len(pattern.findall(content))` to count regex matches, as `findall` computes the list natively in C and performs much faster when only the match count is needed.
 
- Let me look at the provided file versions:
+## 2026-04-23 — Performance Optimization: O(V*E) Bottleneck in Betweenness Centrality
 
-   Ancestor: ... (truncated) ... ends with: "Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly."
+Learning:
+Calculating exact betweenness centrality using `nx.betweenness_centrality(graph)` has a time complexity of O(V*E), which causes severe performance bottlenecks when building dependency maps for large codebases.
 
-   Base (master): ... (truncated) ... ends with: "Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback."
+Action:
+Used the `k` parameter to calculate an approximation based on a limited sample of nodes (`nx.betweenness_centrality(graph, k=min(50, len(graph.nodes)), seed=42)`). The `min()` check ensures small graphs don't trigger a `ValueError` for oversampling, and explicitly setting a `seed` guarantees deterministic outputs, preventing flaky tests.
 
-   Head: ... (truncated) ... ends with: "Action: Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption."
+## 2026-04-25 — Optimization: Redundant Summation Replacement
 
- And the diff (Head vs base) shows that the Base branch has replaced the Head's 230 lines (which start with "## 2026-04-01 — Performance Optimization: ...") with two new sections.
+Learning:
+In `DeveloperAnalyzer`, we were tracking total commits by calling `sum(contributors.values())` which runs in O(N) time over the `contributors` dictionary keys. However, the exact total commit count is already accurately maintained by the `commit_count` variable incremented inside the previous iteration. Relying on aggregate functions like `sum()` inside post-processing steps introduces unnecessary complexity when a pre-calculated running total already exists.
 
- How to resolve?
+Action:
+Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be effectively tracked or is already tracked via an incrementing variable during the initial processing loop.
+## 2026-04-26 — Optimization: Redundant Summation Replacement in Line Counting
 
- Since the Base branch has added two new sections (which are meaningful) and the Head branch has a large set of changes (which are also meaningful), we should try to include both.
+Learning:
+In `LanguageDetector.detect`, we were tracking total lines by calling `sum(line_counter.values())` twice, which runs in O(N) time. However, the exact total lines count can be accurately maintained by an `overall_lines` variable incremented inside the previous file-processing loop.
 
- However, note that the Head branch's 230 lines include the section that the Base branch is replacing? Actually, the Head branch's 230 lines are the entire content from line 1 to 230 of the Head branch's file.
+Action:
+Avoid O(N) aggregate function calls like `sum(dict.values())` if the total count can be tracked via an incrementing variable during the initial processing loop.
 
- The Base branch's version of the file has, in the same region (lines 1-12), two new sections.
+## 2026-04-28 — Optimization: Redundant length calculation
 
- Therefore, the merged file should have, in that region, both:
-   - The Head branch's 230 lines (which are the PR author's changes) AND
-   - The Base branch's 12 lines (the two new sections)
+Learning:
+In `DeveloperAnalyzer`, we were calling `len(contributor_files.get(author, set()))` twice inside the inner loop of `analyze`. This creates unnecessary overhead by performing dictionary lookups and set instantiations redundantly.
 
- But wait: that would be duplicating the same region? We cannot have two different contents for the same lines.
+Action:
+To optimize performance in tight loops, avoid repeated dictionary `.get()` calls or length calculations for the same key; instead, cache the value in a local variable at the start of the iteration.
 
- We must interleave or concatenate? The rules don't specify, but note that the two sets of changes are in the same location.
+## 2026-05-15 — Lazy-load Console instantiations for Renderer and RepoCloner
 
- However, observe: the Base branch's two new sections are about:
-   - Fix lstrip Path Prefix Bug
-   - Performance & Reliability Optimizations
+Learning:
+When modules like `renderer.py` and `repo_cloner.py` have heavy instantiations (e.g., `console = Console()` from `rich`) at the module level, it increases startup time when those modules are imported, even if the class is not immediately instantiated. Moving the instantiation inside the `__init__` method defers the heavy load until it's actually required.
 
- And the Head branch's 230 lines include many sections, including one that is very similar to the Base branch's first new section? Let's see:
+Action:
+Removed `console = Console()` from the global module scope of `renderer.py` and `repo_cloner.py` and instantiated `self.console = Console()` inside their respective `__init__` methods.
 
-   In the Head branch's truncated middle, we see:
-        ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
-        ... 
-        ## 2026-05-27 — Fix lstrip Path Prefix Bug
-        ... 
+## 2026-05-16 — Performance Optimization: O(N) Traversal Bottleneck in Code Smell and Architecture Analysis
 
-   And then the Base branch also has:
-        ## 2026-05-27 — Fix lstrip Path Prefix Bug
-        ... 
-        ## 2026-05-27 — Performance & Reliability Optimizations
-        ...
+Learning:
+Performing redundant sequential file system traversals to gather separate architectural or code smell metrics (e.g., assessing coupling in `ArchitectureDetector` or detecting large modules in `CodeSmellDetector`) creates severe disk I/O bottlenecks. In `ArchitectureDetector`, executing a separate `_walk` to assess coupling and in `CodeSmellDetector`, spawning a generator with a separate `sum` comprehension inside `_walk_dirs` caused unnecessary repetitive directory traversals and `stat` calls.
 
- So it appears that the Head branch already has the "Fix lstrip Path Prefix Bug" section? But note the Head branch's version of that section is present in the 230 lines.
+Action:
+Consolidated the structural requirements into single-pass DFS traversals using stacks and loops. In `ArchitectureDetector`, I integrated the `src_dirs` tracking directly into the main `self._walk` loop, avoiding an entire second pass. In `CodeSmellDetector`, I integrated the file count directly into the `stack`-based tree traversal. Always aim to merge codebase scans into single-pass pipelines when iterating over file systems.
 
- However, the Base branch's version of the "Fix lstrip Path Prefix Bug" section might be different? We don't have the full text.
+## 2026-05-18 — Performance & Maintainability Optimization: Single-Pass Traversal and Extracted Logic
 
- But note: the diff shows that the Base branch replaced the Head branch's 230 lines with 12 lines that include two sections. The Head branch's 230 lines (as seen in the diff) start with the same header as the ancestor and then have a lot of changes (truncated). The Base branch's 12 lines are two new sections.
+Learning:
+In `CodeSmellDetector`, the initial design executed two distinct O(N) traversals: one to parse file contents (`_walk_source`) and another to calculate module sizes (`_detect_large_modules`). The refactoring successfully merged these into a single O(N) stack-based DFS traversal. However, directly inlining the logic resulted in a "God Method" exhibiting the Arrow Anti-Pattern (deep nesting up to 8 levels of indentation).
 
- How can we reconcile?
+Action:
+Consolidated the multiple sequential traversals into a single pass and extracted the file processing logic from the inner loop into a dedicated `_analyze_file` helper method. This preserves the O(N) performance gain (cutting directory reads by 50%) while eliminating the extreme nesting and significantly improving code readability and maintainability.
 
- Since we don't have the full text of the Head branch's 230 lines, we must rely on the provided information.
+## 2026-05-19 — Performance Optimization: Regex Counting and Extraction Bottleneck in Dependency Mapper
 
- However, the problem says: "Output only the resolved file content with no formatting, no markdown, no explanation."
+Learning:
+Using `pattern.finditer(content)` to extract dependency matches in `DependencyMapper` creates unnecessary overhead by allocating Python `re.Match` objects for every match during massive codebase scans. Since we only need the exact string from a single capture group, we can bypass this allocation loop.
 
- And we are to preserve all valid code from both branches.
+Action:
+Replaced the loop `for match in pattern.finditer(content): dep = match.group(1)` with `for dep in pattern.findall(content):` in `DependencyMapper.map`. `pattern.findall` returns a list of matched strings natively in C, which halves execution time for regex dependency extraction on large files.
+## 2026-05-20 — Performance Optimization: Avoid Redundant Object Accumulation and Iteration
 
- Given the conflict, and the rules, we must:
+Learning:
+Accumulating items in temporary arrays (`depth_stats`, `src_dirs`, `edges`) solely to calculate aggregates (like `max`, `sum`, or `len`) at the end introduces severe and unnecessary memory overhead, alongside the O(N) cost of functions like `sum()`. For example, in `StructureAnalyzer` and `ArchitectureDetector`, appending integer depths into lists to calculate their average wastes memory for each file/directory traversed. Additionally, in `DependencyMapper`, maintaining a secondary `edges` list mirrored the edges already safely persisted in the underlying `nx.DiGraph`.
 
-   - Keep the Head branch's 230 lines (because they are the PR author's changes and we prefer HEAD unless base has an obvious bug fix) AND
-   - Also include the Base branch's two new sections.
+Action:
+Replaced the `depth_stats` and `src_dirs` lists with continuously updated scalar aggregates (`total_depth`, `max_depth`, `depth_count`). In `DependencyMapper`, the duplicate `edges` array was eliminated, and edges were extracted lazily and capped using `itertools.islice(graph.edges, 100)` directly from the NetworkX object. Always use running aggregates or leverage the capabilities of domain objects instead of allocating auxiliary unbounded arrays.
+## 2026-05-22 — Performance Optimization: Eliminating N+1 Git Subprocesses
 
- But note: the Base branch's two new sections are meant to replace the Head branch's 230 lines? That doesn't make sense.
+Learning:
+Iterating over `git.Repo.iter_commits` in GitPython and subsequently accessing properties like `commit.stats.files` or `commit.tree.traverse()` triggers a severe N+1 performance bottleneck. Under the hood, GitPython executes individual `git diff` or `git ls-tree` subprocesses for *every single commit*. On a repository with 500 commits, this spawned over 500 subprocesses and took significant time (~1.15s overhead).
 
- Alternatively, perhaps the Base branch's changes are not in the same location as the Head branch's changes? The context said:
+Action:
+Instead of iterating through commits and reading properties, run a single, batched raw command like `repo.git.log('--numstat', '--format=COMMIT::%H::...', '-n 500')` to extract file changes and metadata in a single process. For tree traversals, `repo.git.ls_tree("-r", commit.hexsha)` is exponentially faster than Python-level tree iterators. By applying this batched logic in `DeveloperAnalyzer` and `EvolutionEngine`, performance improved radically (e.g. `DeveloperAnalyzer` execution dropped from ~1.15s to ~0.03s).
 
-   Base (master): 11 lines changed (lines 232-242)
-   Head: 230 lines changed (lines 2-231)
+## 2026-05-23 — Performance Optimization: O(N) Blocking by Huge Files
 
- This suggests that the changes are in different parts of the file. Then why does the diff show a conflict in the first 230 lines?
+Learning:
+Loading and scanning extremely large files (e.g., massive minified bundles, data dumps) using regex in codebase analyzers (like `SecurityDetector`, `DependencyMapper`, `CodeSmellDetector`) blocks the CPU.
 
- Let me reexamine:
+Action:
+Introduced a file size threshold (`if item.stat().st_size <= 5 * 1024 * 1024`) during repository traversal to bypass files larger than 5MB. This skips the severe latency impact of processing huge binaries and data dumps while preserving accurate analysis for actual source code.
 
-   The diff provided is: "Git Diff (Head changes vs base)" and shows:
+## 2026-05-25 — Performance Optimization: Removing redundant relative path string splitting in ArchitectureDetector
 
-        @@ -1,230 +1,12 @@
+Learning:
+In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and subsequently calling `.replace` and `.split` inside the file traversal loop to add path parts to the `all_names` set creates significant overhead. This is redundant because the directory traversal inherently yields each of these parts individually when visiting the subdirectories themselves (i.e. `item.name.lower()` is already invoked for every folder).
 
-   This means that when comparing the Head branch to the Base branch, the Head branch has 230 lines from line 1 to 230, and the Base branch has 12 lines from line 1 to 12 in that region.
+Action:
+Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
+2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
+Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
+Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+## 2026-05-19 — Git Log Formatting Bug Fix
 
-   But the context says the Base branch changed lines 232-242? That would be later in the file.
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
 
-   This implies that the file has more than 242 lines? And the Base branch's change (lines 232-242) is actually after the region that the Head branch changed (lines 2-231).
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+## 2026-05-21 — Configure Max File Size
 
-   However, the diff shows that the Base branch has only 12 lines in the first 230 lines of the Head branch? That doesn't add up.
+Learning:
+Parsing environment variables inside tight file iteration loops causes severe CPU blocking and latency.
 
-   Alternatively, the diff might be showing the entire file? And the Head branch's file is 230 lines long? And the Base branch's file is 12 lines long? That seems unlikely.
+Action:
+Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
-   Another possibility: the diff is showing a specific hunk that is conflicting, and the file is longer.
+Learning:
+Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
 
-   Given the confusion, let's stick to the provided diff and the rules.
+Action:
+Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
+## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
-   The diff shows that in the region that the Head branch has 230 lines (from line 1 to 230), the Base branch has only 12 lines.
+Learning:
+Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
 
-   Therefore, to resolve the conflict, we must decide what to put in lines 1-? of the merged file.
+Action:
+Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
-   The rules say: keep ALL meaningful changes from both branches.
+## 2026-05-27 — Fix lstrip Path Prefix Bug
 
-   The Head branch's 230 lines are meaningful (they are the PR author's changes).
-   The Base branch's 12 lines are meaningful (they are two new sections).
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
 
-   How to combine? We cannot put 230 lines and then 12 lines in the same place because that would be 242 lines and the Base branch only has 12 lines in that region.
-
-   We must integrate the Base branch's two new sections into the Head branch's 230 lines? Or vice versa?
-
-   But note: the Base branch's two new sections are about specific topics (lstrip bug and performance optimizations) and the Head branch's 230 lines already contain a section about the lstrip bug? (as seen in the truncated middle of the Head branch).
-
-   Specifically, in the Head branch's truncated middle we see:
-
-        ## 2026-05-27 — Fix lstrip Path Prefix Bug
-        ...
-
-   So if we simply put the Base branch's two new sections at the top (or somewhere) we might be duplicating the lstrip bug fix.
-
-   However, the Base branch's version of the lstrip bug fix might be different? We don't know.
-
-   Given the rules: when both modify the same logic, prefer the HEAD branch unless the base has an obvious bug fix or security patch.
-
-   The Base branch's two new sections include:
-        - Fix lstrip Path Prefix Bug (which the Head branch also has, so same logic?)
-        - Performance & Reliability Optimizations (which the Head branch might not have? we see in the Head branch's truncated middle there is a section about "Performance & Reliability Optimizations" on 2026-05-27? Actually, we don't see that in the Head branch's provided truncated middle.)
-
-   Let me look at the Head branch's provided truncated middle: it ends with the lstrip bug fix section. We don't see the performance & reliability optimizations section in the Head branch's provided text.
-
-   Therefore, the Base branch has added a new section (Performance & Reliability Optimizations) that the Head branch does not have.
-
-   And for the lstrip bug fix, both branches have a section? But we don't know if they are the same.
-
-   Since we cannot see the full text, we must assume that the Head branch's version of the lstrip bug fix is the one we should keep (because it's the PR author's change and we prefer HEAD) unless the Base branch's version is an obvious bug fix.
-
-   However, the Base branch's version of the lstrip bug fix is presented as a new section in the Base branch, and the Head branch also has it (so it's not new in the Base branch?).
-
-   This is very confusing.
-
-   Let's read the context again for the Base branch:
-
-        Base (master): 11 lines changed (lines 232-242)
-            Action:
-            Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
-        
-          + ## 2026-05-27 — Fix lstrip Path Prefix Bug
-          + 
-          + Learning:
-          + When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
-          + 
-          + Action:
-          + Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
-          + ## 2026-05-27 — Performance & Reliability Optimizations
-          + Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-          + Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-          + 
-
-   This shows that the Base branch added two sections (starting with "+ ##") in the lines 232-242.
-
-   And the Head branch changed lines 2-231 (230 lines) which is a different part of the file.
-
-   Therefore, the two changes are in different parts of the file and do not overlap? Then why is there a conflict?
-
-   The diff provided (Head changes vs base) shows a conflict in the first 230 lines? That suggests that the Head branch's change (lines 2-231) and the Base branch's change (lines 232-242) are not overlapping, but the diff is showing the entire file? And the Head branch's file is longer than the Base branch's file in the beginning?
-
-   Alternatively, the file might have been shifted.
-
-   Given the time, and since we must output the resolved file, I propose:
-
-   We take the Head branch's file (the PR branch) and then insert the Base branch's two new sections at the location where the Base branch made its change (lines 232-242 in the Base branch, but we don't know where that is in the Head branch).
-
-   However, we don't have the full file.
-
-   Another approach: since the diff shows that the Base branch has replaced the Head branch's first 230 lines with 12 lines, but the context says the Base branch changed lines 232-242, it is possible that the Head branch's file has extra lines at the beginning that the Base branch does not have? Or vice versa.
-
-   Without the full files, we cannot be sure.
-
-   But note: the problem says we are to output the resolved file content.
-
-   And we are given three versions: ancestor, base, head.
-
-   We must do a 3-way merge.
-
-   However, we are not given the full files, only truncated versions and a diff.
-
-   Given the constraints, I think the intended resolution is:
-
-   The Base branch's change (the two new sections) should be placed after the Head branch's changes, because the Base branch's change is at lines 232-242 and the Head branch's change is at lines 2-231 (so they are adjacent).
-
-   Therefore, in the merged file, we should have:
-
-        [Head branch's lines 1-231]   (which is 230 lines changed, but note: the Head branch changed lines 2-231, so line 1 might be unchanged from ancestor?)
-        then the Base branch's two new sections (which were at lines 232-242 in the Base branch)
-
-   But wait, the Head branch changed lines 2-231, meaning line 1 is the same as ancestor? And the Base branch changed lines 232-242, meaning lines 1-231 are the same as ancestor in the Base branch? 
-
-   However, the diff shows that the Base branch has only 12 lines in the first 230 lines of the Head branch? That doesn't match.
-
-   Let's assume that the Head branch's file has, in the first 230 lines, a lot of changes (the PR author's work) and the Base branch's file has, in the first 230 lines, only 12 lines (the two new sections) and then the rest of the file is the same as the ancestor? 
-
-   But then the Base branch's change at lines 232-242 would be after the first 230 lines.
-
-   So the merged file should be:
-
-        First, we take the Head branch's first 230 lines (which are the PR author's changes for the beginning of the file) 
-        Then, we take the Base branch's lines from 231 onward? But we don't have that.
-
-   Alternatively, we can think of the merge as:
-
-        The ancestor file had, say, X lines.
-        The Head branch changed lines 2-231 (so it modified a block in the middle) and left the rest.
-        The Base branch changed lines 232-242 (so it modified a block after the Head branch's change).
-
-   Therefore, there is no overlap and we can simply apply both changes.
-
-   But the diff provided (Head changes vs base) shows a conflict in the first 230 lines? That suggests that the Base branch's file does not have the Head branch's changes in the first 230 lines.
-
-   How can that be if the Base branch only changed lines 232-242?
-
-   Unless the Head branch's change (lines 2-231) caused a shift in line numbers? For example, if the Head branch inserted or deleted lines, then the Base branch's change (which was at lines 232-242 in the ancestor) might now be at a different line number in the Head branch.
-
-   Specifically, if the Head branch inserted 218 lines in the beginning, then the Base branch's change (which was at lines 232-242 in the ancestor) would be at lines 232+218 = 450-460 in the Head branch.
-
-   But the diff shows the Base branch has only 12 lines in the first 230 lines of the Head branch? That doesn't match.
-
-   Given the complexity and the fact that we must output something, I will follow the diff provided and the rules.
-
-   The diff shows that in the region of the first 230 lines of the Head branch, the Base branch has 12 lines.
-
-   We must keep both changes.
-
-   Since the Head branch's 230 lines are the PR author's work and we prefer HEAD for same logic, but the Base branch's 12 lines are two new sections that are not present in the Head branch's 230 lines (as far as we can tell from the truncation), we will:
-
-        Keep the Head branch's 230 lines, and then insert the Base branch's 12 lines somewhere? But where?
-
-   The Base branch's 12 lines are meant to replace the Head branch's 230 lines in the Base branch's view, but in reality, they are two new sections that should be added.
-
-   However, note: the Base branch's 12 lines are two sections that are about specific topics. We see that the Head branch's 230 lines (from the truncated middle) already contain a section about the lstrip bug fix. So if we add the Base branch's two sections, we might be duplicating the lstrip bug fix.
-
-   To avoid duplication, we should only add the Base branch's section that is not present in the Head branch.
-
-   From the Head branch's truncated middle, we see it has the lstrip bug fix section. We do not see the performance & reliability optimizations section.
-
-   Therefore, we should only add the Base branch's "Performance & Reliability Optimizations" section.
-
-   But wait, the Base branch's diff shows two sections. We don't know if the Head branch has the performance & reliability optimizations section.
-
-   Since we don't see it in the Head branch's provided text, we assume it is not there.
-
-   So the resolution for the conflicting region (first 230 lines of Head branch vs 12 lines of Base branch) is:
-
-        We keep the Head branch's 230 lines, and then we add the Base branch's "Performance & Reliability Optimizations" section after the Head branch's 230 lines? 
-        But note: the Base branch's two sections are together. We cannot split them arbitrarily.
-
-   Alternatively, we replace the Head branch's lstrip bug fix section with nothing? and then add both sections from the Base branch? But that would be against preferring HEAD.
-
-   Given the rules: if the base added something the head doesn't have, incorporate it.
-
-   The Base branch added two sections. The Head branch has one of them (lstrip bug fix) but not the other (performance & reliability optimizations). So we incorporate the performance & reliability optimizations section.
-
-   And for the lstrip bug fix section, since both have it, we keep the Head branch's version (because we prefer HEAD for same logic).
-
-   Therefore, in the merged file, for the region that is conflicting, we want:
-
-        The Head branch's 230 lines, but with the Head branch's lstrip bug fix section replaced by nothing? and then we add the Base branch's two sections? 
-        -> No, that would be removing the Head branch's lstrip bug fix and adding the Base branch's two sections, which includes the lstrip bug fix.
-
-   But we want to keep the Head branch's lstrip bug fix section and add the Base branch's performance & reliability optimizations section.
-
-   How can we do that without duplicating the lstrip bug fix?
-
-   We note that the Head branch's 230 lines already contain the lstrip bug fix section (somewhere in the middle). We want to leave that in place and then add the performance & reliability optimizations section somewhere.
-
-   Where should we add the performance & reliability optimizations section? The Base branch placed it after the lstrip bug fix section.
-
-   In the Head branch's file, we have the lstrip bug fix section. We can add the performance & reliability optimizations section right after the lstrip bug fix section in the Head branch's file.
-
-   Steps for the conflicting region (which we are assuming is the entire file for simplicity, but note the context says the changes are in different parts):
-
-        We take the Head branch's file.
-        We find the lstrip bug fix section in the Head branch's file (which we know is there from the truncated middle).
-        We insert the Base branch's performance & reliability optimizations section right after the lstrip bug fix section.
-
-   But we don't have the full Head branch's file.
-
-   Given the instructions to output only the resolved file content, and that we are not given the full files, we must assume that the only changes are in the provided snippets.
-
-   However, the problem says: "Output ONLY the complete resolved file content"
-
-   And we are given three versions (truncated) and a diff.
-
-   This is not sufficient to reconstruct the full file.
-
-   But note: the diff provided (Head changes vs base) is for the entire file? It shows a change from 230 lines to 12 lines at the beginning.
-
-   And the context says the Base branch changed lines 232-242 and the Head branch changed lines 2-231.
-
-   This suggests that the file is at least 242 lines long.
-
-   And the diff showing a change in the first 230 lines implies that the Head branch's file has 230 lines in the beginning that are different from the Base branch's file.
-
-   Therefore, the resolved file should have:
-
-        [The Head branch's lines 1-230]   but wait, the Head branch changed lines 2-231, so line 1 is unchanged from ancestor? 
-        However, the diff shows the Head branch's file has 230 lines from line 1 to 230 that are different from the Base branch's file.
-
-   Let's assume that the Head branch's file has, in the first 230 lines, the PR author's changes (which include modifications to lines 2-231 and possibly line 1?).
-
-   And the Base branch's file has, in the first 230 lines, only 12 lines (the two new sections) and then the rest of the file is the same as the Head branch's file from line 231 onward? 
-
-   But the Base branch changed lines 232-242, so lines 1-231 in the Base branch should be the same as the ancestor.
-
-   This is not matching.
-
-   Given the time, I will output the following as a guess:
-
-        We take the Head branch's file (the PR branch) and then we insert the Base branch's two new sections at the end of the file.
-
-   Why at the end? Because the Base branch's change was at lines 232-242, which is after the Head branch's change (lines 2-231) if we assume no line shifts.
-
-   But the Head branch changed 230 lines (lines 2-231) which is 230 lines, so if the file originally had N lines, after the Head branch's change it still has N lines (if it was a pure modification) or N + delta.
-
-   The Base branch's change at lines 232-242 in the ancestor would be at lines 232+delta - 242+delta in the Head branch's file? 
-
-   Without knowing delta, we cannot know.
-
-   However, the diff shows that the Base branch's file has only 12 lines in the first 230 lines of the Head branch's file. This suggests that the Head branch's file has, in the first 230 lines, a lot of content that is not in the Base branch's file, and the Base branch's file has, in the first 230 lines, only 12 lines.
-
-   Therefore, the resolved file should have, in the first 230 lines, the Head branch's content (because we prefer HEAD for the same logic and the Base branch's content in that region is not an obvious bug fix that we must take over HEAD) and then after the first 230 lines, we put the Base branch's content that is not in the Head branch's first 230 lines.
-
-   But the Base branch's file has only 12 lines in the first 230 lines, meaning that the Base branch's file has very little in the beginning and then presumably the rest of the file is the same as the Head branch's file from line 231 onward? 
-
-   However, the Base branch changed lines 232-242, so lines 233 onward in the Base branch's file should be the same as the ancestor's lines 233 onward.
-
-   And the Head branch's file has changes in lines 2-231, so lines 232 onward in the Head branch's file should be the same as the ancestor's lines 232 onward.
-
-   Therefore, lines 232 onward should be the same in both the Head branch and the Base branch? 
-
-   Then why is there a conflict in the first 230 lines? 
-
-   The only explanation is that the Head branch's change (lines 2-231) and the Base branch's change (lines 232-242) are not overlapping, so there should be no conflict.
-
-   But the diff shows a conflict in the first 230 lines.
-
-   This suggests that the Head branch's change includes line 1 or that the Base branch's change includes lines before 232.
-
-   Given the provided information, I think the safest is to output the Head branch's file as the resolved file, because:
-
-        - The Head branch's change is larger (230 lines vs 11 lines in the Base branch for a different part, but the diff shows the Base branch's version of the Head branch's changed region is only 12 lines)
-        - And we prefer HEAD for same logic.
-
-   However, we know the Base branch has added two new sections that are meaningful.
-
-   Alternatively, output the Base branch's file? But that would lose the Head branch's 230 lines.
-
-   Given the rules: keep ALL meaningful changes from both branches.
-
-   We must have both.
-
-   Therefore, I will output:
-
-        [Head branch's file] 
-        but with the Base branch's two new sections inserted at the location where the Base branch made its change (which we assume is after the Head branch's changed region).
-
-   Since the Head branch changed lines 2-231, we insert after line 231.
-
-   But we don't have the full file.
-
-   We are only allowed to output the resolved file content, and we are not given the full files.
-
-   This is impossible.
-
-   However, note that the problem says: "You are a code merge expert specializing in markdown. You are performing a 3-way merge."
-
-   And we are given the three versions in truncated form and a diff.
-
-   Perhaps the truncation is such that the only changes are in the provided snippets.
-
-   Let's look at the ancestor, base, and head provided:
-
-        Ancestor: 
-            ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
-            Learning:
-            An O(N^2) algorithmic bottleneck existed in `CodeSme
-            // ... 22630 characters truncated (middle section) ...
-            ion:
-            Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
-
-        Base (master):
-            ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
-            Learning:
-            An O(N^2) algorithmic bottleneck existed in `CodeSmellDetector._detect_long_functions` when parsing deeply nested functions or processing large Python files. The previous implementation utilized nested loops that iterated ahead through remaining lines 
-            // ... 23173 characters truncated (middle section) ...
-            thods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-            Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-
-        Head (fix-normalize-import-path-corruption-...):
-            ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
-                    ... (truncated middle) ...
-                    ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
-                    Learning:
-                    Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, cau
-
-            // ... 378 characters truncated (middle section) ...
-
-            ats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
-                    Action:
-                    Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
-
-   We see that the Head branch's version has extra indentation in the beginning? It starts with 8 spaces? 
-
-   And the Base branch's version does not have that extra indentation.
-
-   Also, the Head branch's version has a section "## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine" that the Base branch's version does not have in the provided snippet.
-
-   And the Head branch's version ends with the lstrip bug fix section.
-
-   The Base branch's version ends with the performance & reliability optimizations section.
-
-   Given that the only provided snippets are these, and the truncation markers, I will assume that the file consists only of what is shown in the snippets (without the truncation markers) and that the truncation markers are not part of the file.
-
-   Therefore, we have:
-
-        Ancestor: 
-            "## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection\nLearning:\nAn O(N^2) algorithmic bottleneck existed in `CodeSme\n... [truncated] ...\nion:\nReplaced the loop over `commit.stats` with a single, batched raw `repo
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
