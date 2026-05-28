@@ -1,7 +1,7 @@
 {
   "metadata": {
     "source": ".",
-    "analyzed_at": "2026-05-22T03:09:39.667741",
+    "analyzed_at": "2026-05-28T13:43:01.845475",
     "version": "1.0.0"
   },
   "signature": "LANG:PYT | ARCH:MON | SIZE:MD | TEAM:DUO | HEALTH:1",
@@ -9,19 +9,19 @@
   "languages": {
     "languages": {
       "Python": {
-        "files": 29,
-        "lines": 3276,
-        "percentage": 64.9
+        "files": 35,
+        "lines": 3491,
+        "percentage": 65.2
       },
       "Markdown": {
         "files": 5,
-        "lines": 1286,
-        "percentage": 25.5
+        "lines": 1371,
+        "percentage": 25.6
       },
       "JSON": {
         "files": 4,
         "lines": 130,
-        "percentage": 2.6
+        "percentage": 2.4
       },
       "TOML": {
         "files": 1,
@@ -31,17 +31,17 @@
       "YAML": {
         "files": 1,
         "lines": 34,
-        "percentage": 0.7
+        "percentage": 0.6
       },
       "HTML": {
         "files": 1,
         "lines": 267,
-        "percentage": 5.3
+        "percentage": 5.0
       }
     },
     "primary": "Python",
-    "total_files": 41,
-    "total_lines": 5051
+    "total_files": 47,
+    "total_lines": 5351
   },
   "architecture": {
     "primary_pattern": "Monolith",
@@ -54,15 +54,15 @@
     "coupling": "Low"
   },
   "structure_stats": {
-    "total_files": 42,
+    "total_files": 48,
     "total_dirs": 6,
     "max_depth": 2,
     "modules": 4
   },
   "dependencies": {
-    "total_modules": 89,
-    "total_edges": 133,
-    "density": 0.017,
+    "total_modules": 97,
+    "total_edges": 164,
+    "density": 0.0176,
     "has_circular_deps": false,
     "circular_count": 0
   },
@@ -77,7 +77,7 @@
     "circular_deps": false
   },
   "risks": [
-    "\ud83d\udd34 God Class in `tests/test_analyzers.py`: 24 methods detected (threshold: 15)",
+    "\ud83d\udd34 God Class in `tests/test_analyzers.py`: 25 methods detected (threshold: 15)",
     "\ud83d\udfe1 Long Function in `codedna/cli.py`",
     "\ud83d\udfe1 Long Function in `codedna/analyzers/developer_analyzer.py`",
     "\ud83d\udfe1 Long Function in `codedna/analyzers/dna_generator.py`",
@@ -88,26 +88,26 @@
   "developer_genome": {
     "total_contributors": 2,
     "bus_factor": 1,
-    "primary_architect": "google-labs-jules[bot]",
+    "primary_architect": "Shenal D",
     "top_contributors": [
       {
-        "name": "google-labs-jules[bot]",
+        "name": "Shenal D",
         "role": "Primary Architect",
-        "commits": 7
+        "commits": 18
       },
       {
-        "name": "Shenal D",
+        "name": "google-labs-jules[bot]",
         "role": "Core Maintainer",
-        "commits": 5
+        "commits": 10
       }
     ]
   },
   "evolution": {
-    "total_commits": 12,
+    "total_commits": 28,
     "first_commit": "2026-05-12T22:39:11+05:30",
-    "last_commit": "2026-05-22T08:36:31+05:30",
+    "last_commit": "2026-05-28T13:39:06Z",
     "patterns": [
-      "High Refactoring Activity"
+      "Stable Evolution"
     ]
   },
   "security": {
@@ -123,5 +123,5 @@
     "description": "",
     "homepage": ""
   },
-  "mermaid_graph": "graph LR\n    fix_bolt --> sys\n    fix_bolt --> re\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest\n    tests_test_minimal --> pathlib\n    tests_test_minimal --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> pytest\n    tests_test_analyzers --> json\n    tests_test_analyzers --> codedna_analyzers_architecture_detector\n    tests_test_analyzers --> codedna_analyzers_code_smell_detector\n    tests_test_analyzers --> codedna_analyzers_dependency_mapper\n    tests_test_analyzers --> codedna_analyzers_dna_generator\n    tests_test_analyzers --> codedna_analyzers_github_analyzer\n    tests_test_analyzers --> codedna_analyzers_language_detector\n    tests_test_analyzers --> codedna_analyzers_security_detector\n    tests_test_analyzers --> codedna_analyzers_structure_analyzer\n    tests_test_analyzers --> codedna_analyzers_developer_analyzer\n    tests_test_analyzers --> unittest_mock\n    tests_test_visualization --> pytest\n    tests_test_visualization --> codedna_visualization_html_export\n    tests_test_github_analyzer_security --> unittest\n    tests_test_github_analyzer_security --> unittest_mock\n    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer\n    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer\n    tests_test_repo_cloner --> sys\n    tests_test_repo_cloner --> unittest\n    tests_test_repo_cloner --> git\n    tests_test_repo_cloner --> unittest_mock\n    tests_test_repo_cloner --> codedna_analyzers_repo_cloner"
+  "mermaid_graph": "graph LR\n    resolver5 --> subprocess\n    resolver5 --> re\n    resolver2 --> subprocess\n    resolver2 --> re\n    fix_bolt --> sys\n    fix_bolt --> re\n    fix_smells --> re\n    fix_smells --> logging\n    fix_smells --> os\n    fix_smells --> __future__\n    fix_smells --> pathlib\n    fix_smells --> _language_detector\n    fix_deps --> re\n    fix_deps --> itertools\n    fix_deps --> logging\n    fix_deps --> os\n    fix_deps --> networkx\n    fix_deps --> __future__\n    fix_deps --> pathlib\n    fix_deps --> _language_detector\n    fix_security --> re\n    fix_security --> json\n    fix_security --> logging\n    fix_security --> os\n    fix_security --> __future__\n    fix_security --> pathlib\n    fix_security --> _language_detector\n    tests_test_minimal --> shutil\n    tests_test_minimal --> tempfile\n    tests_test_minimal --> unittest"
 }

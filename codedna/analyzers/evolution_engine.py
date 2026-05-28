@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -28,7 +29,6 @@ class EvolutionEngine:
             return {"error": "Not a Git repository", "timeline": []}
 
         import re
-
         try:
             log_output = repo.git.log(
                 "--format=tformat:COMMIT::%H::%cI::%cd::%s",

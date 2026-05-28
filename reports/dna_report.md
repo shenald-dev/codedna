@@ -1,7 +1,7 @@
 # 🧬 CodeDNA Profile
 
 > Analyzed: `.`
-> Date: 2026-05-22
+> Date: 2026-05-28
 
 
 ---
@@ -17,12 +17,12 @@
 
 | Language | Files | Lines | Share |
 |----------|-------|-------|-------|
-| Python | 29 | 3,276 | 64.9% `████████████` |
-| Markdown | 5 | 1,286 | 25.5% `█████` |
-| JSON | 4 | 130 | 2.6% `█` |
+| Python | 35 | 3,491 | 65.2% `█████████████` |
+| Markdown | 5 | 1,371 | 25.6% `█████` |
+| JSON | 4 | 130 | 2.4% `█` |
 | TOML | 1 | 58 | 1.1% `█` |
-| YAML | 1 | 34 | 0.7% `█` |
-| HTML | 1 | 267 | 5.3% `█` |
+| YAML | 1 | 34 | 0.6% `█` |
+| HTML | 1 | 267 | 5.0% `█` |
 
 ## 🩺 Health Score: **Needs Attention**
 
@@ -32,7 +32,7 @@
 
 ## ⚠️ Risk Signals
 
-- 🔴 God Class in `tests/test_analyzers.py`: 24 methods detected (threshold: 15)
+- 🔴 God Class in `tests/test_analyzers.py`: 25 methods detected (threshold: 15)
 - 🟡 Long Function in `codedna/cli.py`
 - 🟡 Long Function in `codedna/analyzers/developer_analyzer.py`
 - 🟡 Long Function in `codedna/analyzers/dna_generator.py`
@@ -42,61 +42,61 @@
 
 ## 🔗 Dependency Graph
 
-- Modules: **89**
-- Connections: **133**
-- Density: **0.017**
+- Modules: **97**
+- Connections: **164**
+- Density: **0.0176**
 - Circular Dependencies: **None ✅**
 
 ```mermaid
 graph LR
+    resolver5 --> subprocess
+    resolver5 --> re
+    resolver2 --> subprocess
+    resolver2 --> re
     fix_bolt --> sys
     fix_bolt --> re
+    fix_smells --> re
+    fix_smells --> logging
+    fix_smells --> os
+    fix_smells --> __future__
+    fix_smells --> pathlib
+    fix_smells --> _language_detector
+    fix_deps --> re
+    fix_deps --> itertools
+    fix_deps --> logging
+    fix_deps --> os
+    fix_deps --> networkx
+    fix_deps --> __future__
+    fix_deps --> pathlib
+    fix_deps --> _language_detector
+    fix_security --> re
+    fix_security --> json
+    fix_security --> logging
+    fix_security --> os
+    fix_security --> __future__
+    fix_security --> pathlib
+    fix_security --> _language_detector
     tests_test_minimal --> shutil
     tests_test_minimal --> tempfile
     tests_test_minimal --> unittest
-    tests_test_minimal --> pathlib
-    tests_test_minimal --> codedna_analyzers_code_smell_detector
-    tests_test_analyzers --> pytest
-    tests_test_analyzers --> json
-    tests_test_analyzers --> codedna_analyzers_architecture_detector
-    tests_test_analyzers --> codedna_analyzers_code_smell_detector
-    tests_test_analyzers --> codedna_analyzers_dependency_mapper
-    tests_test_analyzers --> codedna_analyzers_dna_generator
-    tests_test_analyzers --> codedna_analyzers_github_analyzer
-    tests_test_analyzers --> codedna_analyzers_language_detector
-    tests_test_analyzers --> codedna_analyzers_security_detector
-    tests_test_analyzers --> codedna_analyzers_structure_analyzer
-    tests_test_analyzers --> codedna_analyzers_developer_analyzer
-    tests_test_analyzers --> unittest_mock
-    tests_test_visualization --> pytest
-    tests_test_visualization --> codedna_visualization_html_export
-    tests_test_github_analyzer_security --> unittest
-    tests_test_github_analyzer_security --> unittest_mock
-    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer
-    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer
-    tests_test_repo_cloner --> sys
-    tests_test_repo_cloner --> unittest
-    tests_test_repo_cloner --> git
-    tests_test_repo_cloner --> unittest_mock
-    tests_test_repo_cloner --> codedna_analyzers_repo_cloner
 ```
 
 ## 👥 Developer Genome
 
 - Contributors: **2**
 - Bus Factor: **1**
-- Primary Architect: **google-labs-jules[bot]**
+- Primary Architect: **Shenal D**
 
 | Developer | Role | Commits |
 |-----------|------|---------|
-| google-labs-jules[bot] | Primary Architect | 7 |
-| Shenal D | Core Maintainer | 5 |
+| Shenal D | Primary Architect | 18 |
+| google-labs-jules[bot] | Core Maintainer | 10 |
 
 ## 📈 Evolution
 
-- Total Commits: **12**
+- Total Commits: **28**
 - First Commit: 2026-05-12
-- Patterns: High Refactoring Activity
+- Patterns: Stable Evolution
 
 ## 🧬 DNA Signature
 
