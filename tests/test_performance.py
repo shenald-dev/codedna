@@ -1,7 +1,18 @@
+"""Performance benchmarks for file traversal and codebase scanning.
+
+These tests synthesize large, highly nested mock directory structures
+to ensure that optimizations—such as avoiding redundant O(N) internal iterations
+and string manipulations—keep execution times under 1.0 second.
+These assert performance boundaries explicitly as part of the CI pipeline
+to guard against future regressions in hot-path traversal logic.
+"""
+
 import time
 from pathlib import Path
-from codedna.analyzers.structure_analyzer import StructureAnalyzer
+
 from codedna.analyzers.architecture_detector import ArchitectureDetector
+from codedna.analyzers.structure_analyzer import StructureAnalyzer
+
 
 def test_structure_analyzer_performance(tmp_path):
     # Create 1000 dummy files in directories to measure iteration performance

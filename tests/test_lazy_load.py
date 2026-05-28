@@ -1,6 +1,15 @@
+"""Lazy load validation tests.
+
+These tests ensure that heavy module-level dependencies (such as 'rich.console')
+are deferred until object instantiation, preventing excessive startup time overhead
+when the core analyzer components are imported but not immediately executed.
+"""
+
 import sys
-from codedna.visualization.renderer import Renderer
+
 from codedna.analyzers.repo_cloner import RepoCloner
+from codedna.visualization.renderer import Renderer
+
 
 def test_lazy_imports_not_in_sys():
     """Verify that importing Renderer and RepoCloner doesn't inherently load 'rich.console'"""
