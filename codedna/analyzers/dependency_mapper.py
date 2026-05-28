@@ -162,5 +162,8 @@ class DependencyMapper:
 
     def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
+            # Use regex to remove exactly './' or '../' prefixes.
+            # Avoid str.lstrip('./') as it strips any combination of '.' and '/' characters
+            # which corrupts hidden files like '../../.env' into 'env'.
             return re.sub(r"^(?:\./|\.\./)+", "", dep)
         return dep
