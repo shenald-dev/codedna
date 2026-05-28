@@ -1,7 +1,11 @@
 # Changelog
 
-## [1.0.24] - 2026-05-24
+## [1.0.25] - 2026-05-27
 
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`.
+
+## [1.0.24] - 2026-05-24
 ### Changed
 * **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse.
 
