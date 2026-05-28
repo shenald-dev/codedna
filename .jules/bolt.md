@@ -222,29 +222,3 @@ When extracting integer limits from environment variables (e.g., `int(os.environ
 
 Action:
 Always wrap environment variable parsing into integers or floats with a `try...except ValueError` block to ensure a safe fallback to the default value if the user provides malformed input.
-
-## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
-
-Learning:
-Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
-
-Action:
-Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
-## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
-
-Learning:
-Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
-
-Action:
-Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
-
-## 2026-05-27 — Fix lstrip Path Prefix Bug
-
-Learning:
-When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
-
-Action:
-Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
