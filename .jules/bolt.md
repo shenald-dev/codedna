@@ -208,7 +208,6 @@ Using `--format=COMMIT` or `--format=COMMIT::...` without a placeholder like `%H
 Action:
 Always strictly prepend custom literal string formats with the `tformat:` prefix when making `git log` calls via GitPython to guarantee cross-version compatibility and prevent crashes or suppressed exceptions.
 
-Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
 ## 2026-05-21 — Configure Max File Size
 
 Learning:
@@ -238,3 +237,6 @@ When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` tr
 
 Action:
 Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.

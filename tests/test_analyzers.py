@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -182,6 +183,20 @@ class TestSecurityDetector:
 
 
 class TestDeveloperAnalyzer:
+    @patch('codedna.analyzers.developer_analyzer.git.Repo')
+    def test_tformat_git_log(self, mock_repo_cls, sample_repo):
+        from unittest.mock import MagicMock
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+
+        analyzer = DeveloperAnalyzer()
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT::926371::Test User::test@example.com::2026-05-12\nfile.py\n\nCOMMIT::123456::Test User 2::test2@example.com::2026-05-11\nfile2.py\n"
+        mock_repo_cls.return_value = mock_repo
+
+        result = analyzer.analyze(sample_repo)
+        assert result.get("total_commits", -1) == 2
+        assert len(result.get("contributors", [])) == 2
+
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()
