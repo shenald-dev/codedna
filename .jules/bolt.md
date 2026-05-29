@@ -214,6 +214,7 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+
 ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
 Learning:

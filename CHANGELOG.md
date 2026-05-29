@@ -3,6 +3,7 @@
 ## [1.0.20] - 2026-05-20
 
 ### Changed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
 * **Performance:** Hoisted standard library imports (`os`, `re`, `copy`, `json`, `urllib.parse`) to the module level in `AIAnalyzer`, `EvolutionEngine`, and `RepoCloner` to avoid repetitive import overhead. Implemented `MAX_FILE_SIZE` handling in `LanguageDetector`.
 * **Reliability:** Added explicit `logging.warning()` inside the `try/except ValueError` block when parsing the `CODEDNA_MAX_FILE_SIZE` environment variable in `SecurityDetector`, `DependencyMapper`, and `CodeSmellDetector`.
 * **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
