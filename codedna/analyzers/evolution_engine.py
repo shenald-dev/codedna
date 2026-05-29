@@ -6,9 +6,6 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
-
 
 class EvolutionEngine:
     """Analyzes codebase evolution across Git commit history."""
@@ -23,6 +20,9 @@ class EvolutionEngine:
         Returns:
             Dict with growth timeline, churn hotspots, and evolution patterns.
         """
+        from git import Repo
+        from git.exc import InvalidGitRepositoryError
+
         try:
             repo = Repo(str(repo_path))
         except InvalidGitRepositoryError:
