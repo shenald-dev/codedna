@@ -238,6 +238,9 @@ When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` tr
 
 Action:
 Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
