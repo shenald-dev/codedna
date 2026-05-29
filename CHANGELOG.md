@@ -5,6 +5,11 @@
 ### Changed
 * **Performance:** Replaced an $O(N^2)$ internal list comprehension loop `sum(1 for p in items if p.is_file())` with a single $O(N)$ scalar counter in `StructureAnalyzer` directory traversal, significantly improving performance and avoiding long hangs in large directories containing many module markers.
 
+## [1.0.25] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
 ## [1.0.24] - 2026-05-27
 
 ### Fixed
