@@ -229,6 +229,7 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+<<<<<<< HEAD
 ## 2024-05-26 — Fix dangerous prefix stripping and redundant import parsing
 
 Learning:
@@ -239,6 +240,8 @@ Action: Always use `removeprefix`, regex `re.sub(r"^(?:\.\./|\./)+", "", dep)`, 
 2024-05-26 — Add test case for path stripping logic
 Learning: Always test edge cases in path parsing, especially files starting with `.`, when stripping prefixes like `./` or `../`.
 Action: Add explicit test cases covering edge cases (e.g. `.env`, `../.env`) when updating parsing logic.
+=======
+>>>>>>> origin/master
 ## 2026-05-27 — Fix lstrip Path Prefix Bug
 
 Learning:
