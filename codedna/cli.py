@@ -18,7 +18,9 @@ import click
 
 
 
-@click.version_option(version="1.0.25", prog_name="codedna")
+
+
+
 
 
 
@@ -76,7 +78,9 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
 
 
-    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.25[/]")
+
+
+
 
 
 

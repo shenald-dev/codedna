@@ -150,3 +150,11 @@ Observation / Pruned:
 The previous optimization agent successfully replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to properly strip relative path prefixes without corrupting valid path names (like `../.env` to `env`). Scanned the codebase for dead code and found none.
 Alignment / Deferred:
 Updated `CHANGELOG.md` to reflect the reliability bugfix. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.24. No dependency upgrades deferred.
+
+
+
+2026-05-28 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent incorrectly used `logging.warning()` which caused bugs if logging was not configured. Applied `logging.getLogger(__name__).warning()` for robust log handling.
+Alignment / Deferred:
+Updated `CHANGELOG.md` and bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.25.
