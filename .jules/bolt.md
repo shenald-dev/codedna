@@ -214,7 +214,6 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
-
 ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
 Learning:
@@ -230,8 +229,6 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
-<<<<<<< HEAD
-=======
 ## 2026-05-27 — Fix lstrip Path Prefix Bug
 
 Learning:
@@ -242,4 +239,3 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
->>>>>>> origin/master
