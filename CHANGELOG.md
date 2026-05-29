@@ -1,7 +1,11 @@
 # Changelog
 
-## [1.0.25] - 2026-05-27
+## [1.0.26] - 2026-05-28
 
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
+## [1.0.25] - 2026-05-27
 ### Fixed
 * **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`.
 
