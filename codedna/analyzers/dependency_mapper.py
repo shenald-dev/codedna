@@ -15,7 +15,7 @@ from .language_detector import IGNORE_DIRS
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-    logging.warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
@@ -164,5 +164,5 @@ class DependencyMapper:
 
     def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
-            return re.sub(r"^(?:\.\.?/)+", "", dep)
+            return re.sub(r'^(?:\.\./|\./)+', '', dep)
         return dep
