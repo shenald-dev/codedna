@@ -98,6 +98,7 @@ Observation / Pruned:
 Discovered that `AIAnalyzer._minimize_payload()` mutated the original `raw_dna_profile` when removing values in the shallow copy. Applied `copy.deepcopy` to the cloned payload and pruned unused variable assignment in `tests/test_ai_analyzer.py` via `ruff`.
 Alignment / Deferred:
 Version bumped to 1.0.18 across all manifest files. `CHANGELOG.md` updated and changes prepared for release. No dependencies upgraded.
+
 2026-05-06 — Assessment & Lifecycle
 Observation / Pruned:
 The previous optimization agent successfully removed the redundant `item.relative_to` calculations inside `ArchitectureDetector._walk` loop, as the item names are yielded natively by the traversal mechanism. Modified the `_walk` to return depth information to further avoid relative parsing. Codebase is clean and tests are passing.
@@ -115,3 +116,21 @@ Observation / Pruned:
 The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands across `DeveloperAnalyzer` and `EvolutionEngine`, preventing fatal format errors on modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
 Alignment / Deferred:
 Updated `CHANGELOG.md` to reflect the reliability enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.21. No dependency upgrades deferred.
+
+2026-05-22 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent extracted `MAX_FILE_SIZE` into module scope but missed the required `try...except ValueError` block when casting the environment variable to an integer. This caused an uncaught ValueError if a malformed string was provided. Scanned the codebase for dead code and found none.
+Alignment / Deferred:
+Applied the required `try...except ValueError` blocks in `security_detector.py`, `dependency_mapper.py`, and `code_smell_detector.py` to ensure a safe fallback. Version bumped to 1.0.22.
+
+2026-05-24 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully removed N+1 git subprocess overhead in EvolutionEngine by using a batched git log call. Scanned the codebase for dead code and found none.
+Alignment / Deferred:
+No dependency upgrades deferred. Bumped version to 1.0.23.
+
+2026-05-27 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to properly strip relative path prefixes without corrupting valid path names (like `../.env` to `env`). Scanned the codebase for dead code and found none.
+Alignment / Deferred:
+Updated `CHANGELOG.md` to reflect the reliability bugfix. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.24. No dependency upgrades deferred.

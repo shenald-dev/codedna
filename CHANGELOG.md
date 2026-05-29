@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.24] - 2026-05-27
+
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
+
+## [1.0.23] - 2026-05-24
+
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+
+## [1.0.22] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+
 ## [1.0.21] - 2026-05-21
 
 ### Changed
@@ -13,13 +28,9 @@
 ## [1.0.19] - 2026-05-06
 
 ### Changed
-* **Performance:** Removed redundant path parsing logic and string manipulation within the directory traversal in `ArchitectureDetector` by returning traversal depths directly from the stack, eliminating `ValueError` exceptions and improving file system scanning times.
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
-## [1.0.18] - 2026-05-05
-
-### Fixed
-* **Reliability:** Applied `copy.deepcopy` to the cloned payload in `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads.
+## [1.0.17] - 2026-05-04
 
 ### Changed
 * **Performance:** Replaced iterative `commit.stats.files` and `commit.tree.traverse()` property access with batched `repo.git.log` and `repo.git.ls_tree` commands in `DeveloperAnalyzer` and `EvolutionEngine` to eliminate severe N+1 git subprocess overhead during deep history analysis.

@@ -126,6 +126,7 @@ class ArchitectureDetector:
                 for item in current_dir.iterdir():
                     if item.name in IGNORE_DIRS or item.name.startswith("."):
                         continue
+                    # Yield item along with its effective depth (child depth is current_depth + 1)
                     yield item, current_depth + 1
                     if item.is_dir():
                         stack.append((item, current_depth + 1))
