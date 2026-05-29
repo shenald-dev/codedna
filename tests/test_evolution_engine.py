@@ -6,7 +6,7 @@ from git import Repo
 
 def test_compute_churn_git_log_format():
     engine = EvolutionEngine()
-    repo_mock = MagicMock(spec=Repo)
+    repo_mock = MagicMock()
     repo_mock.git = MagicMock()
 
     # Mock git log output to simulate correct parsing of "--format=format:COMMIT"
@@ -50,7 +50,7 @@ def test_analyze_no_error_on_invalid_repo(tmp_path):
 
 def test_compute_churn_git_exception_handling():
     engine = EvolutionEngine()
-    repo_mock = MagicMock(spec=Repo)
+    repo_mock = MagicMock()
     repo_mock.git = MagicMock()
 
     # Simulate an exception raised by git.log, e.g. GitCommandError
@@ -63,7 +63,7 @@ def test_compute_churn_git_exception_handling():
 
 def test_compute_churn_invalid_format_parsing():
     engine = EvolutionEngine()
-    repo_mock = MagicMock(spec=Repo)
+    repo_mock = MagicMock()
     repo_mock.git = MagicMock()
 
     # Mock output with missing columns to test parsing robustness
@@ -79,3 +79,15 @@ def test_compute_churn_invalid_format_parsing():
     assert file2_churn["changes"] == 1
     assert file2_churn["total_additions"] == 0
     assert file2_churn["total_deletions"] == 0
+
+def test_analyze_empty_repository(tmp_path):
+    # Create an empty git repo
+    repo = Repo.init(str(tmp_path))
+    engine = EvolutionEngine()
+    result = engine.analyze(tmp_path)
+
+    # An empty repository has no commits. It should return empty lists without crashing.
+    assert "error" not in result
+    assert result.get("total_commits", 0) == 0
+    assert result["timeline"] == []
+    assert result.get("patterns", []) == []
