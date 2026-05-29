@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -27,12 +28,50 @@ class EvolutionEngine:
         except InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "timeline": []}
 
-        commits = list(repo.iter_commits(max_count=500))
+        try:
+            log_output = repo.git.log(
+                "--format=tformat:COMMIT::%H::%cI::%cd::%s",
+                "--date=short",
+                "--shortstat",
+                "-n", "500"
+            )
+        except Exception:
+            log_output = ""
+
+        commits = []
+        current_commit = {}
+        for line in log_output.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("COMMIT::"):
+                if current_commit:
+                    commits.append(current_commit)
+                parts = line.split("::", 4)
+                current_commit = {
+                    "hexsha": parts[1] if len(parts) > 1 else "",
+                    "iso_date": parts[2] if len(parts) > 2 else "",
+                    "date": parts[3] if len(parts) > 3 else "",
+                    "message": parts[4].strip().split("\n")[0][:60] if len(parts) > 4 else "",
+                    "additions": 0,
+                    "deletions": 0,
+                }
+            elif current_commit and ("files changed" in line or "file changed" in line):
+                ins_match = re.search(r'(\d+)\s+insertion', line)
+                del_match = re.search(r'(\d+)\s+deletion', line)
+                if ins_match:
+                    current_commit["additions"] = int(ins_match.group(1))
+                if del_match:
+                    current_commit["deletions"] = int(del_match.group(1))
+
+        if current_commit:
+            commits.append(current_commit)
+
         if not commits:
             return {"timeline": [], "patterns": []}
 
         # Build timeline snapshots
-        timeline = self._build_timeline(commits, snapshots)
+        timeline = self._build_timeline(commits, snapshots, repo)
 
         # Detect churn (files that change most frequently)
         churn = self._compute_churn(repo)
@@ -42,14 +81,14 @@ class EvolutionEngine:
 
         return {
             "total_commits": len(commits),
-            "first_commit": commits[-1].committed_datetime.isoformat() if commits else None,
-            "last_commit": commits[0].committed_datetime.isoformat() if commits else None,
+            "first_commit": commits[-1]["iso_date"] if commits else None,
+            "last_commit": commits[0]["iso_date"] if commits else None,
             "timeline": timeline,
             "churn_hotspots": churn[:10],
             "patterns": patterns,
         }
 
-    def _build_timeline(self, commits: list, snapshots: int) -> list[dict]:
+    def _build_timeline(self, commits: list[dict], snapshots: int, repo: Repo) -> list[dict]:
         """Build time-based snapshots of the project's evolution."""
         if len(commits) < 2:
             return []
@@ -59,31 +98,21 @@ class EvolutionEngine:
 
         for i in range(0, len(commits), step):
             commit = commits[i]
-            date = commit.committed_datetime.strftime("%Y-%m-%d")
 
             # Count files at this point
             try:
-                output = commit.repo.git.ls_tree("-r", commit.hexsha)
+                output = repo.git.ls_tree("-r", commit["hexsha"])
                 file_count = output.count('\n') + 1 if output else 0
             except Exception:
                 file_count = 0
 
-            # Count insertions/deletions
-            try:
-                stats = commit.stats.total
-                additions = stats.get("insertions", 0)
-                deletions = stats.get("deletions", 0)
-            except Exception:
-                additions = 0
-                deletions = 0
-
             timeline.append({
-                "date": date,
-                "commit": commit.hexsha[:8],
-                "message": commit.message.strip().split("\n")[0][:60],
+                "date": commit["date"],
+                "commit": commit["hexsha"][:8],
+                "message": commit["message"],
                 "file_count": file_count,
-                "additions": additions,
-                "deletions": deletions,
+                "additions": commit["additions"],
+                "deletions": commit["deletions"],
             })
 
         return timeline[:snapshots]
