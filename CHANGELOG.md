@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.25] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
 ## [1.0.24] - 2026-05-27
 
 ### Fixed
