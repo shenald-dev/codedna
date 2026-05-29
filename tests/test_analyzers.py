@@ -101,6 +101,8 @@ class TestDependencyMapper:
         assert mapper._normalize_import("../../file") == "file"
         assert mapper._normalize_import("../.env") == ".env"
         assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("..../file") == "..../file"
+        assert mapper._normalize_import(".././../file") == "file"
 
     def test_map_dependencies(self, sample_repo):
         result = DependencyMapper().map(sample_repo)
