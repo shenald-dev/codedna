@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.25] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
+## [1.0.24] - 2026-05-27
+
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
+
+## [1.0.23] - 2026-05-24
+
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+
 ## [1.0.22] - 2026-05-22
 
 ### Changed
