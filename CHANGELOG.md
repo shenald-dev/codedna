@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.26] - 2026-05-28
+
+### Fixed
+* **Performance:** Fixed merge collisions and stabilized the recursive directory traversal optimizations across the CI test suites. Latency improvements to hot-path structure scanning are now preserved.
+
 ## [1.0.25] - 2026-05-28
 
 ### Fixed
