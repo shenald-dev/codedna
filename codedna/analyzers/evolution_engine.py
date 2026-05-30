@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import re
+import typing
 from collections import Counter, defaultdict
 from pathlib import Path
+
+if typing.TYPE_CHECKING:
+    from git import Repo
 
 
 class EvolutionEngine:
