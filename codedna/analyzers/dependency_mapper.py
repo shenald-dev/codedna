@@ -67,6 +67,7 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        # Lazy load networkx to improve CLI startup time
         import networkx as nx
         graph = nx.DiGraph()
 

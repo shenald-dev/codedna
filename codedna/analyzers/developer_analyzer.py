@@ -16,6 +16,7 @@ class DeveloperAnalyzer:
         Returns:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
+        # Lazy load git to improve CLI startup time
         import git
         try:
             repo = git.Repo(str(repo_path))

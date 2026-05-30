@@ -71,6 +71,7 @@ class RepoCloner:
             return dest
 
         self.console.print(f"  📥 Cloning [cyan]{source}[/] ...")
+        # Lazy load git to improve CLI startup time
         from git import Repo
         Repo.clone_from(source, str(dest), depth=100)
         return dest

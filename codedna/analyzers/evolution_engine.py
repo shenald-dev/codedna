@@ -24,6 +24,7 @@ class EvolutionEngine:
         Returns:
             Dict with growth timeline, churn hotspots, and evolution patterns.
         """
+        # Lazy load git to improve CLI startup time
         from git import Repo
         from git.exc import InvalidGitRepositoryError
 
