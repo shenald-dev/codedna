@@ -66,8 +66,8 @@ class ArchitectureDetector:
                 all_names.add(item.name.lower())
                 if item.name not in IGNORE_DIRS:
                     total_src_dir_depth += depth
-                    src_dir_count += 1            else:
-                all_names.add(item.name.lower())
+                    src_dir_count += 1
+            else:                all_names.add(item.name.lower())
 
         # Detect architecture patterns
         detected = []

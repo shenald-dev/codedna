@@ -72,6 +72,38 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 ### Changed
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
+## [1.0.26] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
+## [1.0.25] - 2026-05-27
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`.
+
+## [1.0.24] - 2026-05-24
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse.
+
+## [1.0.23] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings.
+
+## [1.0.22] - 2026-05-21
+### Changed
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`.
+
+## [1.0.21] - 2026-05-20
+* **Performance:** Removed the redundant `.relative_to` path string processing per file inside `ArchitectureDetector._walk` and optimized the file counting in `StructureAnalyzer`.
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
+* **Cleanup:** Verified clean code state using static analysis (`vulture`, `ruff`), leaving 0 unused files. Updated `pip` and `playwright` dependencies to latest safe patch releases.
+
+## [1.0.18] - 2026-05-05
+
+### Changed
+* **Quality Assurance:** Applied `copy.deepcopy` to the cloned payload in `AIAnalyzer._minimize_payload()` to prevent mutating the original `raw_dna_profile` and removed an unused `api_key` assignment in `tests/test_ai_analyzer.py`.
+
 ## [1.0.17] - 2026-05-04
  Steps:
  1. We note that the base (master) has changes from the ancestor to the base.

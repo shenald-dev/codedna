@@ -14,6 +14,10 @@ try:
 except ValueError:
     logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
 # Thresholds
 MAX_FILE_LINES = 500
 MAX_FUNCTION_LINES = 80
