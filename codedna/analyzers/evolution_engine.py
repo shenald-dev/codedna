@@ -129,8 +129,8 @@ class EvolutionEngine:
             output = repo.git.log(
                 "--numstat",
                 "--format=tformat:COMMIT",
-                "-n 200",                "--no-renames"
-            )
+                "-n 200",
+                "--no-renames"            )
         except Exception:
             return {"timeline": [], "patterns": []}
 
