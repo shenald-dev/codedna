@@ -290,6 +290,9 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 2026-05-29 — Performance Optimization: Lazy-load heavy dependencies to improve CLI startup time
 
 Learning:
