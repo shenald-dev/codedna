@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import re
-<<<<<<< HEAD
 =======
-=======>>>>>>> origin/master
->>>>>>> origin/master
+<<<<<<< HEAD>>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -43,9 +41,6 @@ class EvolutionEngine:
             )
         except Exception:
             log_output = ""
-<<<<<<< HEAD
-
-=======
 >>>>>>> origin/master
         commits = []
         current_commit = {}
