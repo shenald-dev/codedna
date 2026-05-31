@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import re
-=======
 =======>>>>>>> origin/master
->>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -38,10 +36,9 @@ class EvolutionEngine:
                 "--format=tformat:COMMIT::%H::%cI::%cd::%s",
                 "--date=short",
                 "--shortstat",
-<<<<<<< HEAD
                 "-n", "500"
-            )        except Exception:
-            log_output = ""
+            )
+        except Exception:            log_output = ""
 
         commits = []
         current_commit = {}
@@ -131,8 +128,7 @@ class EvolutionEngine:
             # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             output = repo.git.log(
                 "--numstat",
-                "--format=tformat:COMMIT",
-                "-n 200",
+                "--format=format:COMMIT",                "-n 200",
                 "--no-renames"            )
         except Exception:
             return {"timeline": [], "patterns": []}

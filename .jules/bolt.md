@@ -233,6 +233,13 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
 
+## 2026-06-03 — Performance Optimization: Eliminating N+1 Git Subprocesses (Fixing Git Format Error)
+
+Learning:
+When running batched `git log` commands with a custom format (like literal string "COMMIT"), passing `--format=COMMIT` fails in modern Git versions with a `fatal: invalid --pretty format` error, returning empty output that gets silently caught in try/except blocks and causes inaccurate analysis.
+
+Action:
+Used `--format=format:COMMIT` in `EvolutionEngine._compute_churn` to correctly use Git`s format specifier. This fixes the error and allows the batch extraction of churn metrics.
 ## 2026-05-26 — Fix: Git log formatting in GitPython
 
 Learning:
