@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from git import Repo
 from rich.console import Console
 
 from .cache_manager import CacheManager
@@ -82,7 +83,6 @@ class RepoCloner:
             return dest
 
         self.console.print(f"  📥 Cloning [cyan]{source}[/] ...")
-        from git import Repo
         Repo.clone_from(source, str(dest), depth=100)
         return dest
 
