@@ -35,42 +35,10 @@ class StructureAnalyzer:
 
             dirs_to_process = []
             file_count = None
-
-            for item in items:
-                if item.name in IGNORE_DIRS or item.name.startswith("."):
-                    continue
-
-                if item.is_dir():
-                    total_dirs += 1
-
-                    if current_depth < 3 and current_dict is not None:
-                        new_dict = {}
-                        current_dict[f"📁 {item.name}/"] = new_dict
-                        dirs_to_process.append((item, new_dict, current_depth + 1))
-                    else:
-                        if current_dict is not None and "..." not in current_dict:
-                            current_dict["..."] = None
-                        dirs_to_process.append((item, None, current_depth + 1))
-                else:
-                    total_files += 1
-
-                    if current_depth < 3 and current_dict is not None:
-                        current_dict[f"📄 {item.name}"] = None
-
-                    if item.suffix in (".py", ".js", ".ts", ".go", ".rs", ".java"):
-                        max_depth = max(max_depth, current_depth)
-                        total_depth += current_depth
-                        depth_count += 1
-
-                    if item.name in ("__init__.py", "package.json", "go.mod", "Cargo.toml", "build.gradle"):
-                        try:
-                            if file_count is None:
-                                file_count = sum(1 for p in items if p.is_file())
-                            module_path = str(current_path.relative_to(repo_path))
                             modules.append({
                                 "path": module_path,
                                 "marker": item.name,
-                                "file_count": file_count,
+                                "file_count": cached_file_count,
                             })
                         except ValueError:
                             pass
