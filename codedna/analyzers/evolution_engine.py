@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import re
-=======
-import typing
->>>>>>> origin/master
+=======>>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -34,10 +32,9 @@ class EvolutionEngine:
             return {"error": "Not a Git repository", "timeline": []}
 
         try:
-<<<<<<< HEAD
             log_output = repo.git.log(
-                "--format=tformat:COMMIT::%H::%cI::%cd::%s",                "--date=short",
-                "--shortstat",
+                "--format=tformat:COMMIT::%H::%cI::%cd::%s",
+                "--date=short",                "--shortstat",
                 "-n", "500"
             )
         except Exception:
@@ -94,8 +91,8 @@ class EvolutionEngine:
         }
 
     def _build_timeline(self, commits: list[dict], snapshots: int, repo: Repo) -> list[dict]:
-        """Build time-based snapshots of the project's evolution."""        if len(commits) < 2:
-            return []
+        """Build time-based snapshots of the project's evolution."""
+        if len(commits) < 2:            return []
 
         step = max(1, len(commits) // snapshots)
         timeline = []
