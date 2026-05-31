@@ -64,9 +64,8 @@ class ArchitectureDetector:
         for item, depth in self._walk(repo_path):
             if item.is_dir():
                 all_names.add(item.name.lower())
-                if item.name not in IGNORE_DIRS:
-                    total_src_dir_depth += depth
-                    src_dir_count += 1
+                total_src_dir_depth += depth
+                src_dir_count += 1
             else:
                 all_names.add(item.name.lower())
 
