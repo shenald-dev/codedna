@@ -1,10 +1,5 @@
 # Changelog
 
-## [1.0.26] - 2026-05-30
-
-### Changed
-* **Performance:** Lazy-load heavy dependencies to improve CLI startup time.
-
 ## [1.0.25] - 2026-05-28
 
 ### Fixed
