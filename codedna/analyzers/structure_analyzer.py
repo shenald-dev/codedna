@@ -34,8 +34,7 @@ class StructureAnalyzer:
                 continue
 
             dirs_to_process = []
-            cached_file_count = None
-
+            file_count = None
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -64,9 +63,8 @@ class StructureAnalyzer:
 
                     if item.name in ("__init__.py", "package.json", "go.mod", "Cargo.toml", "build.gradle"):
                         try:
-                            if cached_file_count is None:
-                                cached_file_count = sum(1 for p in items if p.is_file())
-                            module_path = str(current_path.relative_to(repo_path))
+                            if file_count is None:
+                                file_count = sum(1 for p in items if p.is_file())                            module_path = str(current_path.relative_to(repo_path))
                             modules.append({
                                 "path": module_path,
                                 "marker": item.name,

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import re
-=======
 =======>>>>>>> origin/master
->>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -40,7 +38,6 @@ class EvolutionEngine:
                 "--shortstat",
                 "-n", "500"
             )
-<<<<<<< HEAD
         except Exception:
             log_output = ""
         commits = []

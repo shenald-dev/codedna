@@ -197,7 +197,9 @@ class TestDeveloperAnalyzer:
 
         # We simulate the output returned by a git log with tformat semantic.
         # Ensure that it correctly parses commits when tformat adds trailing newlines.
+=======
 <<<<<<< HEAD
+>>>>>>> origin/master
 
         mock_repo = MagicMock()
         mock_log = MagicMock(return_value="COMMIT::926371::Test User::test@example.com::2026-05-12\nfile.py\n\nCOMMIT::123456::Test User 2::test2@example.com::2026-05-11\nfile2.py\n")
@@ -215,8 +217,7 @@ class TestDeveloperAnalyzer:
         assert result["total_commits"] == 2
         assert len(result["contributors"]) == 2
 
-=======
->>>>>>> origin/master
+<<<<<<< HEAD>>>>>>> origin/master
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()
