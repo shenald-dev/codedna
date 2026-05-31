@@ -239,10 +239,3 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-2026-05-29 — Performance Optimization: Lazy-load heavy dependencies to improve CLI startup time
-
-Learning:
-Importing heavy third-party packages like `networkx` (~0.2s) and `git` (~0.06s) at the module level severely impacts CLI startup time, as these modules are loaded even when their commands are not executed or are lightly invoked. By moving these imports directly into the functions where they are actually used (lazy loading), startup performance is radically improved without sacrificing functionality.
-
-Action:
-Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import git`) out of the module level scope and inside `map`, `analyze`, and `clone` methods of `DependencyMapper`, `DeveloperAnalyzer`, `EvolutionEngine`, and `RepoCloner`. This optimization is highly effective for CLI tools.
