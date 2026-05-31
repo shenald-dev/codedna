@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import itertools
-import logging
 import os
 import re
 from pathlib import Path
+
+import networkx as nx
 
 from .language_detector import IGNORE_DIRS
 

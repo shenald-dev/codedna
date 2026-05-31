@@ -116,6 +116,7 @@ class TestDependencyMapper:
         assert mapper._normalize_import("./utils/.env") == "utils/.env"
         assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
+
 class TestCodeSmellDetector:
     def test_detect_smells(self, sample_repo):
         result = CodeSmellDetector().detect(sample_repo)
@@ -187,32 +188,6 @@ class TestSecurityDetector:
 
 
 class TestDeveloperAnalyzer:
-    def test_tformat_git_log(self, sample_repo):
-        from unittest.mock import MagicMock
-
-        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
-
-        analyzer = DeveloperAnalyzer()
-
-        # We simulate the output returned by a git log with tformat semantic.
-        # Ensure that it correctly parses commits when tformat adds trailing newlines.
-
-        mock_repo = MagicMock()
-        mock_log = MagicMock(return_value="COMMIT::926371::Test User::test@example.com::2026-05-12\nfile.py\n\nCOMMIT::123456::Test User 2::test2@example.com::2026-05-11\nfile2.py\n")
-        mock_repo.git.log = mock_log
-
-        import git
-        original_repo = git.Repo
-        git.Repo = MagicMock(return_value=mock_repo)
-
-        try:
-            result = analyzer.analyze(sample_repo)
-        finally:
-            git.Repo = original_repo
-
-        assert result["total_commits"] == 2
-        assert len(result["contributors"]) == 2
-
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()

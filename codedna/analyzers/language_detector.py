@@ -2,14 +2,8 @@
 
 from __future__ import annotations
 
-import os
 from collections import Counter
 from pathlib import Path
-
-try:
-    MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
-except ValueError:
-=======    MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Extension → Language mapping
 LANGUAGE_MAP: dict[str, str] = {
@@ -141,10 +135,6 @@ class LanguageDetector:
                     if item.is_dir():
                         stack.append(item)
                     elif item.is_file():
-                        try:
-                            if item.stat().st_size <= MAX_FILE_SIZE:
-                                yield item
-                        except OSError:
-                            pass
+                        yield item
             except PermissionError:
                 pass
