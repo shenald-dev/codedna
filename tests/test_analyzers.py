@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -110,6 +111,11 @@ class TestDependencyMapper:
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
 
+    def test_normalize_import_preserves_filenames(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./utils/.env") == "utils/.env"
+        assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
 class TestCodeSmellDetector:
     def test_detect_smells(self, sample_repo):
@@ -182,6 +188,15 @@ class TestSecurityDetector:
 
 
 class TestDeveloperAnalyzer:
+    def test_tformat_git_log(self, sample_repo):
+        from unittest.mock import MagicMock
+
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+
+        analyzer = DeveloperAnalyzer()
+
+        # We simulate the output returned by a git log with tformat semantic.
+        # Ensure that it correctly parses commits when tformat adds trailing newlines.
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()

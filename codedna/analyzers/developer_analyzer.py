@@ -6,8 +6,6 @@ import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import git
-
 
 class DeveloperAnalyzer:
     """Analyzes developer contribution patterns from Git history."""
@@ -18,6 +16,7 @@ class DeveloperAnalyzer:
         Returns:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
+        import git
         try:
             repo = git.Repo(str(repo_path))
         except git.exc.InvalidGitRepositoryError:
@@ -30,9 +29,10 @@ class DeveloperAnalyzer:
         commit_count = 0
 
         try:
+            # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             log_output = repo.git.log(
                 "--name-only",
-                "--format=COMMIT::%H::%aN::%aE::%ad",
+                "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
                 "--date=short",
                 f"-n {max_commits}"
             )

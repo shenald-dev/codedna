@@ -21,7 +21,6 @@
        "Programming Language :: Python :: 3.12",
        "Topic :: Software Development :: Quality Assurance",
    ]
-
    dependencies = [
        "click>=8.1.0",
        "gitpython>=3.1.40",

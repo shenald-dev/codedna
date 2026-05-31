@@ -3,11 +3,22 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import re
 from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
 
+try:
+    MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
+except ValueError:
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
     "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),  # noqa: E501
@@ -108,7 +119,7 @@ class SecurityDetector:
                         # Also skip massive files (like large minified JS or massive data files)
                         if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
                             try:
-                                if item.stat().st_size <= 5 * 1024 * 1024:
+                                if item.stat().st_size <= MAX_FILE_SIZE:
                                     yield item
                             except OSError:
                                 pass
