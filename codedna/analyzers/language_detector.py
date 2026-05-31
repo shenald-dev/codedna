@@ -10,6 +10,10 @@ try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
     MAX_FILE_SIZE = 5 * 1024 * 1024
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
 # Extension → Language mapping
 LANGUAGE_MAP: dict[str, str] = {
     ".py": "Python",

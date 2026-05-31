@@ -185,6 +185,8 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
 
+
+
 ## 2026-05-26 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
 
 Learning:
@@ -251,6 +253,7 @@ When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` tr
 
 Action:
 Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.

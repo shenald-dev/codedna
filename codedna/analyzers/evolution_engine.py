@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import re
-=======
-<<<<<<< HEAD>>>>>>> origin/master
-from collections import Counter, defaultdict
+=======from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
     from git import Repo
@@ -41,7 +39,6 @@ class EvolutionEngine:
             )
         except Exception:
             log_output = ""
->>>>>>> origin/master
         commits = []
         current_commit = {}
         for line in log_output.split('\n'):

@@ -9,8 +9,22 @@ import click
 
 
 @click.group()
-@click.version_option(version="1.0.25", prog_name="codedna")def main():
-    """🧬 CodeDNA — A genetic analyzer for software.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def main():    """🧬 CodeDNA — A genetic analyzer for software.
     Reverse-engineer any codebase into a DNA profile describing its
     architecture, structure, evolution, and developer patterns.
     """
@@ -53,9 +67,22 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     from .visualization.html_export import HTMLExporter
     from .visualization.renderer import Renderer
     console = Console()
-    console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.25[/]")
-    console.print("[dim]━" * 50 + "[/]\n")>>>>>>> origin/master
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.print("[dim]━" * 50 + "[/]\n")
     console.print("[dim]━" * 50 + "[/]\n")
     cloner = RepoCloner()
 

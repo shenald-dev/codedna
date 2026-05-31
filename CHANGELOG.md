@@ -139,6 +139,64 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 ### Changed
 * **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
 
+
+
+
+
+
+
+## [1.0.19] - 2026-05-20
+
+## [1.0.27] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
+
+## [1.0.24] - 2026-05-27
+
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
+
+
+## [1.0.27] - 2026-05-24
+
+### Changed
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+
+## [1.0.27] - 2026-05-22
+
+### Changed
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+
+
+## [1.0.21] - 2026-05-21
+
+### Changed
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
+
+## [1.0.21] - 2026-05-20
+
+
+### Changed
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
+
+
+
+
+## [1.0.19] - 2026-05-06
+
+### Changed
+* **Testing:** Added adversarial unit tests in `tests/test_architecture_detector.py` to verify the path splitting optimization and ensure `_walk` accurately traverses directory structures while correctly bypassing ignored and hidden directories.
+
+
+* **[Performance]:** Removed redundant path string splitting and `relative_to` processing in the `ArchitectureDetector` traversal, significantly lowering the overhead per file scanned.
+
+
+
+
+
 ## [1.0.17] - 2026-05-04
  Steps:
  1. We note that the base (master) has changes from the ancestor to the base.
