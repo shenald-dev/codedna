@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import re
+=======
+<<<<<<< HEAD>>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
+if typing.TYPE_CHECKING:
+    from git import Repo
 
 
 class EvolutionEngine:
@@ -23,6 +25,9 @@ class EvolutionEngine:
         Returns:
             Dict with growth timeline, churn hotspots, and evolution patterns.
         """
+        from git import Repo
+        from git.exc import InvalidGitRepositoryError
+
         try:
             repo = Repo(str(repo_path))
         except InvalidGitRepositoryError:
@@ -39,8 +44,7 @@ class EvolutionEngine:
             return {"timeline": [], "patterns": []}
 
         commits_data = []
-        current_commit = None
-        file_changes: Counter = Counter()
+        current_commit = None        file_changes: Counter = Counter()
         file_additions: defaultdict = defaultdict(int)
         file_deletions: defaultdict = defaultdict(int)
 
