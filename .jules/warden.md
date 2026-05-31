@@ -104,6 +104,25 @@ Observation / Pruned:
 The previous optimization agent successfully removed the redundant string splitting overhead inside the file iteration loop in ArchitectureDetector._walk. During adversarial QA, I verified this logic directly tracks item.name.lower() to capture all path components accurately. Added test_architecture_detector.py to assert that correct traversal and folder ignoring remain intact. No dependencies were upgraded or dead code pruned.
 Alignment / Deferred:
 Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md updated to document the testing enhancements. No dependencies upgraded.
+2026-05-20 — Assessment & Lifecycle
+
+Observation / Pruned:
+
+The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`. Scanned the codebase and test suite for dead code. Pruned zero files. Test suite passed successfully.
+
+Alignment / Deferred:
+No dependency updates required as pyproject.toml dependencies are current. Released v1.0.20.
+
+
+
+2026-05-21 — Assessment & Lifecycle
+
+Observation / Pruned:
+
+The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands across `DeveloperAnalyzer` and `EvolutionEngine`, preventing fatal format errors on modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
+
+Alignment / Deferred:
+
 
 2026-05-20 — Assessment & Lifecycle
 Observation / Pruned:

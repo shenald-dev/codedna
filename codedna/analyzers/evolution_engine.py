@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import typing
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -30,8 +31,8 @@ class EvolutionEngine:
         except InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "timeline": []}
 
-        try:            log_output = repo.git.log(
-                "--format=tformat:COMMIT::%H::%cI::%cd::%s",
+        try:
+            log_output = repo.git.log(                "--format=tformat:COMMIT::%H::%cI::%cd::%s",
                 "--date=short",
                 "--shortstat",
                 "-n", "500"
@@ -89,8 +90,7 @@ class EvolutionEngine:
             "patterns": patterns,
         }
 
-    def _build_timeline(self, commits: list[dict], snapshots: int, repo: Repo) -> list[dict]:
-        """Build time-based snapshots of the project's evolution."""
+    def _build_timeline(self, commits: list[dict], snapshots: int, repo: 'Repo') -> list[dict]:        """Build time-based snapshots of the project's evolution."""
         if len(commits) < 2:
             return []
 
@@ -118,7 +118,7 @@ class EvolutionEngine:
 
         return timeline[:snapshots]
 
-    def _compute_churn(self, repo: Repo) -> list[dict]:
+    def _compute_churn(self, repo: 'Repo') -> list[dict]:
         """Find files with the highest change frequency (churn)."""
         file_changes: Counter = Counter()
         file_additions: defaultdict = defaultdict(int)
