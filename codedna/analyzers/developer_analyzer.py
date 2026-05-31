@@ -6,8 +6,6 @@ import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import git
-
 
 class DeveloperAnalyzer:
     """Analyzes developer contribution patterns from Git history."""
@@ -18,6 +16,7 @@ class DeveloperAnalyzer:
         Returns:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
+        import git
         try:
             repo = git.Repo(str(repo_path))
         except git.exc.InvalidGitRepositoryError:

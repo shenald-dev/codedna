@@ -52,6 +52,9 @@ codedna analyze ./my-project
 # Self-analyze CodeDNA itself
 codedna analyze .
 
+# Configure maximum file size constraint to 10MB (default is 5MB)
+CODEDNA_MAX_FILE_SIZE=10485760 codedna analyze .
+
 # Save reports to a directory
 codedna analyze . --output reports/ --format both
 

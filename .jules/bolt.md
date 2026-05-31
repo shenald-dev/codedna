@@ -207,6 +207,43 @@ When using GitPython to execute batched `git log` commands with a custom literal
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+## 2026-05-27 — Fix fatal Git formatting bug in git.log calls
+
+Learning:
+Using `--format=COMMIT` or `--format=COMMIT::...` without a placeholder like `%H` or the explicit `tformat:` prefix causes a fatal `invalid --pretty format` error in newer Git versions, which can crash GitPython when executing `repo.git.log`. This can silently suppress extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Always strictly prepend custom literal string formats with the `tformat:` prefix when making `git log` calls via GitPython to guarantee cross-version compatibility and prevent crashes or suppressed exceptions.
+## 2025-03-13 — Git Format Issue
+
+Learning:
+Modern Git versions reject `--format=COMMIT` without the `tformat:` prefix with a "fatal: invalid --pretty format" error. In CodeDNA analyzers, `try-except` blocks silently caught this as a `GitCommandError`, completely breaking contributor and evolution analysis without failing the test suite.
+
+Action:
+Always use `--format=tformat:...` when passing custom literal format strings to `git.log()` via GitPython, and verify git commands locally outside of broad try-except blocks to catch silent failures early.
+
+2026-05-26 — Fix GitPython Crash due to Invalid Git Format String
+Learning: Using `--format=COMMIT` in `git log` without a `tformat:` prefix or `%` variables causes modern Git versions to crash with `fatal: invalid --pretty format`, resulting in an unhandled `GitCommandError` that silently breaks analysis.
+Action: Always explicitly use `tformat:` prefix for literal string separators in Git formatting commands.
+## 2026-05-19 — Git Log Formatting Bug Fix
+
+Learning:
+Git format strings that do not contain a `%` placeholder or the `tformat:` / `format:` prefix are rejected with a fatal error in newer versions of Git, which silently suppressed extraction logic in the evolution engine due to broad try/except blocks.
+
+Action:
+Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+
+## 2026-05-26 — Fix: Git log formatting in GitPython
+
+Learning:
+In Git, if you pass a custom format string via `--format=<string>` and it does *not* contain a `%` placeholder (like `--format=COMMIT`), Git will fail with a `fatal: invalid --pretty format: COMMIT` error. Git only auto-infers custom string formats if they contain a `%`.
+
+Action:
+Explicitly prepend `tformat:` to literal string formats in `git log` commands via GitPython (e.g., `--format=tformat:COMMIT`) to ensure Git interprets it correctly and avoids runtime crashes.
+2025-02-21 — Optimize Evolution Engine & Make File Size Configurable
+Learning: Evolution Engine iter_commits was spawning O(N) Git subprocesses, creating a severe bottleneck. Also, a hardcoded 5MB limit in analyzer modules prevented custom handling of massive files.
+Action: Use batched raw git commands (`repo.git.log` with `tformat`) and read `CODEDNA_MAX_FILE_SIZE` from the environment.
+
 ## 2026-05-21 — Configure Max File Size
 
 Learning:
@@ -214,6 +251,14 @@ Parsing environment variables inside tight file iteration loops causes severe CP
 
 Action:
 Always extract configurable limits (e.g. `os.environ.get('CODEDNA_MAX_FILE_SIZE', ...)`) to module-level scope so they are parsed only once rather than redundantly per file.
+
+## 2026-05-26 — Reliability: Safe parsing of environment variables
+
+Learning:
+When extracting integer limits from environment variables (e.g., `int(os.environ.get(...))`), passing a malformed string (like "invalid") will raise a `ValueError` during module import and crash the entire application before it can run.
+
+Action:
+Always wrap environment variable parsing into integers or floats with a `try...except ValueError` block to ensure a safe fallback to the default value if the user provides malformed input.
 ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
 Learning:
@@ -229,6 +274,34 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`). Additionally, DependencyMapper failed to filter external libraries correctly due to a missing `continue`, polluting graph structures.
+
+Action:
+## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`). Additionally, DependencyMapper failed to filter external libraries correctly due to a missing `continue`, polluting graph structures.
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) to prevent path corruption. Added a robust filter for external dependencies by correctly skipping dependencies lacking `.` and `/` characters.
+## 2026-05-24 — Correctness: Avoid using lstrip for path prefix removal
+
+Learning: Using `str.lstrip("./")` to remove relative path prefixes like `./` or `../` treats the argument as a set of characters, which incorrectly strips any combination of those characters from the string start (e.g., corrupting `../.env` into `env`).
+
+Action: Use exact prefix removal methods like `re.sub(r"^(?:\./|\.\./)+", "", path)` or explicit slicing instead of `lstrip()` when normalizing file paths to prevent data corruption.
+## 2024-05-26 — Fix dangerous prefix stripping and redundant import parsing
+
+Learning:
+Python's `str.lstrip` strips all combinations of characters provided, which can corrupt valid paths like `../.env` when doing `lstrip("./")`.
+
+Action: Always use `removeprefix`, regex `re.sub(r"^(?:\.\./|\./)+", "", dep)`, or explicit string slicing to strip specific string prefixes, rather than `lstrip()`.
+
+2024-05-26 — Add test case for path stripping logic
+Learning: Always test edge cases in path parsing, especially files starting with `.`, when stripping prefixes like `./` or `../`.
+Action: Add explicit test cases covering edge cases (e.g. `.env`, `../.env`) when updating parsing logic.
 ## 2026-05-27 — Fix lstrip Path Prefix Bug
 
 Learning:
@@ -239,3 +312,13 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
+2026-05-29 — Performance Optimization: Lazy-load heavy dependencies to improve CLI startup time
+
+Learning:
+Importing heavy third-party packages like `networkx` (~0.2s) and `git` (~0.06s) at the module level severely impacts CLI startup time, as these modules are loaded even when their commands are not executed or are lightly invoked. By moving these imports directly into the functions where they are actually used (lazy loading), startup performance is radically improved without sacrificing functionality.
+
+Action:
+Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import git`) out of the module level scope and inside `map`, `analyze`, and `clone` methods of `DependencyMapper`, `DeveloperAnalyzer`, `EvolutionEngine`, and `RepoCloner`. This optimization is highly effective for CLI tools.
