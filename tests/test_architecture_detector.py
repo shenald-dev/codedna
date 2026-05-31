@@ -36,7 +36,6 @@ class TestArchitectureDetectorWalk(unittest.TestCase):
 
         items = list(self.detector._walk(self.tmp_path))
         names = [item[0].name.lower() for item in items]
-
         self.assertIn("src", names)
         self.assertIn("models", names)
         self.assertIn("views", names)
