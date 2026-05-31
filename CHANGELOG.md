@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.26] - 2026-05-30
+
+### Changed
+* **Performance:** Lazy-load heavy dependencies to improve CLI startup time.
+
+## [1.0.25] - 2026-05-28
+
+### Fixed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+
+## [1.0.24] - 2026-05-27
+
+### Fixed
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
+
 ## [1.0.23] - 2026-05-24
 
 ### Changed
@@ -123,3 +138,4 @@
 
 ### Fixed
 * **Correctness:** Fixed a path resolution bug in `DependencyMapper` where using `lstrip` corrupted relative paths pointing to hidden files (e.g., `../../.env` into `env`). Replaced with precise regex matching to ensure correct module resolution.
+* **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
