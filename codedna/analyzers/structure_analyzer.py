@@ -71,8 +71,7 @@ class StructureAnalyzer:
                             modules.append({
                                 "path": module_path,
                                 "marker": item.name,
-                                "file_count": file_count_cache,
-                            })
+                                "file_count": file_count_cache,                            })
                         except ValueError:
                             pass
 
