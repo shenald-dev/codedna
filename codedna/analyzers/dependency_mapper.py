@@ -8,6 +8,8 @@ import os
 import re
 from pathlib import Path
 
+import networkx as nx
+
 from .language_detector import IGNORE_DIRS
 
 try:
@@ -15,7 +17,6 @@ try:
 except ValueError:
     logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
-<<<<<<< HEAD
 
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
@@ -165,5 +166,3 @@ class DependencyMapper:
         if dep.startswith("./") or dep.startswith("../"):
             return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
-=======
->>>>>>> origin/master
