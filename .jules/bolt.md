@@ -218,6 +218,14 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+
+## 2026-05-26 — Fix: Git log formatting in GitPython
+
+Learning:
+In Git, if you pass a custom format string via `--format=<string>` and it does *not* contain a `%` placeholder (like `--format=COMMIT`), Git will fail with a `fatal: invalid --pretty format: COMMIT` error. Git only auto-infers custom string formats if they contain a `%`.
+
+Action:
+Explicitly prepend `tformat:` to literal string formats in `git log` commands via GitPython (e.g., `--format=tformat:COMMIT`) to ensure Git interprets it correctly and avoids runtime crashes.
 2025-02-21 — Optimize Evolution Engine & Make File Size Configurable
 Learning: Evolution Engine iter_commits was spawning O(N) Git subprocesses, creating a severe bottleneck. Also, a hardcoded 5MB limit in analyzer modules prevented custom handling of massive files.
 Action: Use batched raw git commands (`repo.git.log` with `tformat`) and read `CODEDNA_MAX_FILE_SIZE` from the environment.
