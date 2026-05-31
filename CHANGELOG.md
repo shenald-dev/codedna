@@ -76,41 +76,6 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 ### Changed
 * **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
 
-## [1.0.26] - 2026-05-30
-
-### Changed
-* **Performance:** Lazy-load heavy dependencies to improve CLI startup time.
-
-## [1.0.25] - 2026-05-28
-
-### Fixed
-* **Reliability:** Fixed `logging.warning` to use module-level logger.
-
-## [1.0.24] - 2026-05-27
-
-### Fixed
-* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
-
-## [1.0.23] - 2026-05-24
-
-### Changed
-* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
-
-## [1.0.22] - 2026-05-22
-
-### Changed
-* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
-
-## [1.0.21] - 2026-05-21
-
-### Changed
-* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
-
-## [1.0.20] - 2026-05-20
-
-### Changed
-* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
-
 ## [1.0.19] - 2026-05-06
 
  However, note that the provided diff is from head changes vs base (i.e., showing what the head branch changed relative to the base).
@@ -693,14 +658,3 @@ We are given three versions: ancestor, base (master), and head (PR branch).
    We cannot output a file that is truncated. We must output the complete file.
 
    This is
-### Changed
-* **Testing:** Replaced the global `sys.modules['networkx']` mock with real networkx execution in `test_dependency_mapper_errors.py` to fix unpredictable graph node injection across tests. Empty mocked files now properly limit `total_modules` resolution to 1.
-* **Code Quality:** Removed stale unused imports globally utilizing aggressive `ruff check --fix` policies.
-* **Cleanup:** Removed unused orphaned scripts such as `update_security_detector.py`.
-* **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
-
-## [1.0.24] - 2026-05-24
-
-### Fixed
-* **Correctness:** Fixed a path resolution bug in `DependencyMapper` where using `lstrip` corrupted relative paths pointing to hidden files (e.g., `../../.env` into `env`). Replaced with precise regex matching to ensure correct module resolution.
-* **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.

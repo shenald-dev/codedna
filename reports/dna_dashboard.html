@@ -33,7 +33,7 @@
             <span class="inline-block px-4 py-2 rounded-full bg-slate-800 border border-slate-700 font-mono text-cyan-400 font-semibold shadow-xl">  # noqa: E501
                 LANG:PYT | ARCH:MON | SIZE:MD | TEAM:DUO | HEALTH:1
             </span>
-            <p class="text-sm text-slate-500 mt-2">Analyzed on 2026-05-28</p>
+            <p class="text-sm text-slate-500 mt-2">Analyzed on 2026-05-31</p>
         </div>
     </div>
 </div>
@@ -52,7 +52,7 @@
         </div>
         <div class="card p-6 flex flex-col justify-center">
             <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Total Files</h3>  # noqa: E501
-            <p class="text-2xl font-bold text-white">48</p>
+            <p class="text-2xl font-bold text-white">45</p>
         </div>
         <div class="card p-6 flex flex-col justify-center">
             <h3 class="text-slate-400 text-sm uppercase tracking-wider font-semibold mb-1">Contributors</h3>  # noqa: E501
@@ -71,36 +71,36 @@
             <div class="bg-slate-900 rounded-lg p-4 w-full overflow-x-auto min-h-[300px] flex items-center justify-center">  # noqa: E501
                 <div class="mermaid">
 graph LR
-    resolver5 --> subprocess
-    resolver5 --> re
-    resolver2 --> subprocess
-    resolver2 --> re
-    fix_bolt --> sys
-    fix_bolt --> re
-    fix_smells --> re
-    fix_smells --> logging
-    fix_smells --> os
-    fix_smells --> __future__
-    fix_smells --> pathlib
-    fix_smells --> _language_detector
-    fix_deps --> re
-    fix_deps --> itertools
-    fix_deps --> logging
-    fix_deps --> os
-    fix_deps --> networkx
-    fix_deps --> __future__
-    fix_deps --> pathlib
-    fix_deps --> _language_detector
-    fix_security --> re
-    fix_security --> json
-    fix_security --> logging
-    fix_security --> os
-    fix_security --> __future__
-    fix_security --> pathlib
-    fix_security --> _language_detector
+    fix_ee3 --> re
     tests_test_minimal --> shutil
     tests_test_minimal --> tempfile
     tests_test_minimal --> unittest
+    tests_test_minimal --> pathlib
+    tests_test_minimal --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> pytest
+    tests_test_analyzers --> git
+    tests_test_analyzers --> json
+    tests_test_analyzers --> codedna_analyzers_architecture_detector
+    tests_test_analyzers --> codedna_analyzers_code_smell_detector
+    tests_test_analyzers --> codedna_analyzers_dependency_mapper
+    tests_test_analyzers --> codedna_analyzers_dna_generator
+    tests_test_analyzers --> codedna_analyzers_github_analyzer
+    tests_test_analyzers --> codedna_analyzers_language_detector
+    tests_test_analyzers --> codedna_analyzers_security_detector
+    tests_test_analyzers --> codedna_analyzers_structure_analyzer
+    tests_test_analyzers --> unittest_mock
+    tests_test_analyzers --> codedna_analyzers_developer_analyzer
+    tests_test_visualization --> pytest
+    tests_test_visualization --> codedna_visualization_html_export
+    tests_test_github_analyzer_security --> unittest
+    tests_test_github_analyzer_security --> unittest_mock
+    tests_test_github_analyzer_security --> codedna_analyzers_github_analyzer
+    tests_test_ai_analyzer --> codedna_analyzers_ai_analyzer
+    tests_test_repo_cloner --> sys
+    tests_test_repo_cloner --> unittest
+    tests_test_repo_cloner --> git
+    tests_test_repo_cloner --> unittest_mock
+    tests_test_repo_cloner --> codedna_analyzers_repo_cloner
                 </div>
             </div>
         </div>
@@ -115,10 +115,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">Python</span>
-                    <span class="text-slate-400">65.2% <span class="text-xs ml-1">(35 files)</span></span>  # noqa: E501
+                    <span class="text-slate-400">64.0% <span class="text-xs ml-1">(32 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 65.2%"></div>
+                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 64.0%"></div>
                 </div>
             </div>
 
@@ -126,10 +126,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">Markdown</span>
-                    <span class="text-slate-400">25.6% <span class="text-xs ml-1">(5 files)</span></span>  # noqa: E501
+                    <span class="text-slate-400">26.8% <span class="text-xs ml-1">(5 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-slate-400 h-2 rounded-full" style="width: 25.6%"></div>
+                    <div class="bg-slate-400 h-2 rounded-full" style="width: 26.8%"></div>
                 </div>
             </div>
 
@@ -137,10 +137,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">JSON</span>
-                    <span class="text-slate-400">2.4% <span class="text-xs ml-1">(4 files)</span></span>  # noqa: E501
+                    <span class="text-slate-400">2.5% <span class="text-xs ml-1">(4 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-slate-400 h-2 rounded-full" style="width: 2.4%"></div>
+                    <div class="bg-slate-400 h-2 rounded-full" style="width: 2.5%"></div>
                 </div>
             </div>
 
@@ -170,10 +170,10 @@ graph LR
             <div>
                 <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium text-slate-200">HTML</span>
-                    <span class="text-slate-400">5.0% <span class="text-xs ml-1">(1 files)</span></span>  # noqa: E501
+                    <span class="text-slate-400">5.1% <span class="text-xs ml-1">(1 files)</span></span>  # noqa: E501
                 </div>
                 <div class="w-full bg-slate-800 rounded-full h-2">
-                    <div class="bg-orange-400 h-2 rounded-full" style="width: 5.0%"></div>
+                    <div class="bg-orange-400 h-2 rounded-full" style="width: 5.1%"></div>
                 </div>
             </div>
 
@@ -219,7 +219,7 @@ graph LR
                     <p class="text-xs text-cyan-400">Primary Architect</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm font-bold text-white">18</p>
+                    <p class="text-sm font-bold text-white">19</p>
                     <p class="text-xs text-slate-500">commits</p>
                 </div>
             </div>
@@ -230,7 +230,7 @@ graph LR
                     <p class="text-xs text-cyan-400">Core Maintainer</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm font-bold text-white">10</p>
+                    <p class="text-sm font-bold text-white">12</p>
                     <p class="text-xs text-slate-500">commits</p>
                 </div>
             </div>
@@ -244,7 +244,7 @@ graph LR
                 📈 Evolution
             </h2>
             <ul class="space-y-2 text-sm text-slate-300">
-                <li class="flex justify-between"><span>Total Commits</span> <strong class="text-white">28</strong></li>  # noqa: E501
+                <li class="flex justify-between"><span>Total Commits</span> <strong class="text-white">31</strong></li>  # noqa: E501
                 <li class="flex justify-between"><span>First Commit</span> <strong class="text-white">2026-05-12</strong></li>  # noqa: E501
             </ul>
             <div class="mt-4 pt-4 border-t border-slate-700">
