@@ -108,6 +108,32 @@ Version bumped to 1.0.19 across pyproject.toml and codedna/cli.py. CHANGELOG.md 
 2026-05-20 — Assessment & Lifecycle
 Observation / Pruned:
 The previous optimization agent successfully fixed a bug in the git format string (`--format=COMMIT`) that was failing in modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
+The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`, verified the optimization in `EvolutionEngine` replacing N+1 sub-processes, wrapped `CODEDNA_MAX_FILE_SIZE` parsing in `try...except ValueError`, successfully replaced `format:` with `tformat:` for literal strings in `git log` commands to prevent fatal format errors, extracted a configurable `CODEDNA_MAX_FILE_SIZE` threshold to optimize huge file bypassing across detectors, and hoisted standard library imports to the module level while adding `logging.warning()` to env parsing. Scanned the codebase and test suite for dead code. Pruned zero files.
+Alignment / Deferred:
+Updated `CHANGELOG.md` to reflect the testing enhancements, reliability, and performance enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.20. No dependency upgrades deferred.
+2026-05-20 — Assessment & Lifecycle
+
+Observation / Pruned:
+
+The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`. Scanned the codebase and test suite for dead code. Pruned zero files. Test suite passed successfully.
+
+Alignment / Deferred:
+No dependency updates required as pyproject.toml dependencies are current. Released v1.0.20.
+
+
+
+2026-05-21 — Assessment & Lifecycle
+
+Observation / Pruned:
+
+The previous optimization agent successfully replaced `format:` with `tformat:` for literal strings in `git log` commands across `DeveloperAnalyzer` and `EvolutionEngine`, preventing fatal format errors on modern Git versions. Scanned the codebase and test suite for dead code. Pruned zero files.
+
+Alignment / Deferred:
+
+
+2026-05-20 — Assessment & Lifecycle
+Observation / Pruned:
+The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`. Scanned the codebase and test suite for dead code. Pruned zero files.
 Alignment / Deferred:
 Updated `CHANGELOG.md` to reflect the testing enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.20. No dependency upgrades deferred.
 
@@ -140,3 +166,9 @@ Observation / Pruned:
 The previous optimization agent incorrectly used `logging.warning()` which caused bugs if logging was not configured. Applied `logging.getLogger(__name__).warning()` for robust log handling.
 Alignment / Deferred:
 Updated `CHANGELOG.md` and bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.25.
+2026-05-30 — Assessment & Lifecycle
+Observation / Pruned:
+The previous agent performed optimization by lazy-loading heavy module imports. Validated that this change does not break functionality or tests. Verified codebase survival by running pytest, ruff, and vulture. No new dead code, unused dependencies, or orphaned files were detected following the CLI startup latency optimization.
+
+Alignment / Deferred:
+Updated CHANGELOG.md and bumped the version in pyproject.toml and codedna/cli.py to 1.0.26 to reflect the lazy-loading of heavy module imports optimization.
