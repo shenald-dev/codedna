@@ -30,9 +30,7 @@ class EvolutionEngine:
         except InvalidGitRepositoryError:
             return {"error": "Not a Git repository", "timeline": []}
 
-<<<<<<< HEAD
-        import re        try:
-            log_output = repo.git.log(
+        try:            log_output = repo.git.log(
                 "--format=tformat:COMMIT::%H::%cI::%cd::%s",
                 "--date=short",
                 "--shortstat",
