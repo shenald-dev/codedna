@@ -13,7 +13,6 @@ import click
 
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
-
     Reverse-engineer any codebase into a DNA profile describing its
     architecture, structure, evolution, and developer patterns.
     """
@@ -59,7 +58,6 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.25[/]")
 
     console.print("[dim]━" * 50 + "[/]\n")
-
     cloner = RepoCloner()
 
     try:

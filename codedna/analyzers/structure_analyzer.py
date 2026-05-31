@@ -36,7 +36,6 @@ class StructureAnalyzer:
             dirs_to_process = []
             cached_file_count = None
 
-
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -67,7 +66,6 @@ class StructureAnalyzer:
                         try:
                             if cached_file_count is None:
                                 cached_file_count = sum(1 for p in items if p.is_file())
-
                             module_path = str(current_path.relative_to(repo_path))
                             modules.append({
                                 "path": module_path,
