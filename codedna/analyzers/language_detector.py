@@ -9,11 +9,8 @@ from pathlib import Path
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-<<<<<<< HEAD
 =======
-    import logging
-    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
->>>>>>> origin/master
+<<<<<<< HEAD>>>>>>> origin/master
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Extension → Language mapping

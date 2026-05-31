@@ -207,6 +207,10 @@ Git format strings that do not contain a `%` placeholder or the `tformat:` / `fo
 
 Action:
 Strictly prepend custom format strings with `tformat:` when making `git log` calls via GitPython to guarantee cross-version reliability and avoid suppressed exceptions.
+2025-02-21 — Optimize Evolution Engine & Make File Size Configurable
+Learning: Evolution Engine iter_commits was spawning O(N) Git subprocesses, creating a severe bottleneck. Also, a hardcoded 5MB limit in analyzer modules prevented custom handling of massive files.
+Action: Use batched raw git commands (`repo.git.log` with `tformat`) and read `CODEDNA_MAX_FILE_SIZE` from the environment.
+
 ## 2026-05-21 — Configure Max File Size
 
 Learning:
