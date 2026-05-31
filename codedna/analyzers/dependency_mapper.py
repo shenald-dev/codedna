@@ -8,8 +8,6 @@ import os
 import re
 from pathlib import Path
 
-import networkx as nx
-
 from .language_detector import IGNORE_DIRS
 
 try:
@@ -69,6 +67,7 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        import networkx as nx
         graph = nx.DiGraph()
 
         for file_path in self._walk_source(repo_path):
@@ -164,5 +163,5 @@ class DependencyMapper:
 
     def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
-            return re.sub(r'^(?:\.\./|\./)+', '', dep)
+            return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
