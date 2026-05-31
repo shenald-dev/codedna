@@ -236,6 +236,19 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`). Additionally, DependencyMapper failed to filter external libraries correctly due to a missing `continue`, polluting graph structures.
+
+Action:
+## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`). Additionally, DependencyMapper failed to filter external libraries correctly due to a missing `continue`, polluting graph structures.
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) to prevent path corruption. Added a robust filter for external dependencies by correctly skipping dependencies lacking `.` and `/` characters.
 ## 2026-05-24 — Correctness: Avoid using lstrip for path prefix removal
 
 Learning: Using `str.lstrip("./")` to remove relative path prefixes like `./` or `../` treats the argument as a set of characters, which incorrectly strips any combination of those characters from the string start (e.g., corrupting `../.env` into `env`).

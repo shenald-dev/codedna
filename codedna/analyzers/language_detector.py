@@ -9,8 +9,7 @@ from pathlib import Path
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-=======    MAX_FILE_SIZE = 5 * 1024 * 1024
-
+    MAX_FILE_SIZE = 5 * 1024 * 1024
 # Extension → Language mapping
 LANGUAGE_MAP: dict[str, str] = {
     ".py": "Python",

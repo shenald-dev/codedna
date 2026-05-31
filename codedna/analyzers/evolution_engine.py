@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import re
-=======from collections import Counter, defaultdict
-from pathlib import Path
+from collections import Counter, defaultdictfrom pathlib import Path
 
 if typing.TYPE_CHECKING:
     from git import Repo

@@ -13,6 +13,7 @@ from .language_detector import IGNORE_DIRS
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
+    logging.warning("Invalid CODEDNA_MAX_FILE_SIZE. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
@@ -86,6 +87,9 @@ class DependencyMapper:
             for pattern in IMPORT_PATTERNS[lang]:
                 for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
+                    if "." not in dep and "/" not in dep:
+                        continue
+
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)
@@ -161,8 +165,5 @@ class DependencyMapper:
 
     def _normalize_import(self, dep: str) -> str:
         if dep.startswith("./") or dep.startswith("../"):
-            # Use regex to remove exactly './' or '../' prefixes.
-            # Avoid str.lstrip('./') as it strips any combination of '.' and '/' characters
-            # which corrupts hidden files like '../../.env' into 'env'.
-            return re.sub(r"^(?:\./|\.\./)+", "", dep)
+            return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
