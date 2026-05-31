@@ -289,6 +289,19 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 ### Changed
 * **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
 
+## [1.0.20] - 2026-05-20
+
+### Changed
+* **Reliability:** Fixed `logging.warning` to use module-level logger.
+* **Performance:** Hoisted standard library imports (`os`, `re`, `copy`, `json`, `urllib.parse`) to the module level in `AIAnalyzer`, `EvolutionEngine`, and `RepoCloner` to avoid repetitive import overhead. Implemented `MAX_FILE_SIZE` handling in `LanguageDetector`.
+* **Reliability:** Added explicit `logging.warning()` inside the `try/except ValueError` block when parsing the `CODEDNA_MAX_FILE_SIZE` environment variable in `SecurityDetector`, `DependencyMapper`, and `CodeSmellDetector`.
+* **Performance:** Verified the optimization in `EvolutionEngine` that replaces N+1 `git log` sub-processes with a single batched history parse. Pruned zero files.
+* **Reliability:** Wrapped `CODEDNA_MAX_FILE_SIZE` environment variable parsing in `try...except ValueError` to prevent startup crashes when provided malformed strings. Pruned zero files.
+* **Reliability:** Fixed `git log` crashes on modern Git versions by updating custom literal format strings to use the `tformat:` prefix instead of `format:` in `DeveloperAnalyzer` and `EvolutionEngine`. Pruned zero files.
+* **Performance:** Extracted hardcoded `5 * 1024 * 1024` file size limits into a configurable `os.environ.get("CODEDNA_MAX_FILE_SIZE")` threshold across `SecurityDetector`, `CodeSmellDetector`, and `DependencyMapper` to allow users to override the maximum scanning size.
+* **Reliability:** Replaced `str.lstrip` with regex substitution in `DependencyMapper._normalize_import` to prevent corrupting valid path components when removing relative prefixes like `./` or `../`. Pruned zero files.
+* **Testing:** Fixed tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by previous traversal optimizations. No dead code pruned.
+
 ## [1.0.19] - 2026-05-06
 
  However, note that the provided diff is from head changes vs base (i.e., showing what the head branch changed relative to the base).
