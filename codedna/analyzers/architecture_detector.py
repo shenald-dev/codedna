@@ -69,6 +69,7 @@ class ArchitectureDetector:
                     src_dir_count += 1
             else:
                 all_names.add(item.name.lower())
+
         # Detect architecture patterns
         detected = []
         for pattern_name, config in PATTERNS.items():
