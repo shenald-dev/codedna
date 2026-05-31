@@ -8,8 +8,6 @@ import os
 import re
 from pathlib import Path
 
-import networkx as nx
-
 from .language_detector import IGNORE_DIRS
 
 import logging
@@ -17,8 +15,7 @@ import logging
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE environment variable. Falling back to 5MB.")
-    MAX_FILE_SIZE = 5 * 1024 * 1024
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE environment variable. Falling back to 5MB.")    MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
@@ -91,6 +88,9 @@ class DependencyMapper:
             for pattern in IMPORT_PATTERNS[lang]:
                 for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
+                    if "." not in dep and "/" not in dep:
+                        continue
+
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)

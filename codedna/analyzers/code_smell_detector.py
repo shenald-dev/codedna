@@ -14,7 +14,7 @@ import logging
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE environment variable. Falling back to 5MB.")
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE environment variable. Falling back to 5MB.")>>>>>>> origin/master
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Thresholds
