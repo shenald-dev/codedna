@@ -111,6 +111,11 @@ class TestDependencyMapper:
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
 
+    def test_normalize_import_preserves_filenames(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./utils/.env") == "utils/.env"
+        assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
 class TestCodeSmellDetector:
     def test_detect_smells(self, sample_repo):
@@ -196,7 +201,6 @@ class TestDeveloperAnalyzer:
         result = analyzer.analyze(sample_repo)
         assert result.get("total_commits", -1) == 2
         assert len(result.get("contributors", [])) == 2
-
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()
