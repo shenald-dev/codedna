@@ -110,6 +110,18 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
+
+## 2024-05-08 — Optimize StructureAnalyzer Directory Parsing
+
+Learning:
+`StructureAnalyzer` contained a hidden O(N) evaluation within a directory parsing loop: `sum(1 for p in items if p.is_file())` was called repeatedly for each module marker, causing O(N^2) behavior in directories with many files.
+
+Action:
+Replaced the internal list comprehension loop with a continuously updated scalar counter (`local_files`) tracked during the main iteration, eliminating the redundant inner loops and strictly improving traversal performance.
+
+## 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
+Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
+Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
@@ -253,6 +265,9 @@ When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` tr
 
 Action:
 Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
