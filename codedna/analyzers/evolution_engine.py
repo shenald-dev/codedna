@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import re
-=======
 =======>>>>>>> origin/master
->>>>>>> origin/master
 from collections import Counter, defaultdict
 from pathlib import Path
 if typing.TYPE_CHECKING:
@@ -36,10 +34,9 @@ class EvolutionEngine:
         try:
             log_output = repo.git.log(
                 "--format=tformat:COMMIT::%H::%cI::%cd::%s",
-<<<<<<< HEAD
                 "--date=short",
-                "--shortstat",                "-n", "500"
-            )
+                "--shortstat",
+                "-n", "500"            )
         except Exception:
             log_output = ""
 
@@ -128,6 +125,7 @@ class EvolutionEngine:
         file_deletions: defaultdict = defaultdict(int)
 
         try:
+            # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             output = repo.git.log(
                 "--numstat",
                 "--format=tformat:COMMIT",
