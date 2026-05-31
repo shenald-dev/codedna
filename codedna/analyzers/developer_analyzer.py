@@ -17,10 +17,7 @@ class DeveloperAnalyzer:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
         import git
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
         try:
             repo = git.Repo(str(repo_path))
         except git.exc.InvalidGitRepositoryError:
@@ -33,7 +30,6 @@ class DeveloperAnalyzer:
         commit_count = 0
 
         try:
-            # Note: Explicit tformat: prefix is required by newer Git versions for custom strings
             log_output = repo.git.log(
                 "--name-only",
                 "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
