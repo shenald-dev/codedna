@@ -34,8 +34,9 @@ class StructureAnalyzer:
                 continue
 
             dirs_to_process = []
-            local_files = 0
-            found_markers = []
+            current_dir_file_count = 0
+            has_module_markers = []
+            file_count = None
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -53,8 +54,7 @@ class StructureAnalyzer:
                         dirs_to_process.append((item, None, current_depth + 1))
                 else:
                     total_files += 1
-                    local_files += 1
-
+                    current_dir_file_count += 1
                     if current_depth < 3 and current_dict is not None:
                         current_dict[f"📄 {item.name}"] = None
 
@@ -64,8 +64,19 @@ class StructureAnalyzer:
                         depth_count += 1
 
                     if item.name in ("__init__.py", "package.json", "go.mod", "Cargo.toml", "build.gradle"):
-                        found_markers.append(item.name)
+                        has_module_markers.append(item.name)
 
+            if has_module_markers:
+                try:
+                    module_path = str(current_path.relative_to(repo_path))
+                    for marker in has_module_markers:
+                        modules.append({
+                            "path": module_path,
+                            "marker": marker,
+                            "file_count": current_dir_file_count,
+                        })
+                except ValueError:
+                    pass
             for marker in found_markers:
                 try:
                     module_path = str(current_path.relative_to(repo_path))
