@@ -71,6 +71,8 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        import networkx as nx
+
         graph = nx.DiGraph()
 
         for file_path in self._walk_source(repo_path):

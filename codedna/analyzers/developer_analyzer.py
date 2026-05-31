@@ -17,6 +17,10 @@ class DeveloperAnalyzer:
             Dict with contributors, hotspots, collaboration data, and commit patterns.
         """
         import git
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
         try:
             repo = git.Repo(str(repo_path))
         except git.exc.InvalidGitRepositoryError:

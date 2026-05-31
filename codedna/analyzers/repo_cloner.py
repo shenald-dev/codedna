@@ -83,6 +83,10 @@ class RepoCloner:
 
         self.console.print(f"  📥 Cloning [cyan]{source}[/] ...")
         from git import Repo
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
         Repo.clone_from(source, str(dest), depth=100)
         return dest
 

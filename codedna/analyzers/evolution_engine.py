@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import re
+import typing
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
+if typing.TYPE_CHECKING:
+    from git import Repo
 
 class EvolutionEngine:
     """Analyzes codebase evolution across Git commit history."""
@@ -90,7 +91,7 @@ class EvolutionEngine:
             "patterns": patterns,
         }
 
-    def _build_timeline(self, commits: list[dict], snapshots: int, repo: Repo) -> list[dict]:
+    def _build_timeline(self, commits: list[dict], snapshots: int, repo: 'Repo') -> list[dict]:
         """Build time-based snapshots of the project's evolution."""
         if len(commits) < 2:            return []
 
