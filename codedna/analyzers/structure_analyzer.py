@@ -36,7 +36,6 @@ class StructureAnalyzer:
             dirs_to_process = []
             local_files = 0
             found_markers = []
-
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -77,7 +76,6 @@ class StructureAnalyzer:
                     })
                 except ValueError:
                     pass
-
             stack.extend(reversed(dirs_to_process))
 
         return {
