@@ -4,9 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codedna"
-
-version = "1.0.25"
-description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
+version = "1.0.24"description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
 readme = "README.md"license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [

@@ -9,9 +9,7 @@ import click
 
 
 @click.group()
-
-@click.version_option(version="1.0.25", prog_name="codedna")
-def main():
+@click.version_option(version="1.0.24", prog_name="codedna")def main():
     """🧬 CodeDNA — A genetic analyzer for software.
     Reverse-engineer any codebase into a DNA profile describing its
     architecture, structure, evolution, and developer patterns.

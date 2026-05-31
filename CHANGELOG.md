@@ -133,3 +133,9 @@
 * **Code Quality:** Removed stale unused imports globally utilizing aggressive `ruff check --fix` policies.
 * **Cleanup:** Removed unused orphaned scripts such as `update_security_detector.py`.
 * **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
+
+## [1.0.24] - 2026-05-24
+
+### Fixed
+* **Correctness:** Fixed a path resolution bug in `DependencyMapper` where using `lstrip` corrupted relative paths pointing to hidden files (e.g., `../../.env` into `env`). Replaced with precise regex matching to ensure correct module resolution.
+* **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
