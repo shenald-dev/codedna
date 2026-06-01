@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -122,6 +123,12 @@ class TestDependencyMapper:
         assert mapper._normalize_import("../../") == ""
         assert mapper._normalize_import(".") == "."
         assert mapper._normalize_import("..") == ".."
+
+    def test_normalize_import_preserves_filenames(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./utils/.env") == "utils/.env"
+        assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
 
 class TestCodeSmellDetector:
