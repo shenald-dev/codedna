@@ -4,8 +4,6 @@ from unittest.mock import MagicMock, patch
 
 # Mock necessary modules
 sys.modules['git'] = MagicMock()
-sys.modules['rich'] = MagicMock()
-sys.modules['rich.console'] = MagicMock()
 
 from codedna.analyzers.repo_cloner import RepoCloner  # noqa: E402
 
@@ -31,16 +29,16 @@ class TestRepoCloner(unittest.TestCase):
                 self.assertTrue("Invalid repository source" in str(cm.exception) or "Unauthorized URL scheme" in str(cm.exception))
                 git.Repo.clone_from.assert_not_called()
 
-    def test_clone_with_valid_source(self):
-        import git
+    @patch("codedna.analyzers.repo_cloner.Repo.clone_from")
+    def test_clone_with_valid_source(self, mock_clone_from):
         valid_source = "https://github.com/user/repo.git"
 
         # Mock Path.exists to return False so it tries to clone
         with patch("codedna.analyzers.repo_cloner.Path.exists", return_value=False):
             self.cloner.clone(valid_source)
 
-        git.Repo.clone_from.assert_called()
-        args, _ = git.Repo.clone_from.call_args
+        mock_clone_from.assert_called()
+        args, _ = mock_clone_from.call_args
         self.assertEqual(args[0], valid_source)
 
 if __name__ == "__main__":
