@@ -256,6 +256,14 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+## 2026-05-26 — Fix Git log format bug in DeveloperAnalyzer and EvolutionEngine
+
+Learning:
+When using GitPython to execute batched `git log` commands with a custom literal string format, modern Git versions reject the un-prefixed version with a 'fatal: invalid --pretty format' error.
+
+Action:
+Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) instead of `format:` or just `--format=COMMIT`.
+
 
 ## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
 
