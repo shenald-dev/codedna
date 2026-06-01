@@ -40,6 +40,7 @@ class EvolutionEngine:
             )
         except Exception:
             log_output = ""
+
         commits = []
         current_commit = {}
         for line in log_output.split('\n'):

@@ -277,6 +277,13 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 
+## 2026-05-18 — Git Log Formatting Bug Fix
+
+Learning:
+Git log commands using plain `--format=COMMIT` throw a fatal error on some Git versions ("invalid --pretty format"), which may be silently caught and masked in the codebase, leading to empty fallback data.
+
+Action:
+Strictly use `--format=tformat:COMMIT` when formatting string in git.log commands to avoid silent failures and retain correct semantics.
 ## 2026-05-27 — Fix lstrip Path Prefix Bug
 
 Learning:
