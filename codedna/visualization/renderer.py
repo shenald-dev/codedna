@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
@@ -10,8 +9,18 @@ from rich.table import Table
 class Renderer:
     """Renders analysis results using Rich for beautiful terminal output."""
 
-    def __init__(self):
-        self.console = Console()
+    def __init__(self, console=None):
+        """Initialize the Renderer.
+
+        Args:
+            console: Optional rich Console instance. If None, it will be lazily
+                     imported and instantiated to reduce module load time.
+        """
+        if console is None:
+            from rich.console import Console
+            self.console = Console()
+        else:
+            self.console = console
 
     def render_dna_profile(self, profile: dict) -> None:
         """Render the full DNA profile to the terminal."""

@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 
 import click
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 
 @click.group()
@@ -13,32 +15,11 @@ import click
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
 
-    Reverse-engineer any codebase into a DNA profile describing its
-    architecture, structure, evolution, and developer patterns.
-    """
-    pass
 
 
-@main.command()
-@click.argument("source")
-@click.option("--output", "-o", type=click.Path(), help="Output directory for reports")
-@click.option("--format", "-f", "fmt", type=click.Choice(["markdown", "json", "html", "all"]), default="all", help="Output format")  # noqa: E501
-@click.option("--depth", "-d", type=int, default=100, help="Git history depth (commits to analyze)")
-@click.option("--no-visualize", is_flag=True, help="Skip terminal visualization")
-@click.option("--ai", is_flag=True, help="Synthesize an Executive Summary via LLM")
-def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize: bool, ai: bool):
-    """Analyze a repository and generate its DNA profile.
 
-    SOURCE can be a GitHub URL or a local path to a repository.
 
-    \b
-    Examples:
-        codedna analyze https://github.com/user/project
-        codedna analyze ./my-local-project
-        codedna analyze . --output reports/
-    """
-    from rich.console import Console
-    from rich.progress import Progress, SpinnerColumn, TextColumn
+
 
     from .analyzers.ai_analyzer import AIAnalyzer
     from .analyzers.architecture_detector import ArchitectureDetector
@@ -58,8 +39,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
     console.print("\n[bold cyan]🧬 CodeDNA[/] [dim]v1.0.25[/]")
     console.print("[dim]━" * 50 + "[/]\n")
 
-    cloner = RepoCloner()
-
+    cloner = RepoCloner(console=console)
     try:
         with Progress(
             SpinnerColumn(),
@@ -151,7 +131,7 @@ def analyze(source: str, output: str | None, fmt: str, depth: int, no_visualize:
 
         # ── Render to terminal ──
         if not no_visualize:
-            Renderer().render_dna_profile(profile)
+            Renderer(console=console).render_dna_profile(profile)
 
         # ── Save outputs ──
         if output:
