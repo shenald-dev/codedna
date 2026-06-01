@@ -133,6 +133,9 @@ Action: Refactored _walk in ArchitectureDetector to yield depth directly instead
 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+2026-05-18 — Git format reliability
+Learning: Using format: instead of tformat: for GitPython log formats can break downstream parsing or cause errors in modern Git, which might be silently masked by broad try/except blocks.
+Action: Always prefix custom format strings with tformat: when calling git log.
 
 ## 2026-05-26 — Optimization: Avoid redundant file system traversal string splitting and operations
 
@@ -238,6 +241,7 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+
 ## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
 
 Learning:
@@ -273,6 +277,9 @@ When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` tr
 
 Action:
 Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
