@@ -40,7 +40,6 @@ class EvolutionEngine:
             )
         except Exception:
             log_output = ""
->>>>>>> origin/master
         commits = []
         current_commit = {}
         for line in log_output.split('\n'):
@@ -134,9 +133,7 @@ class EvolutionEngine:
                 "--no-renames"
             )
         commits_data = []
-        current_commit = None        file_changes: Counter = Counter()
-        file_additions: defaultdict = defaultdict(int)
-        file_deletions: defaultdict = defaultdict(int)
+        current_commit = None
 
         for line in output.split('\n'):
             line = line.strip()
