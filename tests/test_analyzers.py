@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -94,6 +95,16 @@ class TestStructureAnalyzer:
 
 
 class TestDependencyMapper:
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./file") == "file"
+        assert mapper._normalize_import("../file") == "file"
+        assert mapper._normalize_import("../../file") == "file"
+        assert mapper._normalize_import("../.env") == ".env"
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("..../file") == "..../file"
+        assert mapper._normalize_import(".././../file") == "file"
+
     def test_map_dependencies(self, sample_repo):
         result = DependencyMapper().map(sample_repo)
         assert "total_modules" in result
@@ -109,6 +120,25 @@ class TestDependencyMapper:
         data = mapper.map(sample_repo)
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
+
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./foo.py") == "foo.py"
+        assert mapper._normalize_import("../foo.py") == "foo.py"
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./.gitignore") == ".gitignore"
+        assert mapper._normalize_import("foo.py") == "foo.py"
+        assert mapper._normalize_import("") == ""
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("../../") == ""
+        assert mapper._normalize_import(".") == "."
+        assert mapper._normalize_import("..") == ".."
+
+    def test_normalize_import_preserves_filenames(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./utils/.env") == "utils/.env"
+        assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
 
 class TestCodeSmellDetector:
