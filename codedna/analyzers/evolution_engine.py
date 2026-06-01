@@ -132,6 +132,9 @@ class EvolutionEngine:
                 "-n 200",
                 "--no-renames"
             )
+        except Exception:
+            output = ""
+
         commits_data = []
         current_commit = None
 

@@ -111,6 +111,19 @@ class TestDependencyMapper:
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
 
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./foo.py") == "foo.py"
+        assert mapper._normalize_import("../foo.py") == "foo.py"
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./.gitignore") == ".gitignore"
+        assert mapper._normalize_import("foo.py") == "foo.py"
+        assert mapper._normalize_import("") == ""
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("../../") == ""
+        assert mapper._normalize_import(".") == "."
+        assert mapper._normalize_import("..") == ".."
+
     def test_normalize_import_preserves_filenames(self):
         mapper = DependencyMapper()
         assert mapper._normalize_import("../../.env") == ".env"
