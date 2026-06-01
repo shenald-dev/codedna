@@ -35,7 +35,7 @@ class StructureAnalyzer:
 
             dirs_to_process = []
             file_count = None
-
+            current_dir_file_count = 0
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -53,7 +53,7 @@ class StructureAnalyzer:
                         dirs_to_process.append((item, None, current_depth + 1))
                 else:
                     total_files += 1
-
+                    current_dir_file_count += 1
                     if current_depth < 3 and current_dict is not None:
                         current_dict[f"📄 {item.name}"] = None
 
@@ -74,7 +74,6 @@ class StructureAnalyzer:
                             })
                         except ValueError:
                             pass
-
             stack.extend(reversed(dirs_to_process))
 
         return {

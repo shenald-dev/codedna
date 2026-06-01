@@ -8,8 +8,6 @@ import os
 import re
 from pathlib import Path
 
-import networkx as nx
-
 from .language_detector import IGNORE_DIRS
 
 try:
@@ -19,6 +17,7 @@ except ValueError:
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
+
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
     "Python": [
         re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE),
@@ -69,6 +68,8 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        import networkx as nx
+
         graph = nx.DiGraph()
 
         for file_path in self._walk_source(repo_path):
