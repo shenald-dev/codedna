@@ -1,15 +1,17 @@
 <div align="center">
+  <img src="assets/logo.png" alt="CodeDNA Logo" width="250" />
+  
+  <br/>
 
-# 🧬 CodeDNA
+  <h1>🧬 CodeDNA</h1>
+  <p><b>Software Intelligence System — A Genetic Analyzer for Code</b></p>
+  <i>Feed it any repository. Get a complete DNA profile — architecture, dependencies, code smells, developer patterns, and evolution timeline.</i>
 
-### Software Intelligence System — A Genetic Analyzer for Code
+  <br/>
 
-[![CI](https://github.com/shenald-dev/codedna/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/codedna/actions)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-> Feed it any repository. Get a complete DNA profile — architecture, dependencies, code smells, developer patterns, and evolution timeline.
-
+  [![CI](https://github.com/shenald-dev/codedna/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/codedna/actions)
+  [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
 ---
