@@ -1,4 +1,3 @@
-import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch, call
 from codedna.analyzers.developer_analyzer import DeveloperAnalyzer

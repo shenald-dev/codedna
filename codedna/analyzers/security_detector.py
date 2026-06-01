@@ -159,4 +159,3 @@ class SecurityDetector:
                     "file": f"{relative}:{idx + 1}",
                     "detail": "Extremely outdated Django version detected."
                 })
-```
