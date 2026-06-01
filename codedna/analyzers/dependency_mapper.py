@@ -17,6 +17,7 @@ except ValueError:
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
+
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
     "Python": [
         re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE),
@@ -166,3 +167,4 @@ class DependencyMapper:
         if dep.startswith("./") or dep.startswith("../"):
             return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
+```
