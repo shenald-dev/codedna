@@ -167,4 +167,3 @@ class DependencyMapper:
         if dep.startswith("./") or dep.startswith("../"):
             return re.sub(r"^(?:\.\.?/)+", "", dep)
         return dep
-```
