@@ -35,6 +35,7 @@ class StructureAnalyzer:
 
             dirs_to_process = []
             file_count = None
+            current_dir_file_count = 0
             for item in items:
                 if item.name in IGNORE_DIRS or item.name.startswith("."):
                     continue
@@ -73,27 +74,6 @@ class StructureAnalyzer:
                             })
                         except ValueError:
                             pass
-            if has_module_markers:
-                try:
-                    module_path = str(current_path.relative_to(repo_path))
-                    for marker in has_module_markers:
-                        modules.append({
-                            "path": module_path,
-                            "marker": marker,
-                            "file_count": current_dir_file_count,
-                        })
-                except ValueError:
-                    pass
-            for marker in found_markers:
-                try:
-                    module_path = str(current_path.relative_to(repo_path))
-                    modules.append({
-                        "path": module_path,
-                        "marker": marker,
-                        "file_count": local_files,
-                    })
-                except ValueError:
-                    pass
             stack.extend(reversed(dirs_to_process))
 
         return {
