@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
+   requires = ["setuptools>=68.0", "wheel"]
+   build-backend = "setuptools.build_meta"
 
 [project]
 name = "codedna"
-version = "1.0.21"
+version = "1.0.25"
 description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
 readme = "README.md"
 license = {text = "MIT"}
@@ -21,38 +21,30 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Quality Assurance",
 ]
+   [project.optional-dependencies]
+   dev = [
+       "pytest>=8.0.0",
+       "pytest-cov>=4.1.0",
+       "ruff>=0.3.0",
+   ]
+   ai = [
+       "openai>=1.0.0",
+   ]
 
-dependencies = [
-    "click>=8.1.0",
-    "gitpython>=3.1.40",
-    "networkx>=3.2",
-    "rich>=13.7.0",
-]
+   [project.scripts]
+   codedna = "codedna.cli:main"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-cov>=4.1.0",
-    "ruff>=0.3.0",
-]
-ai = [
-    "openai>=1.0.0",
-]
+   [tool.setuptools.packages.find]
+   include = ["codedna*"]
 
-[project.scripts]
-codedna = "codedna.cli:main"
+   [tool.ruff]
+   target-version = "py311"
+   line-length = 100
 
-[tool.setuptools.packages.find]
-include = ["codedna*"]
+   [tool.ruff.lint]
+   select = ["E", "F", "I", "N", "W"]
+   ignore = ["E501"]
 
-[tool.ruff]
-target-version = "py311"
-line-length = 100
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W"]
-ignore = ["E501"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
+   [tool.pytest.ini_options]
+   testpaths = ["tests"]
+   pythonpath = ["."]
