@@ -95,6 +95,16 @@ class TestStructureAnalyzer:
 
 
 class TestDependencyMapper:
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./file") == "file"
+        assert mapper._normalize_import("../file") == "file"
+        assert mapper._normalize_import("../../file") == "file"
+        assert mapper._normalize_import("../.env") == ".env"
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("..../file") == "..../file"
+        assert mapper._normalize_import(".././../file") == "file"
+
     def test_map_dependencies(self, sample_repo):
         result = DependencyMapper().map(sample_repo)
         assert "total_modules" in result
@@ -111,11 +121,25 @@ class TestDependencyMapper:
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
 
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./foo.py") == "foo.py"
+        assert mapper._normalize_import("../foo.py") == "foo.py"
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./.gitignore") == ".gitignore"
+        assert mapper._normalize_import("foo.py") == "foo.py"
+        assert mapper._normalize_import("") == ""
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("../../") == ""
+        assert mapper._normalize_import(".") == "."
+        assert mapper._normalize_import("..") == ".."
+
     def test_normalize_import_preserves_filenames(self):
         mapper = DependencyMapper()
         assert mapper._normalize_import("../../.env") == ".env"
         assert mapper._normalize_import("./utils/.env") == "utils/.env"
         assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
+
 
 class TestCodeSmellDetector:
     def test_detect_smells(self, sample_repo):
@@ -197,10 +221,6 @@ class TestDeveloperAnalyzer:
 
         # We simulate the output returned by a git log with tformat semantic.
         # Ensure that it correctly parses commits when tformat adds trailing newlines.
-=======
-=======>>>>>>> origin/master
->>>>>>> origin/master
-
         mock_repo = MagicMock()
         mock_log = MagicMock(return_value="COMMIT::926371::Test User::test@example.com::2026-05-12\nfile.py\n\nCOMMIT::123456::Test User 2::test2@example.com::2026-05-11\nfile2.py\n")
         mock_repo.git.log = mock_log
@@ -217,7 +237,6 @@ class TestDeveloperAnalyzer:
         assert result["total_commits"] == 2
         assert len(result["contributors"]) == 2
 
-<<<<<<< HEAD>>>>>>> origin/master
     def test_detect_collaboration(self):
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         analyzer = DeveloperAnalyzer()
@@ -331,3 +350,45 @@ class TestDNAGenerator:
         assert "1,000" in md # stars
         assert "bad" in md # forks
         assert "2 Issues" in md # issues
+
+class TestDeveloperAnalyzerCustomFormat:
+    def test_git_log_format_tformat(self, tmp_path):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        from unittest.mock import MagicMock, patch
+
+        analyzer = DeveloperAnalyzer()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT::abc::Dev::dev@test.com::2026-05-19\nfile1.py\n"
+
+        with patch("codedna.analyzers.developer_analyzer.git.Repo", return_value=mock_repo):
+            analyzer.analyze(tmp_path, max_commits=5)
+
+            mock_repo.git.log.assert_called_with(
+                "--name-only",
+                "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
+                "--date=short",
+                "-n 5"
+            )
+
+from codedna.analyzers.evolution_engine import EvolutionEngine
+
+class TestEvolutionEngineCustomFormat:
+    def test_git_log_format_tformat(self):
+        from unittest.mock import MagicMock, patch
+
+        analyzer = EvolutionEngine()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT\n1\t2\tfile1.py\n"
+
+        analyzer._compute_churn(mock_repo)
+
+        mock_repo.git.log.assert_called_with(
+            "--numstat",
+            "--format=tformat:COMMIT",
+            "-n 200",
+            "--no-renames"
+        )

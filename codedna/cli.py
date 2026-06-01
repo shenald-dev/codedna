@@ -6,12 +6,15 @@ import sys
 from pathlib import Path
 
 import click
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 
 @click.group()
 @click.version_option(version="1.0.25", prog_name="codedna")
 def main():
     """🧬 CodeDNA — A genetic analyzer for software.
+
 
 
 

@@ -137,6 +137,24 @@ Action: Refactored _walk in ArchitectureDetector to yield depth directly instead
 Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
 Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
 
+## 2026-05-26 — Bug Fix: Invalid Git Format String
+
+Learning:
+Modern Git versions reject un-prefixed format strings (e.g. `--format=COMMIT`) with a 'fatal: invalid --pretty format' error. Using `format:` instead of `tformat:` alters output semantics (separator vs. terminator) and breaks downstream parsing logic that expects standard `tformat` behavior.
+
+Action:
+Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) when using GitPython to execute batched `git log` commands with a custom literal string format.
+## 2026-05-16 — Fix Git log format parsing
+
+Learning:
+Git versions reject the un-prefixed --format=COMMIT version with a 'fatal: invalid --pretty format' error. Using format: alters output semantics. tformat: must be used to ensure standard behavior.
+
+Action:
+Always strictly use the prefix tformat: for Git log custom literal string formats.
+2026-05-18 — Git format reliability
+Learning: Using format: instead of tformat: for GitPython log formats can break downstream parsing or cause errors in modern Git, which might be silently masked by broad try/except blocks.
+Action: Always prefix custom format strings with tformat: when calling git log.
+
 ## 2026-05-26 — Optimization: Avoid redundant file system traversal string splitting and operations
 
 Learning:
@@ -241,6 +259,15 @@ Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an in
 Action:
 Replaced the loop over `commit.stats` with a single, batched raw `repo.git.log('--shortstat', ...)` call, reducing execution time significantly.
 
+## 2026-05-26 — Fix Git log format bug in DeveloperAnalyzer and EvolutionEngine
+
+Learning:
+When using GitPython to execute batched `git log` commands with a custom literal string format, modern Git versions reject the un-prefixed version with a 'fatal: invalid --pretty format' error.
+
+Action:
+Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) instead of `format:` or just `--format=COMMIT`.
+
+
 ## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
 
 Learning:
@@ -279,7 +306,24 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
+## 2026-05-27 — Performance & Reliability Optimizations
+Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
+Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 
+## 2026-05-18 — Git Log Formatting Bug Fix
+
+Learning:
+Git log commands using plain `--format=COMMIT` throw a fatal error on some Git versions ("invalid --pretty format"), which may be silently caught and masked in the codebase, leading to empty fallback data.
+
+Action:
+Strictly use `--format=tformat:COMMIT` when formatting string in git.log commands to avoid silent failures and retain correct semantics.
+## 2026-05-27 — Fix lstrip Path Prefix Bug
+
+Learning:
+When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`).
+
+Action:
+Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+", "", dep)`) or explicit string slicing instead of `lstrip` to prevent path corruption.
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.

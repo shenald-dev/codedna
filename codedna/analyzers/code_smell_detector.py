@@ -217,3 +217,4 @@ class CodeSmellDetector:
         elif counts["warning"] > 3:
             return "Fair"
         return "Healthy"
+```
