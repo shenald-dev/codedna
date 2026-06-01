@@ -69,7 +69,6 @@ class ArchitectureDetector:
                     src_dir_count += 1
             else:
                 all_names.add(item.name.lower())
-
         # Detect architecture patterns
         detected = []
         for pattern_name, config in PATTERNS.items():
@@ -129,6 +128,5 @@ class ArchitectureDetector:
                     # Yield item along with its effective depth (child depth is current_depth + 1)
                     yield item, current_depth + 1
                     if item.is_dir():
-                        stack.append((item, current_depth + 1))
-            except PermissionError:
+                        stack.append((item, current_depth + 1))            except PermissionError:
                 pass

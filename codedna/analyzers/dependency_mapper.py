@@ -8,17 +8,16 @@ import os
 import re
 from pathlib import Path
 
-import networkx as nx
-
 from .language_detector import IGNORE_DIRS
 
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-    logging.warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
+
 IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
     "Python": [
         re.compile(r"^[ \t]*import\s+([\w.]+)", re.MULTILINE),
@@ -69,6 +68,8 @@ class DependencyMapper:
         Returns:
             Dict with graph stats, edges, and centrality metrics.
         """
+        import networkx as nx
+
         graph = nx.DiGraph()
 
         for file_path in self._walk_source(repo_path):
