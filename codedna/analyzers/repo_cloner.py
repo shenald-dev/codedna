@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from git import Repo
 from rich.console import Console
 
 from .cache_manager import CacheManager
@@ -15,8 +14,19 @@ from .cache_manager import CacheManager
 class RepoCloner:
     """Clones a Git repository to a local cache directory for analysis."""
 
-    def __init__(self, cache_dir: str | None = None):
-        self.console = Console()
+    def __init__(self, cache_dir: str | None = None, console=None):
+        """Initialize the RepoCloner.
+
+        Args:
+            cache_dir: Optional custom cache directory path.
+            console: Optional rich Console instance. If None, it will be lazily
+                     instantiated.
+        """
+        if console is None:
+            self.console = Console()
+        else:
+            self.console = console
+
         if cache_dir is None:
             base_dir = Path(CacheManager().cache_dir)
             self.cache_dir = base_dir / "repos"
@@ -72,6 +82,7 @@ class RepoCloner:
             return dest
 
         self.console.print(f"  📥 Cloning [cyan]{source}[/] ...")
+        from git import Repo
         Repo.clone_from(source, str(dest), depth=100)
         return dest
 

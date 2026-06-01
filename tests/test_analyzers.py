@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -94,6 +95,16 @@ class TestStructureAnalyzer:
 
 
 class TestDependencyMapper:
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./file") == "file"
+        assert mapper._normalize_import("../file") == "file"
+        assert mapper._normalize_import("../../file") == "file"
+        assert mapper._normalize_import("../.env") == ".env"
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("..../file") == "..../file"
+        assert mapper._normalize_import(".././../file") == "file"
+
     def test_map_dependencies(self, sample_repo):
         result = DependencyMapper().map(sample_repo)
         assert "total_modules" in result
@@ -109,6 +120,25 @@ class TestDependencyMapper:
         data = mapper.map(sample_repo)
         mermaid = mapper.build_mermaid(data)
         assert mermaid.startswith("graph LR")
+
+    def test_normalize_import(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("./foo.py") == "foo.py"
+        assert mapper._normalize_import("../foo.py") == "foo.py"
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./.gitignore") == ".gitignore"
+        assert mapper._normalize_import("foo.py") == "foo.py"
+        assert mapper._normalize_import("") == ""
+        assert mapper._normalize_import("./") == ""
+        assert mapper._normalize_import("../../") == ""
+        assert mapper._normalize_import(".") == "."
+        assert mapper._normalize_import("..") == ".."
+
+    def test_normalize_import_preserves_filenames(self):
+        mapper = DependencyMapper()
+        assert mapper._normalize_import("../../.env") == ".env"
+        assert mapper._normalize_import("./utils/.env") == "utils/.env"
+        assert mapper._normalize_import("../config/settings.py") == "config/settings.py"
 
 
 class TestCodeSmellDetector:
@@ -321,3 +351,45 @@ class TestDNAGenerator:
         assert "1,000" in md # stars
         assert "bad" in md # forks
         assert "2 Issues" in md # issues
+
+class TestDeveloperAnalyzerCustomFormat:
+    def test_git_log_format_tformat(self, tmp_path):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        from unittest.mock import MagicMock, patch
+
+        analyzer = DeveloperAnalyzer()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT::abc::Dev::dev@test.com::2026-05-19\nfile1.py\n"
+
+        with patch("codedna.analyzers.developer_analyzer.git.Repo", return_value=mock_repo):
+            analyzer.analyze(tmp_path, max_commits=5)
+
+            mock_repo.git.log.assert_called_with(
+                "--name-only",
+                "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
+                "--date=short",
+                "-n 5"
+            )
+
+from codedna.analyzers.evolution_engine import EvolutionEngine
+
+class TestEvolutionEngineCustomFormat:
+    def test_git_log_format_tformat(self):
+        from unittest.mock import MagicMock, patch
+
+        analyzer = EvolutionEngine()
+
+        # Mock git.Repo to verify it gets called with tformat:
+        mock_repo = MagicMock()
+        mock_repo.git.log.return_value = "COMMIT\n1\t2\tfile1.py\n"
+
+        analyzer._compute_churn(mock_repo)
+
+        mock_repo.git.log.assert_called_with(
+            "--numstat",
+            "--format=tformat:COMMIT",
+            "-n 200",
+            "--no-renames"
+        )
