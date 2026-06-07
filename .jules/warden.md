@@ -172,3 +172,14 @@ The previous agent performed optimization by lazy-loading heavy module imports. 
 
 Alignment / Deferred:
 Updated CHANGELOG.md and bumped the version in pyproject.toml and codedna/cli.py to 1.0.26 to reflect the lazy-loading of heavy module imports optimization.
+
+## 2026-06-07 — WARDEN Run
+
+QA Status: amended
+Dead Code Removed: 292 lines
+Dependencies Bumped: 0
+Security: Critical=0, High=0
+Docs Updated: none
+Release: 1.0.26
+
+AI Summary: Identified and deleted 11 orphaned root-level scripts (fix_*.py, resolver*.py, patch_*.py, etc.) and 1 unused module (cache_manager.py) that were artifacts of previous agent runs. Excluded cli.py from deletion as it is the primary entry point. No dependency updates or doc changes required as the README was recently overhauled. Recommending test suite run to verify survival after deletions. Bumping patch version for the cleanup release.
