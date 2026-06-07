@@ -1,4 +1,18 @@
 We are given three versions: ancestor, base (master), and head (PR branch).
+
+## [1.0.26] - 2026-06-07
+
+- 5bc8498 chore(sentinel): update monitoring log
+- 210a350 Overhaul README with enterprise documentation
+- 039b67c Update README with awesome new logo and formatting
+- 7e9a88d Merge pull request #101 from shenald-dev/perf/architecture-detector-redundant-path-parsing-11992625218843173249
+- 0c1f80b Fix merge conflicts
+- b0258a1 Merge pull request #102 from shenald-dev/refactor-architecturedetector-depth-8551722907837575897
+- 6a07bb2 Fix merge conflicts
+- 59cadc5 Merge pull request #103 from shenald-dev/atlas-warden-release-1.0.19-1354787041846005065
+- cf53014 Fix merge conflicts
+- 1ea7836 Merge pull request #121 from shenald-dev/fix-gitpython-format-string-bug-5040603792530385428
+
  We are to perform a 3-way merge, keeping all meaningful changes from both branches.
 
 ## [1.0.25] - 2026-05-28
