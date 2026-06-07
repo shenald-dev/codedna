@@ -1,0 +1,23 @@
+{
+  "runs": [
+    {
+      "run_id": 26784323920,
+      "classification": "lint_failure",
+      "workflow": "CI",
+      "timestamp": "2026-06-07T22:10:46.541931+00:00"
+    },
+    {
+      "run_id": 26784088798,
+      "classification": "lint_failure",
+      "workflow": "CI",
+      "timestamp": "2026-06-07T22:10:47.268250+00:00"
+    },
+    {
+      "run_id": 26734016046,
+      "classification": "lint_failure",
+      "workflow": "CI",
+      "timestamp": "2026-06-07T22:10:47.959208+00:00"
+    }
+  ],
+  "flaky_workflows": {}
+}
