@@ -14,7 +14,7 @@
     "blockers": []
   },
   "warden": {
-    "qa_status": "amended",
+    "qa_status": "verified",
     "dead_code_removed_lines": 0,
     "dependencies_bumped": [],
     "security_critical": 0,
