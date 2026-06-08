@@ -15,14 +15,14 @@
   },
   "warden": {
     "qa_status": "amended",
-    "dead_code_removed_lines": 292,
+    "dead_code_removed_lines": 0,
     "dependencies_bumped": [],
     "security_critical": 0,
     "security_high": 0,
     "security_medium": 0,
     "security_low": 0,
     "docs_updated": [],
-    "release_version": "1.0.26",
+    "release_version": null,
     "blockers": []
   }
 }
