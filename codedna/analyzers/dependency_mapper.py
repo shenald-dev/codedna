@@ -13,7 +13,7 @@ from .language_detector import IGNORE_DIRS
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
 except ValueError:
-    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
+    logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
 # Import patterns per language
@@ -90,6 +90,8 @@ class DependencyMapper:
             for pattern in IMPORT_PATTERNS[lang]:
                 for dep in pattern.findall(content):
                     # Skip stdlib / external packages (heuristic: no dots for local)
+                    if lang == "Python" and "." not in dep:
+                        continue
                     if dep.startswith(".") or "/" in dep:
                         dep = self._normalize_import(dep)
                     graph.add_edge(module_name, dep)

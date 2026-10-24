@@ -30,7 +30,7 @@ def test_large_file_skip(tmp_path, monkeypatch):
 
     # Create a small file and a large file
     small_file = tmp_path / "small.py"
-    small_file.write_text("import os\n")
+    small_file.write_bytes(b"import os\n")
 
     large_file = tmp_path / "large.py"
     large_file.write_text("import sys\n" * 5) # Definitely > 10 bytes

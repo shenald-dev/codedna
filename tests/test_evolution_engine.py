@@ -9,7 +9,7 @@ def test_compute_churn_git_log_format():
     repo_mock = MagicMock()
     repo_mock.git = MagicMock()
 
-    # Mock git log output to simulate correct parsing of "--format=format:COMMIT"
+    # Mock git log output to simulate correct parsing of "--format=tformat:COMMIT"
     # Format:
     # COMMIT
     # 10    5   file1.py
@@ -24,7 +24,7 @@ def test_compute_churn_git_log_format():
     # Assert log was called with correct format argument
     repo_mock.git.log.assert_called_once_with(
         "--numstat",
-        "--format=format:COMMIT",
+        "--format=tformat:COMMIT",
         "-n 200",
         "--no-renames"
     )
