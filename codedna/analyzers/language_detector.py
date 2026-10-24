@@ -149,4 +149,3 @@ class LanguageDetector:
             except PermissionError:
                 pass
 
-```

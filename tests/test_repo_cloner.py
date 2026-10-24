@@ -1,11 +1,7 @@
-import sys
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-# Mock necessary modules
-sys.modules['git'] = MagicMock()
-
-from codedna.analyzers.repo_cloner import RepoCloner  # noqa: E402
+from codedna.analyzers.repo_cloner import RepoCloner
 
 
 class TestRepoCloner(unittest.TestCase):
@@ -13,12 +9,12 @@ class TestRepoCloner(unittest.TestCase):
         self.cache_dir = "test_cache"
         self.cloner = RepoCloner(cache_dir=self.cache_dir)
 
-    def test_clone_with_malicious_source(self):
-        import git
+    @patch("codedna.analyzers.repo_cloner.Repo.clone_from")
+    def test_clone_with_malicious_source(self, mock_clone_from):
         malicious_sources = [
             "--ext-cmd=touch pwned",
             " -u http://evil.com",
-            "\t--help",
+            "	--help",
             "fd::",
         ]
 
@@ -27,7 +23,7 @@ class TestRepoCloner(unittest.TestCase):
                 with self.assertRaises(ValueError) as cm:
                     self.cloner.clone(source)
                 self.assertTrue("Invalid repository source" in str(cm.exception) or "Unauthorized URL scheme" in str(cm.exception))
-                git.Repo.clone_from.assert_not_called()
+                mock_clone_from.assert_not_called()
 
     @patch("codedna.analyzers.repo_cloner.Repo.clone_from")
     def test_clone_with_valid_source(self, mock_clone_from):
@@ -40,6 +36,7 @@ class TestRepoCloner(unittest.TestCase):
         mock_clone_from.assert_called()
         args, _ = mock_clone_from.call_args
         self.assertEqual(args[0], valid_source)
+
 
 if __name__ == "__main__":
     unittest.main()
