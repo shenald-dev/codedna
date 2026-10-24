@@ -21,12 +21,20 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Quality Assurance",
 ]
-   [project.optional-dependencies]
-   dev = [
-       "pytest>=8.0.0",
-       "pytest-cov>=4.1.0",
-       "ruff>=0.3.0",
-   ]
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "GitPython>=3.1.0",
+    "networkx>=3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-subtests",
+    "ruff>=0.3.0",
+]
    ai = [
        "openai>=1.0.0",
    ]
