@@ -1,9 +1,11 @@
-import time
 import shutil
 import tempfile
+import time
 import unittest
 from pathlib import Path
+
 from codedna.analyzers.architecture_detector import ArchitectureDetector
+
 
 class TestArchitectureDetectorPerf(unittest.TestCase):
     def setUp(self):

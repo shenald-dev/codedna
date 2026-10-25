@@ -1,4 +1,5 @@
 from unittest.mock import patch
+
 """Tests for CodeDNA analyzer modules."""
 
 
@@ -8,6 +9,7 @@ from codedna.analyzers.architecture_detector import ArchitectureDetector
 from codedna.analyzers.code_smell_detector import CodeSmellDetector
 from codedna.analyzers.dependency_mapper import DependencyMapper
 from codedna.analyzers.dna_generator import DNAGenerator
+from codedna.analyzers.evolution_engine import EvolutionEngine
 from codedna.analyzers.github_analyzer import GitHubAnalyzer
 from codedna.analyzers.language_detector import LanguageDetector
 from codedna.analyzers.security_detector import SecurityDetector
@@ -265,7 +267,7 @@ class TestGitHubAnalyzer:
 
     def test_analyze_github_url(self):
         import json
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import MagicMock
 
         mock_response = MagicMock()
         mock_response.read.return_value = json.dumps({
@@ -353,8 +355,9 @@ class TestDNAGenerator:
 
 class TestDeveloperAnalyzerCustomFormat:
     def test_git_log_format_tformat(self, tmp_path):
+        from unittest.mock import MagicMock
+
         from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
-        from unittest.mock import MagicMock, patch
 
         analyzer = DeveloperAnalyzer()
 
@@ -372,11 +375,12 @@ class TestDeveloperAnalyzerCustomFormat:
                 "-n 5"
             )
 
-from codedna.analyzers.evolution_engine import EvolutionEngine
+
+
 
 class TestEvolutionEngineCustomFormat:
     def test_git_log_format_tformat(self):
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import MagicMock
 
         analyzer = EvolutionEngine()
 

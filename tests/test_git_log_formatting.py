@@ -1,8 +1,9 @@
 from pathlib import Path
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, call, patch
+
 from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
 from codedna.analyzers.evolution_engine import EvolutionEngine
-import git
+
 
 class TestGitLogFormatting:
     @patch('codedna.analyzers.developer_analyzer.git.Repo')
@@ -37,7 +38,7 @@ class TestGitLogFormatting:
         ]
 
         analyzer = EvolutionEngine()
-        result = analyzer.analyze(Path("dummy_path"))
+        analyzer.analyze(Path("dummy_path"))
 
         # Verify git log was called with the correct tformat: prefix
         expected_calls = [

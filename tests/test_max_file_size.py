@@ -1,6 +1,3 @@
-import os
-import pytest
-from pathlib import Path
 
 def test_max_file_size_config(monkeypatch):
     """Test that setting CODEDNA_MAX_FILE_SIZE changes the module level constant."""
