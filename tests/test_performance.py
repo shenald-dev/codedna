@@ -8,7 +8,6 @@ to guard against future regressions in hot-path traversal logic.
 """
 
 import time
-from pathlib import Path
 
 from codedna.analyzers.architecture_detector import ArchitectureDetector
 from codedna.analyzers.structure_analyzer import StructureAnalyzer

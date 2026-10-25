@@ -1,8 +1,8 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from codedna.analyzers.evolution_engine import EvolutionEngine
+
 from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
-import git
+from codedna.analyzers.evolution_engine import EvolutionEngine
+
 
 def test_evolution_engine_tformat():
     engine = EvolutionEngine()

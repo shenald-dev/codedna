@@ -1,5 +1,5 @@
-import pytest
 import subprocess
+
 
 def test_git_log_tformat():
     # Use standard subprocess to verify git behavior directly, since
