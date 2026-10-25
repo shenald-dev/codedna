@@ -1,19 +1,16 @@
-import os
-import pytest
-from pathlib import Path
 
 def test_max_file_size_config(monkeypatch):
     """Test that setting CODEDNA_MAX_FILE_SIZE changes the module level constant."""
     # This just ensures we can load the modules and they read from os.environ
     # Because they read at module load time, we can't easily monkeypatch and reload them
     # without importlib, but we can verify the constant is there.
-    from codedna.analyzers.code_smell_detector import MAX_FILE_SIZE as csd_size
-    from codedna.analyzers.dependency_mapper import MAX_FILE_SIZE as dm_size
-    from codedna.analyzers.security_detector import MAX_FILE_SIZE as sd_size
+    import codedna.analyzers.code_smell_detector
+    import codedna.analyzers.dependency_mapper
+    import codedna.analyzers.security_detector
 
-    assert isinstance(csd_size, int)
-    assert isinstance(dm_size, int)
-    assert isinstance(sd_size, int)
+    assert isinstance(codedna.analyzers.code_smell_detector.MAX_FILE_SIZE, int)
+    assert isinstance(codedna.analyzers.dependency_mapper.MAX_FILE_SIZE, int)
+    assert isinstance(codedna.analyzers.security_detector.MAX_FILE_SIZE, int)
 
 def test_large_file_skip(tmp_path, monkeypatch):
     """Test that a large file is skipped by DependencyMapper."""
@@ -26,7 +23,7 @@ def test_large_file_skip(tmp_path, monkeypatch):
     import codedna.analyzers.dependency_mapper
     importlib.reload(codedna.analyzers.dependency_mapper)
 
-    DependencyMapper = codedna.analyzers.dependency_mapper.DependencyMapper
+    dm_class = codedna.analyzers.dependency_mapper.DependencyMapper
 
     # Create a small file and a large file
     small_file = tmp_path / "small.py"
@@ -38,7 +35,7 @@ def test_large_file_skip(tmp_path, monkeypatch):
     assert small_file.stat().st_size <= 10
     assert large_file.stat().st_size > 10
 
-    mapper = DependencyMapper()
+    mapper = dm_class()
 
     # The mapper walks the directory
     deps = mapper.map(tmp_path)

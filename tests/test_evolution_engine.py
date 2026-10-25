@@ -1,8 +1,9 @@
-import pytest
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-from codedna.analyzers.evolution_engine import EvolutionEngine
+from unittest.mock import MagicMock
+
 from git import Repo
+
+from codedna.analyzers.evolution_engine import EvolutionEngine
+
 
 def test_compute_churn_git_log_format():
     engine = EvolutionEngine()
@@ -82,7 +83,7 @@ def test_compute_churn_invalid_format_parsing():
 
 def test_analyze_empty_repository(tmp_path):
     # Create an empty git repo
-    repo = Repo.init(str(tmp_path))
+    Repo.init(str(tmp_path))
     engine = EvolutionEngine()
     result = engine.analyze(tmp_path)
 

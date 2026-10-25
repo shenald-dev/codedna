@@ -1,9 +1,11 @@
-import unittest
-import time
-import tempfile
 import shutil
+import tempfile
+import time
+import unittest
 from pathlib import Path
+
 from codedna.analyzers.structure_analyzer import StructureAnalyzer
+
 
 class TestStructureAnalyzerPerf(unittest.TestCase):
     def setUp(self):

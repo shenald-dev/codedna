@@ -1,9 +1,9 @@
-import pytest
-import os
+import importlib
 import logging
+
+import codedna.analyzers.dependency_mapper as dm_module
 from codedna.analyzers.dependency_mapper import DependencyMapper
-from codedna.analyzers.security_detector import SecurityDetector
-from codedna.analyzers.code_smell_detector import CodeSmellDetector
+
 
 def test_normalize_import_path_corruption():
     mapper = DependencyMapper()
@@ -32,8 +32,8 @@ def test_external_dependency_filtering(tmp_path):
     # It should contain utils (if normalized)
     assert ".utils" in edge_targets
 
-import importlib
-import codedna.analyzers.dependency_mapper as dm_module
+
+
 
 def test_env_var_warning(monkeypatch, caplog):
     monkeypatch.setenv("CODEDNA_MAX_FILE_SIZE", "invalid")

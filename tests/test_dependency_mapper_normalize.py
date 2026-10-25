@@ -1,5 +1,5 @@
-import pytest
 from codedna.analyzers.dependency_mapper import DependencyMapper
+
 
 def test_normalize_import():
     mapper = DependencyMapper()

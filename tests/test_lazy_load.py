@@ -5,7 +5,6 @@ are deferred until object instantiation, preventing excessive startup time overh
 when the core analyzer components are imported but not immediately executed.
 """
 
-import sys
 
 from codedna.analyzers.repo_cloner import RepoCloner
 from codedna.visualization.renderer import Renderer
