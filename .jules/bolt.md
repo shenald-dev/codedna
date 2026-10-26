@@ -356,3 +356,7 @@ Importing heavy third-party packages like `networkx` (~0.2s) and `git` (~0.06s) 
 
 Action:
 Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import git`) out of the module level scope and inside `map`, `analyze`, and `clone` methods of `DependencyMapper`, `DeveloperAnalyzer`, `EvolutionEngine`, and `RepoCloner`. This optimization is highly effective for CLI tools.
+
+## 2026-10-26 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
+- **Learning:** In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to compute the number of files in a directory when encountering a module marker introduces unnecessary O(N) operations inside a loop that is already iterating over the directory items. Furthermore, if `items` were a generator, this would exhaust it.
+- **Action:** Instead of iterating over `items` again to count files, maintain a counter (`current_dir_file_count`) inside the main loop, collect the discovered markers, and append them to the `modules` array once the directory iteration is complete. Ensure hidden files are counted to preserve original behavior.
