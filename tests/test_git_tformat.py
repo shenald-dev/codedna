@@ -28,9 +28,6 @@ def test_developer_analyzer_tformat():
     mock_repo.git.log.return_value = ""
 
     with patch("codedna.analyzers.developer_analyzer.git.Repo", return_value=mock_repo):
-        # We need to stub out the iteration part so it doesn't crash
-        mock_repo.iter_commits = MagicMock(return_value=[])
-
         # we can just test the method logic
         # analyzer.analyze does the git log call
         analyzer.analyze(".", max_commits=50)
