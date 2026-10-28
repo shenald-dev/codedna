@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
