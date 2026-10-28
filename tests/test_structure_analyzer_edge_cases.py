@@ -1,6 +1,8 @@
 import tempfile
 from pathlib import Path
+
 from codedna.analyzers.structure_analyzer import StructureAnalyzer
+
 
 def test_structure_analyzer_file_count_includes_hidden():
     with tempfile.TemporaryDirectory() as tmpdir:
