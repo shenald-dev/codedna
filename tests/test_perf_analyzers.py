@@ -70,5 +70,28 @@ class TestAnalyzerPerformance(unittest.TestCase):
         self.assertIn("modules", result)
         self.assertEqual(len(result["modules"]), 10) # 10 nested __init__.py markers
 
+    def test_detect_collaboration_performance(self):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        import time
+
+        analyzer = DeveloperAnalyzer()
+
+        # Generate large sparse dataset with a few massive files
+        contributor_files = {}
+        for i in range(500):
+            author = f"author_{i}"
+            contributor_files[author] = {f"file_{i}_{j}" for j in range(50)}
+
+            # Massive files edited by everyone (e.g. package.json)
+            for k in range(3):
+                contributor_files[author].add(f"massive_lockfile_{k}")
+
+        start_time = time.time()
+        result = analyzer._detect_collaboration(contributor_files)
+        end_time = time.time()
+
+        # Should finish very fast because massive files are skipped
+        self.assertLess(end_time - start_time, 1.5, "DeveloperAnalyzer._detect_collaboration is too slow (O(M^2) blowup)")
+
 if __name__ == '__main__':
     unittest.main()
