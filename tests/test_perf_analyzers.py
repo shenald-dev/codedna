@@ -71,8 +71,9 @@ class TestAnalyzerPerformance(unittest.TestCase):
         self.assertEqual(len(result["modules"]), 10) # 10 nested __init__.py markers
 
     def test_detect_collaboration_performance(self):
-        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
         import time
+
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
 
         analyzer = DeveloperAnalyzer()
 
@@ -87,7 +88,7 @@ class TestAnalyzerPerformance(unittest.TestCase):
                 contributor_files[author].add(f"massive_lockfile_{k}")
 
         start_time = time.time()
-        result = analyzer._detect_collaboration(contributor_files)
+        analyzer._detect_collaboration(contributor_files)
         end_time = time.time()
 
         # Should finish very fast because massive files are skipped
