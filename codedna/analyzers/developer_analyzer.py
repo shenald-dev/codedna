@@ -123,9 +123,10 @@ class DeveloperAnalyzer:
                 file_to_authors[f].append(author)
 
         # Build adjacency list of authors who share at least one file
+        # Bounded complexity to prevent O(M^2) blowup on massive files
         neighbors = defaultdict(set)
         for authors in file_to_authors.values():
-            if len(authors) > 1:
+            if 1 < len(authors) <= 100:
                 for a in authors:
                     neighbors[a].update(authors)
 
