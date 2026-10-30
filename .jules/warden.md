@@ -122,11 +122,6 @@ The previous optimization agent successfully replaced `format:` with `tformat:` 
 Alignment / Deferred:
 
 
-2026-05-20 — Assessment & Lifecycle
-Observation / Pruned:
-The previous optimization agent successfully fixed the tuple unpacking bug in `TestArchitectureDetectorWalk` introduced by the path splitting optimization in `ArchitectureDetector._walk`. Scanned the codebase and test suite for dead code. Pruned zero files.
-Alignment / Deferred:
-Updated `CHANGELOG.md` to reflect the testing enhancements. Bumped the version in `pyproject.toml` and `codedna/cli.py` to 1.0.20. No dependency upgrades deferred.
 
 
 
@@ -206,27 +201,7 @@ Release: none
 
 AI Summary: Repository audit complete. CI is fixed. Verified that cli.py is the primary entry point and must be retained. No dead code, dependency updates, or documentation changes are required. Release deferred as no functional changes have occurred since v1.0.26.
 
-## 2026-06-08 — WARDEN Run
 
-QA Status: verified
-Dead Code Removed: 0 lines
-Dependencies Bumped: 0
-Security: Critical=0, High=0
-Docs Updated: none
-Release: none
-
-AI Summary: Repository audit complete. CI is fixed. Verified cli.py is the primary entry point and must be retained. No dead code, dependency updates, or documentation changes are required. Release deferred as no functional changes have occurred since v1.0.26.
-
-## 2026-06-08 — WARDEN Run
-
-QA Status: verified
-Dead Code Removed: 0 lines
-Dependencies Bumped: 0
-Security: Critical=0, High=0
-Docs Updated: none
-Release: none
-
-AI Summary: Repository audit complete. CI is fixed. Verified cli.py is the primary entry point and must be retained. No dead code, dependency updates, or documentation changes are required. Release deferred as no functional changes have occurred since v1.0.26.
 
 ## 2026-06-19 — WARDEN Run
 
@@ -256,5 +231,10 @@ AI Summary: Repository audit complete. CI is fixed. Rebased against master to re
 
 ## 2026-10-28 — Lifecycle & Assurance Ledger
 - **QA & Veto Actions:** Repository audit complete. Tests pass, `ruff` and `vulture` indicate clean codebase.
+- **Entropy Pruned:** None
+- **Deferred / Blocked:** No dependencies bumped or upgrades applied. Release deferred.
+
+## 2026-10-30 — Lifecycle & Assurance Ledger
+- **QA & Veto Actions:** Resolved git merge conflict markers and removed redundant duplicate entries across `.jules/bolt.md` and `.jules/warden.md` ensuring strict chronological uniqueness.
 - **Entropy Pruned:** None
 - **Deferred / Blocked:** No dependencies bumped or upgrades applied. Release deferred.

@@ -1,24 +1,3 @@
-[Output truncated for brevity]
-@@ -1,199 +1,17 @@
--## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
-+We are given a merge conflict in a markdown file. We have three versions: ancestor, base (master), and head (PR branch).
-+         The conflict is in the section about the ArchitectureDetector.detect method and the subsequent optimization notes.
-
--Learning:
--An O(N^2) algorithmic bottleneck existed in `CodeSmellDetector._detect_long_functions` when parsing deeply nested functions or processing large Python files. The previous implementation utilized nested loops that iterated ahead through remaining lines for every function discovered, causing analysis time to jump from sub-second to over 35 seconds on deeply nested blocks.
-+        Steps:
-+         1. Identify the conflicting region from the diff provided (Head changes vs base) and the context.
-+         2. T
-
--Action:
--Replaced the lookahead nested loop with a single-pass O(N) stack-based approach that tracks active functions and their indentation levels. The execution time for the stress test on deeply nested mock repositories was reduced from ~35 seconds down to ~0.04 seconds, greatly improving the scalability of the analysis phase.
-+        // ... 35778 characters truncated (middle section) ...
-
--2026-04-02 — Security Scanner Performance Bottleneck
--Learning: Running multiple complex regular expressions sequentially over every file's content is a severe performance bottleneck. Profiling `SecurityDetector` revealed that `pattern.finditer` took ~76% of the execution time, scanning for secrets that often have known, fixed prefixes (like `AKIA` or `sk_live_`).
--Action: For heavily repeated regex scans, I added a fast-path literal substring check (`SECRET_HINTS`) before executing the expensive regex. Files lacking the literal substring immediately skip the regex. This drastically reduced the execution time of `SecurityDetector.detect` by avoiding the regex engine entirely on the vast majority of files.
-+
-
 ## 2026-04-01 — Performance Optimization: O(N^2) Bottleneck in Long Function Detection
 
 )` check ensures small graphs don't trigger a `ValueError` for oversampling, and explicitly setting a `seed` guarantees deterministic outputs, preventing flaky tests.
@@ -110,9 +89,7 @@ In `ArchitectureDetector._walk`, computing `.relative_to` on every file item and
 
 Action:
 Removed the `try/except ValueError` block containing `.relative_to(repo_path)` and `.split("/")` from `ArchitectureDetector.detect`. Relying purely on the pre-existing `item.name.lower()` logic for both directories and files perfectly captures all necessary architecture indicators without the 5x speed penalty of string manipulation and path parsing per file.
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+
 ## 2026-05-26 — Performance Optimization: Removing O(N) internal iterations during StructureAnalyzer recursive traversal
 
 Learning:
@@ -130,12 +107,8 @@ Learning:
 Action:
 Replaced the internal list comprehension loop with a continuously updated scalar counter (`local_files`) tracked during the main iteration, eliminating the redundant inner loops and strictly improving traversal performance.
 
-## 2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
+##
+
 
 ## 2026-05-26 — Bug Fix: Invalid Git Format String
 
@@ -163,10 +136,6 @@ Traversing a directory system inherently has logic about child-depth that can av
 Action:
 Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
 
-## 2026-05-26 — Git Log Formatting Bug Fix
-2023-10-27 — Optimization: Avoid redundant file system traversal string splitting and operations
-Learning: Traversing a directory system inherently has logic about child-depth that can avoid redundant len() computations. Avoiding inner O(N) sum calculations over directory file listings also improves performance.
-Action: Refactored _walk in ArchitectureDetector to yield depth directly instead of re-splitting paths, and implemented lazy file_count caching in StructureAnalyzer.
 ## 2026-05-26 — Fix: Git log format specifier
 
 Learning:
@@ -247,13 +216,6 @@ Always wrap environment variable parsing into integers or floats with a `try...e
 ## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
 
 Learning:
-Accessing  via  in GitPython spawns an individual  sub-process per commit, causing severe N+1 bottlenecks on large repositories.
-
-Action:
-Replaced the loop over  with a single, batched raw  call, reducing execution time significantly.
-## 2026-05-21 — Fix N+1 Performance Bottleneck in Evolution Engine
-
-Learning:
 Accessing `commit.stats.total` via `repo.iter_commits` in GitPython spawns an individual `git diff` sub-process per commit, causing severe N+1 bottlenecks on large repositories.
 
 Action:
@@ -268,12 +230,6 @@ Action:
 Strictly use the prefix `tformat:` (e.g., `--format=tformat:COMMIT`) instead of `format:` or just `--format=COMMIT`.
 
 
-## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
-
-Learning:
-When stripping path prefixes like `./` or `../` in Python, `str.lstrip("./")` treats the argument as a set of characters and strips all combinations of those characters from the start of the string (e.g., corrupting `../.env` into `env`). Additionally, DependencyMapper failed to filter external libraries correctly due to a missing `continue`, polluting graph structures.
-
-Action:
 ## 2026-05-27 — Fix lstrip Path Prefix Bug and External Dependency Filtering
 
 Learning:
@@ -314,10 +270,6 @@ Modified `ArchitectureDetector._walk` to directly yield the depth alongside the 
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-
 ## 2026-05-18 — Git Log Formatting Bug Fix
 
 Learning:
@@ -335,20 +287,6 @@ Use exact prefix removal methods like regex substitution (`re.sub(r"^(?:\.\.?/)+
 ## 2026-05-27 — Performance & Reliability Optimizations
 Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
 Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-
-
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
-## 2026-05-27 — Performance & Reliability Optimizations
-Learning: Inline standard library imports in frequently called methods add execution overhead, and failing to log when falling back from malformed environment variables limits user visibility.
-Action: Hoisted inline imports to module level scope to improve execution speed and added logging.warning within try/except ValueError blocks when parsing CODEDNA_MAX_FILE_SIZE to ensure safe fallback with clear feedback.
 2026-05-29 — Performance Optimization: Lazy-load heavy dependencies to improve CLI startup time
 
 Learning:
@@ -360,10 +298,6 @@ Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import gi
 ## 2026-10-26 — Performance Optimization: O(N) Traversal Bottleneck in Structure Analysis
 - **Learning:** In `StructureAnalyzer`, calling `sum(1 for p in items if p.is_file())` to compute the number of files in a directory when encountering a module marker introduces unnecessary O(N) operations inside a loop that is already iterating over the directory items. Furthermore, if `items` were a generator, this would exhaust it.
 - **Action:** Instead of iterating over `items` again to count files, maintain a counter (`current_dir_file_count`) inside the main loop, collect the discovered markers, and append them to the `modules` array once the directory iteration is complete. Ensure hidden files are counted to preserve original behavior.
-
-## 2026-10-28 — Optimize DeveloperAnalyzer._detect_collaboration
-- **Learning:** Detecting collaboration pairs across large sparse datasets via direct pairwise comparisons causes $O(N^2)$ execution slowdowns. Using bipartite graph mappings without bounded complexity results in an $O(M^2)$ bottleneck when processing heavily edited files (like package.json).
-- **Action:** Optimized `_detect_collaboration` by combining a bipartite graph approach to map neighboring collaborators with an explicit cast to sets for safe execution. The combination logic iterates purely on adjacent developers and resolves shared counts with a single set intersection query. Ensure any similar functionality enforces collections are cast to sets when performing bulk cross-references.
 
 ## 2026-10-28 — Optimize DeveloperAnalyzer._detect_collaboration
 - **Learning:** Detecting collaboration pairs across large sparse datasets via direct pairwise comparisons causes $O(N^2)$ execution slowdowns. Using bipartite graph mappings without bounded complexity results in an $O(M^2)$ bottleneck when processing heavily edited files (like package.json).
