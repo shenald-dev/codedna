@@ -1,4 +1,29 @@
-We are given three versions: ancestor, base (master), and head (PR branch).
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.1.0] - 2026-10-31
+
+### Added
+- **Genetic Drift & Mutation Diff Engine (codedna diff):**
+  - Compare two codebases, branches, or DNA profiles (dna_profile.json).
+  - Computes composite Genetic Similarity Score (0.0% to 100.0%) across languages, structures, architecture patterns, and dependency graph topology.
+  - Structural delta metrics: file and module shifts, language percentage changes, circular dependency intro/resolution, and developer bus factor deltas.
+  - Pragmatic mutation verdicts (Stable Evolution, Quality Improvement, Degradation, Identical Genome).
+- **CI/CD Quality Gatekeeper (codedna check):**
+  - Enforce architectural quality, health ratings, secret-free code, and dependency constraints in CI pipelines.
+  - Native OASIS SARIF v2.1.0 output for GitHub Code Scanning tab integration.
+  - Configurable policy thresholds (--min-health, --max-smells, --fail-on-secrets, --fail-on-circular).
+- **Interactive Executive Dashboard & Pure SVG Radar Chart:**
+  - Standalone 5-axis vector radar chart (Health, Security, Modularity, Cohesion, Resilience) rendered without external CDN dependencies.
+  - Client-side search and filtering for code smells and risk signals.
+  - Executive @media print styling for PDF reports.
+- **Cross-Platform Console Stability:**
+  - Configured UTF-8 stream reconfiguring on Windows to ensure emoji and unicode render cleanly without charmap encoding errors.
+
+### Changed
+- Reorganized CLI commands with shared streamlined analysis pipeline for analyze, diff, and check.
+- Upgraded package version to 1.1.0.
 
 ## [1.0.26] - 2026-06-07
 
