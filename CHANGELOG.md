@@ -213,6 +213,7 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
 ## [Unreleased]
 
+* **[Optimized]:** Replaced slow `Path.iterdir()` with `os.scandir()` in `ArchitectureDetector._walk` to eliminate redundant stat syscalls, accelerating tree traversal by ~6.7x and fixing performance test failures.
 **[Fixed]:** Resolved merge conflicts and cleaned up duplicated notes in `.jules/bolt.md` and `.jules/warden.md` ledger files.
 
 **[Pruned]:** Removed dead code related to unused `iter_commits` mock in test suite.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from .language_detector import IGNORE_DIRS
@@ -122,13 +123,14 @@ class ArchitectureDetector:
             if current_depth >= max_depth:
                 continue
             try:
-                for item in current_dir.iterdir():
-                    if item.name in IGNORE_DIRS or item.name.startswith("."):
-                        continue
-                    # Yield item along with its effective depth (child depth is current_depth + 1)
-                    # to avoid redundant O(N) recomputation using `item.relative_to` in callers
-                    yield item, current_depth + 1
-                    if item.is_dir():
-                        stack.append((item, current_depth + 1))
-            except PermissionError:
+                with os.scandir(current_dir) as it:
+                    for entry in it:
+                        if entry.name in IGNORE_DIRS or entry.name.startswith("."):
+                            continue
+                        # Yield entry along with its effective depth (child depth is current_depth + 1)
+                        # to avoid redundant O(N) recomputation using `item.relative_to` in callers
+                        yield entry, current_depth + 1
+                        if entry.is_dir():
+                            stack.append((Path(entry.path), current_depth + 1))
+            except (PermissionError, FileNotFoundError):
                 pass
