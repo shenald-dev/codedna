@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -34,12 +35,12 @@ class DeveloperAnalyzer:
                 "--name-only",
                 "--format=tformat:COMMIT::%H::%aN::%aE::%ad",
                 "--date=short",
-                f"-n {max_commits}"
+                f"-n {max_commits}",
             )
 
             current_author = None
 
-            for line in log_output.split('\n'):
+            for line in log_output.split("\n"):
                 line = line.strip()
                 if not line:
                     continue
@@ -69,19 +70,18 @@ class DeveloperAnalyzer:
         for author, count in contributors.most_common():
             files_touched_count = len(contributor_files.get(author, set()))
             role = self._classify_role(count, total_commits, files_touched_count)  # noqa: E501
-            contributor_list.append({
-                "name": author,
-                "commits": count,
-                "percentage": round((count / total_commits) * 100, 1),
-                "files_touched": files_touched_count,
-                "role": role,
-            })
+            contributor_list.append(
+                {
+                    "name": author,
+                    "commits": count,
+                    "percentage": round((count / total_commits) * 100, 1),
+                    "files_touched": files_touched_count,
+                    "role": role,
+                }
+            )
 
         # Hotspots (most changed files)
-        hotspots = [
-            {"file": f, "changes": c}
-            for f, c in file_changes.most_common(15)
-        ]
+        hotspots = [{"file": f, "changes": c} for f, c in file_changes.most_common(15)]
 
         # Collaboration pairs (authors who modify the same files)
         collaboration = self._detect_collaboration(contributor_files)
@@ -111,7 +111,7 @@ class DeveloperAnalyzer:
 
     def _detect_collaboration(self, contributor_files: dict) -> list[dict]:
         """Find pairs of developers who work on the same files."""
-        # Convert all author files to sets to handle lists/tuples safely and allow fast intersection
+        # Convert all author files to sets to handle lists/tuples safely
         author_sets = {
             a: files if isinstance(files, set) else set(files)
             for a, files in contributor_files.items()
@@ -122,33 +122,26 @@ class DeveloperAnalyzer:
             for f in files:
                 file_to_authors[f].append(author)
 
-        # Build adjacency list of authors who share at least one file
+        pair_counts = Counter()
+
+        # O(N) Tuple-counting: instead of comparing authors pair-wise and doing set intersections,
+        # we directly iterate files and count the exact shared edits.
         # Bounded complexity to prevent O(M^2) blowup on massive files
-        neighbors = defaultdict(set)
         for authors in file_to_authors.values():
             if 1 < len(authors) <= 100:
-                for a in authors:
-                    neighbors[a].update(authors)
-
-        pair_counts = {}
-        authors_list = sorted(contributor_files.keys())
-
-        for a1 in authors_list:
-            set1 = author_sets[a1]
-            for a2 in neighbors[a1]:
-                if a1 >= a2:
-                    continue
-                set2 = author_sets[a2]
-                shared = len(set1.intersection(set2))
-                if shared > 2:
-                    pair_counts[(a1, a2)] = shared
+                # generate unique combinations of sorted authors
+                for a1, a2 in itertools.combinations(sorted(authors), 2):
+                    pair_counts[(a1, a2)] += 1
 
         pairs = []
         for (a1, a2), count in pair_counts.items():
-            pairs.append({
-                "pair": [a1, a2],
-                "shared_files": count,
-            })
+            if count > 2:
+                pairs.append(
+                    {
+                        "pair": [a1, a2],
+                        "shared_files": count,
+                    }
+                )
 
         pairs.sort(key=lambda x: x["shared_files"], reverse=True)
         return pairs

@@ -213,8 +213,6 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 
 ## [Unreleased]
 
-**[Fixed]:** Resolved merge conflicts and cleaned up duplicated notes in `.jules/bolt.md` and `.jules/warden.md` ledger files.
-
 **[Pruned]:** Removed dead code related to unused `iter_commits` mock in test suite.
 
 ### Changed
@@ -2047,6 +2045,4 @@ We are given three versions: ancestor, base (master), and head (PR branch).
 * **Quality Assurance**: Deepcopy applied to `AIAnalyzer._minimize_payload` to prevent unintended mutation of the original dictionary data structures when building prompt payloads. Unused variable assignment removed from the test file and minor versions bumped.
 
 ## [Unreleased]
-
-**[Fixed]:** Resolved merge conflicts and cleaned up duplicated notes in `.jules/bolt.md` and `.jules/warden.md` ledger files.
 **[Optimized]:** Rebased to master, codebase audit and QA complete with zero regressions.
