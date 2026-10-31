@@ -111,44 +111,28 @@ class DeveloperAnalyzer:
 
     def _detect_collaboration(self, contributor_files: dict) -> list[dict]:
         """Find pairs of developers who work on the same files."""
-        # Convert all author files to sets to handle lists/tuples safely and allow fast intersection
-        author_sets = {
-            a: files if isinstance(files, set) else set(files)
-            for a, files in contributor_files.items()
-        }
+        import itertools
 
-        file_to_authors = defaultdict(list)
-        for author, files in author_sets.items():
+        # Build mapping from file to a set of authors who modified it
+        file_to_authors = defaultdict(set)
+        for author, files in contributor_files.items():
             for f in files:
-                file_to_authors[f].append(author)
+                file_to_authors[f].add(author)
 
-        # Build adjacency list of authors who share at least one file
-        # Bounded complexity to prevent O(M^2) blowup on massive files
-        neighbors = defaultdict(set)
+        pair_counts = defaultdict(int)
         for authors in file_to_authors.values():
+            # Bounded complexity to prevent O(M^2) blowup on massive files
             if 1 < len(authors) <= 100:
-                for a in authors:
-                    neighbors[a].update(authors)
-
-        pair_counts = {}
-        authors_list = sorted(contributor_files.keys())
-
-        for a1 in authors_list:
-            set1 = author_sets[a1]
-            for a2 in neighbors[a1]:
-                if a1 >= a2:
-                    continue
-                set2 = author_sets[a2]
-                shared = len(set1.intersection(set2))
-                if shared > 2:
-                    pair_counts[(a1, a2)] = shared
+                for a1, a2 in itertools.combinations(sorted(authors), 2):
+                    pair_counts[(a1, a2)] += 1
 
         pairs = []
         for (a1, a2), count in pair_counts.items():
-            pairs.append({
-                "pair": [a1, a2],
-                "shared_files": count,
-            })
+            if count > 2:
+                pairs.append({
+                    "pair": [a1, a2],
+                    "shared_files": count,
+                })
 
         pairs.sort(key=lambda x: x["shared_files"], reverse=True)
         return pairs
