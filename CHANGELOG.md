@@ -1,6 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [Unreleased]
+**[Pruned]:** Removed unused `details` field from PolicyEvaluation in Gatekeeper.
+
 
 ## [1.1.0] - 2026-10-31
 
