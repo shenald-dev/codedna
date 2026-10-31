@@ -238,3 +238,8 @@ AI Summary: Repository audit complete. CI is fixed. Rebased against master to re
 - **QA & Veto Actions:** Resolved git merge conflict markers and removed redundant duplicate entries across `.jules/bolt.md` and `.jules/warden.md` ensuring strict chronological uniqueness.
 - **Entropy Pruned:** None
 - **Deferred / Blocked:** No dependencies bumped or upgrades applied. Release deferred.
+
+## 2026-10-31 — Lifecycle & Assurance Ledger
+- **QA & Veto Actions:** Verified tests after pruning unused data class field.
+- **Entropy Pruned:** Removed unused `details` field from `PolicyEvaluation` in `codedna/ci/gatekeeper.py`.
+- **Deferred / Blocked:** None.

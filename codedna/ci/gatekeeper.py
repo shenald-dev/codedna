@@ -16,7 +16,6 @@ class PolicyEvaluation:
     passed: bool
     severity: str  # "error" | "warning"
     message: str
-    details: str = ""
 
 
 @dataclass
@@ -105,7 +104,6 @@ class Gatekeeper:
                     if health_pass
                     else f"Overall health '{current_health}' falls below required '{self.min_health}'"
                 ),
-                details=f"Current rank: {actual_rank}, Target rank: {target_rank}",
             )
         )
 
@@ -124,7 +122,6 @@ class Gatekeeper:
                         if secrets_pass
                         else f"Security scan found {vuln_count} vulnerability findings"
                     ),
-                    details=f"Critical vulnerabilities: {total_critical_vulns}, Has secrets: {has_secrets}",
                 )
             )
 
@@ -141,7 +138,6 @@ class Gatekeeper:
                     if crit_pass
                     else f"Critical smells ({crit_smells}) exceeded allowable limit ({self.max_critical_smells})"
                 ),
-                details=f"Detected {crit_smells} critical smells (e.g., God Classes, runaway complexity)",
             )
         )
 
@@ -159,7 +155,6 @@ class Gatekeeper:
                         if smells_pass
                         else f"Total smells ({total_smells}) exceeded threshold ({self.max_smells})"
                     ),
-                    details=f"Breakdown: {crit_smells} critical, {warn_smells} warning",
                 )
             )
 
@@ -177,7 +172,6 @@ class Gatekeeper:
                         if circ_pass
                         else f"Detected {deps_data.get('circular_count', 0)} circular dependency cycles"
                     ),
-                    details=f"Cycles: {deps_data.get('circular_count', 0)}",
                 )
             )
 
@@ -195,7 +189,6 @@ class Gatekeeper:
                         if density_pass
                         else f"Dependency density {density:.4f} exceeds limit {self.max_density:.4f}"
                     ),
-                    details=f"Total edges: {deps_data.get('total_edges', 0)}, modules: {deps_data.get('total_modules', 0)}",
                 )
             )
 
