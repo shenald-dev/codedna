@@ -302,3 +302,7 @@ Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import gi
 ## 2026-10-28 — Optimize DeveloperAnalyzer._detect_collaboration
 - **Learning:** Detecting collaboration pairs across large sparse datasets via direct pairwise comparisons causes $O(N^2)$ execution slowdowns. Using bipartite graph mappings without bounded complexity results in an $O(M^2)$ bottleneck when processing heavily edited files (like package.json).
 - **Action:** Optimized `_detect_collaboration` by combining a bipartite graph approach to map neighboring collaborators with an explicit cast to sets for safe execution. The combination logic iterates purely on adjacent developers and resolves shared counts with a single set intersection query. Ensure any similar functionality enforces collections are cast to sets when performing bulk cross-references.
+
+## 2026-10-31 — Optimize DeveloperAnalyzer._detect_collaboration
+- **Learning:** Detecting collaboration pairs across large sparse datasets via direct pairwise comparisons and set intersections causes severe execution slowdowns and memory scaling issues ($O(M^2 \times F)$). By relying on iterating directly over the shared files using `itertools.combinations`, we can achieve O(N) performance scaling for tuples and easily preserve caps (like the 100 author limit).
+- **Action:** Refactored the internal logic to map developers inversely to files and count directly with an in-place combinations loop.
