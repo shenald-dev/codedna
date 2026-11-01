@@ -247,6 +247,38 @@ class TestDeveloperAnalyzer:
         assert collab[0]["pair"] == ["a", "b"]
         assert collab[0]["shared_files"] == 3
 
+    def test_detect_collaboration_bounded_complexity(self):
+        from codedna.analyzers.developer_analyzer import DeveloperAnalyzer
+        analyzer = DeveloperAnalyzer()
+
+        # Mock up contributor files data:
+        # 101 authors all modify 'huge_file.json'
+        # 3 authors modify 'normal_file.py'
+        contributor_files = {}
+        for i in range(101):
+            contributor_files[f"author_{i}"] = {"huge_file.json"}
+
+        contributor_files["author_0"].add("normal_file.py")
+        contributor_files["author_1"].add("normal_file.py")
+        contributor_files["author_2"].add("normal_file.py")
+
+        collab = analyzer._detect_collaboration(contributor_files)
+
+        # 'huge_file.json' is modified by 101 authors, so it should be skipped by bounded complexity.
+        # 'normal_file.py' is modified by 3 authors, but that is < 3 shared files (only 1 shared file).
+        # But wait, to show up in collaboration_pairs, the pair needs > 2 shared files.
+        # Let's make author_0, author_1, author_2 share 3 normal files to trigger a valid pair.
+        contributor_files["author_0"].update(["f1.py", "f2.py", "f3.py"])
+        contributor_files["author_1"].update(["f1.py", "f2.py", "f3.py"])
+
+        collab = analyzer._detect_collaboration(contributor_files)
+
+        # The only valid pair is author_0 and author_1 sharing 4 files.
+        # The huge file should NOT generate O(M^2) pairs.
+        assert len(collab) == 1
+        assert sorted(collab[0]["pair"]) == ["author_0", "author_1"]
+        assert collab[0]["shared_files"] == 4
+
 
 class TestGitHubAnalyzer:
     def test_analyze_local(self):
