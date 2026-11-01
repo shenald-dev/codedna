@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -60,8 +61,8 @@ class DeveloperAnalyzer:
                 elif current_author:
                     file_changes[line] += 1
                     contributor_files[current_author].add(line)
-        except Exception:
-            pass
+        except Exception as e:
+            logging.getLogger(__name__).warning(f"Git log parsing failed: {e}")
 
         # Build contributor profiles
         total_commits = commit_count or 1
