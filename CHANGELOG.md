@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+- **[Fixed]:** Fixed swallowed Git log parsing error in DeveloperAnalyzer.
+- **[Fixed]:** Added missing edge case test for DeveloperAnalyzer bounded complexity check.
+
 ## [1.1.0] - 2026-10-31
 
 ### Added
