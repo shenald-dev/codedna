@@ -7,8 +7,12 @@ import logging
 import os
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .language_detector import IGNORE_DIRS
+
+if TYPE_CHECKING:
+    from codedna.config import CodeDNAConfig
 
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
@@ -19,24 +23,37 @@ except ValueError:
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
     "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),  # noqa: E501
+    "OpenAI / LLM Key": re.compile(r"(sk-[A-Za-z0-9_-]{32,})"),
+    "Anthropic API Key": re.compile(r"(sk-ant-[A-Za-z0-9_-]{32,})"),
+    "Hugging Face Token": re.compile(r"(hf_[A-Za-z0-9]{30,})"),
+    "Pinecone API Key": re.compile(r"(pcsk_[A-Za-z0-9_]{30,})"),
     "RSA Private Key": re.compile(r"-----BEGIN " + r"RSA PRIVATE KEY-----"),
     "SSH Private Key": re.compile(r"-----BEGIN " + r"OPENSSH PRIVATE KEY-----"),
     "GitHub Token": re.compile(r"((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})"),
-    "Stripe Secret Key": re.compile(r"(sk_live_[0-9a-zA-Z]{24})"),
-    "Slack Token": re.compile(r"(xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24})"),
+    "Stripe Secret Key": re.compile(r"(sk_" + r"live_[0-9a-zA-Z]{24})"),
+    "Slack Token": re.compile(r"(xox[baprs]-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24})"),
     "Google API Key": re.compile(r"(AIza[0-9A-Za-z\-_]{35})"),
     "Discord Bot Token": re.compile(r"[MND][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"),
     "SendGrid API Key": re.compile(r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"),
     "MailChimp API Key": re.compile(r"[0-9a-f]{32}-us[0-9]{1,2}"),
 }
 
+VULN_PATTERNS = {
+    "Command Injection Risk": (re.compile(r"subprocess\.(?:call|Popen|run)\s*\([^)]*shell\s*=\s*True[^)]*\)", re.IGNORECASE), "shell=True"),
+    "Raw SQL String Injection": (re.compile(r'''f["']SELECT\s+.*WHERE\s+.*\{[^}]+\}''', re.IGNORECASE), "SELECT"),
+}
+
 SECRET_HINTS = {
     "AWS Access Key": ("AKIA", "ABIA", "ACCA", "ASIA"),
     "Generic API Key / Token": ("key", "token", "secret", "password", "pw", "auth", "KEY", "TOKEN", "SECRET", "PASSWORD", "PW", "AUTH", "Key", "Token", "Secret", "Password", "Pw", "Auth"),
+    "OpenAI / LLM Key": ("sk-",),
+    "Anthropic API Key": ("sk-ant-",),
+    "Hugging Face Token": ("hf_",),
+    "Pinecone API Key": ("pcsk_",),
     "RSA Private Key": ("-----BEGIN " + "RSA PRIVATE KEY-----",),
     "SSH Private Key": ("-----BEGIN " + "OPENSSH PRIVATE KEY-----",),
     "GitHub Token": ("ghp_", "gho_", "ghu_", "ghs_", "ghr_"),
-    "Stripe Secret Key": ("sk_live_",),
+    "Stripe Secret Key": ("sk_" + "live_",),
     "Slack Token": ("xox",),
     "Google API Key": ("AIza",),
     "SendGrid API Key": ("SG.",),
@@ -47,18 +64,24 @@ SECRET_HINTS = {
 class SecurityDetector:
     """Scans codebase for security vulnerabilities and hardcoded secrets."""
 
-    def detect(self, repo_path: Path) -> dict:
+    def __init__(self, config: CodeDNAConfig | None = None) -> None:
+        self.config = config
+
+    def detect(self, repo_path: Path, config: CodeDNAConfig | None = None) -> dict:
         """Scan repository for security issues.
 
         Returns:
             Dict containing detected secrets and vulnerabilities.
         """
+        active_config = config or self.config
         vulnerabilities = []
 
         for file_path in self._walk_source(repo_path):
             try:
-                content = file_path.read_text(encoding="utf-8", errors="ignore")
                 relative = str(file_path.relative_to(repo_path))
+                if active_config and active_config.is_path_ignored(relative):
+                    continue
+                content = file_path.read_text(encoding="utf-8", errors="ignore")
             except (OSError, ValueError):
                 continue
 
@@ -71,8 +94,11 @@ class SecurityDetector:
                 last_idx = 0
                 current_line = 1
                 for match in pattern.finditer(content):
-                    # To avoid printing real secrets, we truncate/mask the matched value
                     matched_value = match.group(0)
+                    if active_config and active_config.is_secret_whitelisted(matched_value):
+                        continue
+
+                    # Mask secret value
                     if len(matched_value) > 10:
                         masked = f"{matched_value[:4]}***{matched_value[-4:]}"
                     else:
@@ -88,6 +114,22 @@ class SecurityDetector:
                         "file": f"{relative}:{current_line}",
                         "detail": f"Detected {secret_type} ({masked})",
                     })
+
+            # Check for code injection vulnerabilities
+            for vuln_type, (v_pattern, v_hint) in VULN_PATTERNS.items():
+                if v_hint in content:
+                    last_idx = 0
+                    current_line = 1
+                    for match in v_pattern.finditer(content):
+                        start_idx = match.start()
+                        current_line += content.count('\n', last_idx, start_idx)
+                        last_idx = start_idx
+                        vulnerabilities.append({
+                            "type": vuln_type,
+                            "severity": "critical",
+                            "file": f"{relative}:{current_line}",
+                            "detail": f"Insecure dynamic execution vector: {vuln_type}",
+                        })
 
             # Check dependency manifests for outdated or naive flags
             if file_path.name == "package.json":
@@ -112,8 +154,6 @@ class SecurityDetector:
                     if item.is_dir():
                         stack.append(item)
                     elif item.is_file():
-                        # Skip known binary/media/data files
-                        # Also skip massive files (like large minified JS or massive data files)
                         if item.suffix.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".sqlite", ".db"):  # noqa: E501
                             try:
                                 if item.stat().st_size <= MAX_FILE_SIZE:

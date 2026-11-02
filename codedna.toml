@@ -1,0 +1,41 @@
+# CodeDNA Configuration File (codedna.toml)
+# https://github.com/shenald-dev/codedna
+
+# Paths to exclude from analysis, smell checks, and security scans
+ignore_paths = [
+    "tests/*",
+    "docs/*",
+    "build/*",
+    "dist/*",
+    "*.min.js",
+]
+
+# Whitelist false-positive tokens or development test fixtures
+whitelisted_secrets = [
+    "PUBLIC_KEY",
+    "EXAMPLE_KEY",
+]
+
+[gate]
+# Minimum acceptable health rating ("Healthy", "Fair", "Needs Attention", "Critical")
+min_health = "Fair"
+
+# Maximum allowable critical smells (0 enforces zero-tolerance)
+max_critical_smells = 0
+
+# Maximum allowable total smells (omit or leave empty for no cap)
+# max_smells = 50
+
+# Fail CI immediately if secrets/credentials or circular dependencies are found
+fail_on_secrets = true
+fail_on_circular = false
+
+# Maximum acceptable genetic drift percentage during drift regression gates (0-100)
+max_drift = 20.0
+
+[smells]
+# Thresholds for architectural smell detection
+max_file_lines = 650
+max_function_lines = 150
+god_class_methods = 20
+large_module_files = 25

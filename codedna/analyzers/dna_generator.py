@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
+from codedna import __version__
+
 
 class DNAGenerator:
     """Produces the final DNA profile summary from all analysis modules."""
@@ -41,7 +43,7 @@ class DNAGenerator:
             "metadata": {
                 "source": repo_source,
                 "analyzed_at": datetime.now().isoformat(),
-                "version": "1.0.0",
+                "version": __version__,
             },
             "signature": signature,
             "system_type": architecture.get("primary_pattern", "Unknown"),

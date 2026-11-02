@@ -37,3 +37,7 @@ htmlcov/
 # Cloned repos cache
 .codedna_cache/
 prof/
+
+# Caches & Bot tracking artifacts
+.ruff_cache/
+.jules/

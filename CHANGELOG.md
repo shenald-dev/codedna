@@ -2,9 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-- **[Fixed]:** Fixed swallowed Git log parsing error in DeveloperAnalyzer.
-- **[Fixed]:** Added missing edge case test for DeveloperAnalyzer bounded complexity check.
+## [1.2.0] - 2026-11-02
+
+### Added
+- **Declarative Configuration Engine (`codedna.toml`, `pyproject.toml`):**
+  - Support for `codedna.toml`, `.codedna.toml`, and `pyproject.toml [tool.codedna]` configuration files.
+  - Flexible path exclusion globs (`ignore_paths`) across all smell detectors, security audits, and structural analyses.
+  - Secret whitelisting (`whitelisted_secrets`) to filter test fixtures and false-positive tokens.
+  - Custom smell thresholds (`max_file_lines`, `max_function_lines`, `god_class_methods`, `large_module_files`).
+- **Architectural Drift Regression Gating (`codedna gate`):**
+  - Dedicated CLI command to evaluate genetic drift between baseline and target branches or profiles in CI/CD.
+  - Regression policies enforcing health preservation, circular dependency prevention, zero new secrets, and similarity thresholds.
+  - Added `--fail-on-drift` flag to `codedna diff` for inline regression enforcement.
+- **Project Scaffolding (`codedna init`):**
+  - Scaffolds a starter `codedna.toml` file with sensible defaults and `--force` overwrite protection.
+- **GitHub PR Review Markdown Formatting (`--format markdown`):**
+  - High-readability Markdown table outputs for `codedna check` and `codedna gate` designed for automated PR comment bots and GitHub Actions.
+- **Modern AI & Cloud Security Auditing:**
+  - Added detection for modern AI/LLM API credentials (OpenAI `sk-...`, Anthropic `sk-ant-...`, Hugging Face `hf_...`, Pinecone `pcsk_...`).
+  - Added AST/pattern checks for command injection risks (`shell=True`) and raw SQL f-string injection.
+- **Spaghetti Hub Node Coupling Detection:**
+  - Added code smell rule detecting files with excessive import coupling (>15 module imports) indicating architectural bottleneck nodes.
+
+### Fixed
+- **Reliability:** Fixed swallowed Git log parsing error in DeveloperAnalyzer.
+- **Test Stability:** Added edge case test for DeveloperAnalyzer bounded complexity check.
+
+### Changed
+- Promoted PyPI development status classifier to `Development Status :: 5 - Production/Stable`.
+- Normalized version references dynamically from `codedna.__version__`.
+- Cleaned repository hygiene and added bot artifact ignore rules.
 
 ## [1.1.0] - 2026-10-31
 

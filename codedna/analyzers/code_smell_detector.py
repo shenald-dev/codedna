@@ -6,8 +6,12 @@ import logging
 import os
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .language_detector import IGNORE_DIRS
+
+if TYPE_CHECKING:
+    from codedna.config import CodeDNAConfig
 
 try:
     MAX_FILE_SIZE = int(os.environ.get("CODEDNA_MAX_FILE_SIZE", 5 * 1024 * 1024))
@@ -15,30 +19,42 @@ except ValueError:
     logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
-# Thresholds
+# Default Thresholds
 MAX_FILE_LINES = 500
 MAX_FUNCTION_LINES = 80
 GOD_CLASS_METHODS = 15
 LARGE_MODULE_FILES = 20
+HUB_NODE_IMPORTS = 15
 
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX)", re.IGNORECASE)
 PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+", re.MULTILINE)
 JS_METHOD_PATTERN = re.compile(r"(?:\bfunction\s+\w+)|(?:=>\s*\{)|(?:\b[a-zA-Z_$][\w$]*\s*\([^)]*\)\s*\{)")
 JAVA_METHOD_PATTERN = re.compile(r"(?:\bpublic|\bprivate|\bprotected)\s+\w+\s+\w+\s*\(")
+IMPORT_PATTERN = re.compile(r"^(?:import|from)\s+([A-Za-z0-9_.]+)", re.MULTILINE)
 
 
 class CodeSmellDetector:
     """Detects common code smells and structural issues."""
 
-    def detect(self, repo_path: Path) -> dict:
+    def __init__(self, config: CodeDNAConfig | None = None) -> None:
+        self.config = config
+
+    def detect(self, repo_path: Path, config: CodeDNAConfig | None = None) -> dict:
         """Scan for code smells in the repository.
 
         Returns:
             Dict with categorized smells and severity ratings.
         """
+        active_config = config or self.config
         smells: list[dict] = []
         source_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".go", ".rs", ".rb"}
+
+        # Dynamic thresholds
+        max_file_lines = active_config.max_file_lines if active_config else MAX_FILE_LINES
+        max_func_lines = active_config.max_function_lines if active_config else MAX_FUNCTION_LINES
+        god_methods = active_config.god_class_methods if active_config else GOD_CLASS_METHODS
+        large_mod_files = active_config.large_module_files if active_config else LARGE_MODULE_FILES
 
         stack = [repo_path]
         while stack:
@@ -54,22 +70,31 @@ class CodeSmellDetector:
                         file_count += 1
                         if item.suffix.lower() in source_exts:
                             try:
+                                rel = str(item.relative_to(repo_path))
+                                if active_config and active_config.is_path_ignored(rel):
+                                    continue
                                 if item.stat().st_size <= MAX_FILE_SIZE:
-                                    self._analyze_file(item, repo_path, smells)
+                                    self._analyze_file(
+                                        item, repo_path, smells,
+                                        max_file_lines=max_file_lines,
+                                        max_func_lines=max_func_lines,
+                                        god_methods=god_methods,
+                                    )
                             except OSError:
                                 pass
 
                 # ── Large Modules ──
-                if file_count > LARGE_MODULE_FILES and current != repo_path:
+                if file_count > large_mod_files and current != repo_path:
                     try:
                         rel = str(current.relative_to(repo_path))
-                        smells.append({
-                            "type": "Large Module",
-                            "severity": "warning",
-                            "file": rel,
-                            "line": 1,
-                            "detail": f"{file_count} files in module (threshold: {LARGE_MODULE_FILES})",
-                        })
+                        if not (active_config and active_config.is_path_ignored(rel)):
+                            smells.append({
+                                "type": "Large Module",
+                                "severity": "warning",
+                                "file": rel,
+                                "line": 1,
+                                "detail": f"{file_count} files in module (threshold: {large_mod_files})",
+                            })
                     except ValueError:
                         pass
             except PermissionError:
@@ -87,7 +112,15 @@ class CodeSmellDetector:
             "health_score": self._compute_health(severity_counts),
         }
 
-    def _analyze_file(self, item: Path, repo_path: Path, smells: list[dict]) -> None:
+    def _analyze_file(
+        self,
+        item: Path,
+        repo_path: Path,
+        smells: list[dict],
+        max_file_lines: int = MAX_FILE_LINES,
+        max_func_lines: int = MAX_FUNCTION_LINES,
+        god_methods: int = GOD_CLASS_METHODS,
+    ) -> None:
         """Analyze a single file for code smells."""
         try:
             content = item.read_text(encoding="utf-8", errors="ignore")
@@ -97,37 +130,49 @@ class CodeSmellDetector:
 
         # ── Large File ──
         line_count = content.count('\n') + 1
-        if line_count > MAX_FILE_LINES:
+        if line_count > max_file_lines:
             smells.append({
                 "type": "Large File",
                 "severity": "warning" if line_count < 1000 else "critical",
                 "file": relative,
                 "line": 1,
-                "detail": f"{line_count} lines (threshold: {MAX_FILE_LINES})",
+                "detail": f"{line_count} lines (threshold: {max_file_lines})",
             })
 
         # ── God Class ──
         if item.suffix in (".py", ".java", ".ts", ".js"):
             method_count = self._count_methods(content, item.suffix)
-            if method_count > GOD_CLASS_METHODS:
+            if method_count > god_methods:
                 smells.append({
                     "type": "God Class",
                     "severity": "critical",
                     "file": relative,
                     "line": 1,
-                    "detail": f"{method_count} methods detected (threshold: {GOD_CLASS_METHODS})",  # noqa: E501
+                    "detail": f"{method_count} methods detected (threshold: {god_methods})",
                 })
 
         # ── Long Functions ──
-        long_funcs = self._detect_long_functions(content, item.suffix)
+        long_funcs = self._detect_long_functions(content, item.suffix, max_func_lines=max_func_lines)
         for func_name, length, start_line in long_funcs:
             smells.append({
                 "type": "Long Function",
                 "severity": "warning",
                 "file": relative,
                 "line": start_line,
-                "detail": f"'{func_name}' has {length} lines (threshold: {MAX_FUNCTION_LINES})",
+                "detail": f"'{func_name}' has {length} lines (threshold: {max_func_lines})",
             })
+
+        # ── Spaghetti Hub Node (Excessive Coupling) ──
+        if item.suffix == ".py":
+            imports_found = set(IMPORT_PATTERN.findall(content))
+            if len(imports_found) > HUB_NODE_IMPORTS:
+                smells.append({
+                    "type": "Spaghetti Hub Node",
+                    "severity": "warning",
+                    "file": relative,
+                    "line": 1,
+                    "detail": f"{len(imports_found)} distinct imports (threshold: {HUB_NODE_IMPORTS}) — high coupling risk",
+                })
 
         # ── TODO/FIXME/HACK markers ──
         if MARKER_PATTERN.search(content):
@@ -151,7 +196,12 @@ class CodeSmellDetector:
             return len(JAVA_METHOD_PATTERN.findall(content))
         return 0
 
-    def _detect_long_functions(self, content: str, ext: str) -> list[tuple[str, int, int]]:
+    def _detect_long_functions(
+        self,
+        content: str,
+        ext: str,
+        max_func_lines: int = MAX_FUNCTION_LINES,
+    ) -> list[tuple[str, int, int]]:
         """Detect functions exceeding the line threshold."""
         results = []
 
@@ -180,7 +230,7 @@ class CodeSmellDetector:
                 while active_funcs and active_funcs[-1][0] >= indent:
                     _, prev_name, prev_start = active_funcs.pop()
                     func_lines = current_line - prev_start - 1
-                    if func_lines > MAX_FUNCTION_LINES:
+                    if func_lines > max_func_lines:
                         results.append((prev_name, func_lines, prev_start + 1))
 
                 if is_def:
@@ -194,7 +244,7 @@ class CodeSmellDetector:
 
                 for _, name, start in active_funcs:
                     func_lines = total_lines - start - 1
-                    if func_lines > MAX_FUNCTION_LINES:
+                    if func_lines > max_func_lines:
                         results.append((name, func_lines, start + 1))
 
         return results

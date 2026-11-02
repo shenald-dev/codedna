@@ -168,6 +168,37 @@ class Renderer:
         else:
             self.console.print(f"\n[bold red]❌ Quality gate breach: {result.policies_failed} policy check(s) failed.[/]\n")
 
+    def render_drift_gate(self, passed: bool, reasons: list[str], diff: dict) -> None:
+        """Render architectural drift regression gatekeeper evaluation to the terminal."""
+        self.console.print()
+        status_color = "green" if passed else "red"
+        status_text = "PASSED" if passed else "FAILED"
+        sim = diff.get("similarity_score", 0.0)
+        verdict = diff.get("mutation_verdict", "Unknown")
+
+        self.console.print(Panel(
+            f"[bold {status_color}]🛡️ CodeDNA Drift Regression Gate — {status_text}[/]\n\n"
+            f"[white]Genetic Similarity:[/] [bold]{sim}%[/]\n"
+            f"[white]Mutation Verdict:[/]   [bold cyan]{verdict}[/]\n"
+            f"[white]Drift Status:[/]       [bold {status_color}]{'PASS (No unacceptable drift)' if passed else 'FAIL (Architectural regression detected)'}[/]",
+            title="CI Drift Regression Gate",
+            border_style=status_color,
+            padding=(1, 2),
+        ))
+
+        if not passed and reasons:
+            table = Table(title="⚠️ Drift Violations", border_style="red")
+            table.add_column("#", justify="center", width=4)
+            table.add_column("Violation Detail", style="bold red")
+
+            for idx, reason in enumerate(reasons, 1):
+                table.add_row(str(idx), reason)
+
+            self.console.print(table)
+            self.console.print(f"\n[bold red]❌ Drift gate breach: {len(reasons)} regression check(s) failed.[/]\n")
+        else:
+            self.console.print("\n[bold green]✨ Architectural drift within acceptable parameters. Gate passed![/]\n")
+
     def _render_header(self, profile: dict) -> None:
         """Render the DNA header."""
         self.console.print()
