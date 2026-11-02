@@ -24,8 +24,8 @@ LARGE_MODULE_FILES = 20
 # Pre-compiled Regular Expressions for performance
 MARKER_PATTERN = re.compile(r"(TODO|FIXME|HACK|XXX)", re.IGNORECASE)
 PY_METHOD_PATTERN = re.compile(r"^[ \t]*def\s+\w+", re.MULTILINE)
-JS_METHOD_PATTERN = re.compile(r"function\s+\w+|=>\s*\{|[a-zA-Z_]\w*\s*\([^)]*\)\s*\{")
-JAVA_METHOD_PATTERN = re.compile(r"(?:public|private|protected)\s+\w+\s+\w+\s*\(")
+JS_METHOD_PATTERN = re.compile(r"(?:\bfunction\s+\w+)|(?:=>\s*\{)|(?:\b[a-zA-Z_$][\w$]*\s*\([^)]*\)\s*\{)")
+JAVA_METHOD_PATTERN = re.compile(r"(?:\bpublic|\bprivate|\bprotected)\s+\w+\s+\w+\s*\(")
 
 
 class CodeSmellDetector:
@@ -130,26 +130,16 @@ class CodeSmellDetector:
             })
 
         # ── TODO/FIXME/HACK markers ──
-        last_idx = 0
-        current_line = 1
-        for match in MARKER_PATTERN.finditer(content):
-            start_idx = match.start()
-            current_line += content.count('\n', last_idx, start_idx)
-            last_idx = start_idx
-
-            line_start = content.rfind('\n', 0, start_idx) + 1
-            line_end = content.find('\n', start_idx)
-            if line_end == -1:
-                line_end = len(content)
-            line_text = content[line_start:line_end]
-
-            smells.append({
-                "type": "Code Marker",
-                "severity": "info",
-                "file": f"{relative}:{current_line}",
-                "line": current_line,
-                "detail": f"{match.group(1).upper()} found: {line_text.strip()[:80]}",
-            })
+        if MARKER_PATTERN.search(content):
+            for i, line in enumerate(content.splitlines(), 1):
+                for match in MARKER_PATTERN.finditer(line):
+                    smells.append({
+                        "type": "Code Marker",
+                        "severity": "info",
+                        "file": f"{relative}:{i}",
+                        "line": i,
+                        "detail": f"{match.group(1).upper()} found: {line.strip()[:80]}",
+                    })
 
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""

@@ -306,3 +306,7 @@ Moved heavy imports (`import networkx as nx`, `from git import Repo`, `import gi
 ## 2026-10-31 — Optimize DeveloperAnalyzer._detect_collaboration
 - **Learning:** Detecting collaboration pairs across large sparse datasets via direct pairwise comparisons and set intersections causes severe execution slowdowns and memory scaling issues ($O(M^2 \times F)$). By relying on iterating directly over the shared files using `itertools.combinations`, we can achieve O(N) performance scaling for tuples and easily preserve caps (like the 100 author limit).
 - **Action:** Refactored the internal logic to map developers inversely to files and count directly with an in-place combinations loop.
+
+## 2026-11-01 — Optimize Regex Performance in CodeSmellDetector
+- **Learning:** Unanchored alternations in regular expressions (e.g., `JS_METHOD_PATTERN = re.compile(r"function\s+\w+|=>\s*\{|[a-zA-Z_]\w*\s*\([^)]*\)\s*\{")`) cause catastrophic backtracking when matching against large, complex files lacking those patterns, degrading performance severely. Also, calling `content.count('\n', last_idx, start_idx)` in a loop when tracking line numbers is exceptionally slow.
+- **Action:** Rewrite structural matching regexes to use word boundaries `\b` and non-capturing groups `(?:...)` to bypass backtracking overhead. Optimize line-tracking by first checking if the file contains a match via `.search()`, and if so, enumerating `.splitlines()` directly.
