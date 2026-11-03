@@ -110,3 +110,9 @@ def test_load_config_string_path(tmp_path: Path):
     (tmp_path / "codedna.toml").write_text('[gate]\nmin_health = "Critical"\n', encoding="utf-8")
     cfg = load_config(str(tmp_path))
     assert cfg.min_health == "Critical"
+
+def test_load_config_string_path_nonexistent_file(tmp_path: Path):
+    """Verify load_config falls back safely when passed a string path and file doesn't exist."""
+    cfg = load_config(str(tmp_path / "nonexistent"))
+    assert cfg.min_health == "Fair"
+    assert cfg.max_critical_smells == 0
