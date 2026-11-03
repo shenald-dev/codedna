@@ -103,3 +103,10 @@ def test_generate_default_config_toml():
     assert "CodeDNA Configuration" in content
     assert "[gate]" in content
     assert "[smells]" in content
+
+
+def test_load_config_string_path(tmp_path: Path):
+    """Verify load_config works seamlessly when passed a string path."""
+    (tmp_path / "codedna.toml").write_text('[gate]\nmin_health = "Critical"\n', encoding="utf-8")
+    cfg = load_config(str(tmp_path))
+    assert cfg.min_health == "Critical"

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **Config Loader:** Support string path arguments in `load_config(root_path: Path | str)` seamlessly alongside `pathlib.Path`.
+
 ## [1.2.0] - 2026-11-02
 
 ### Added

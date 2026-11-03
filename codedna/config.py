@@ -68,12 +68,13 @@ class CodeDNAConfig:
         return False
 
 
-def load_config(root_path: Path) -> CodeDNAConfig:
+def load_config(root_path: Path | str) -> CodeDNAConfig:
     """Load configuration from codedna.toml, .codedna.toml, or pyproject.toml."""
+    root = Path(root_path)
     candidates = [
-        root_path / "codedna.toml",
-        root_path / ".codedna.toml",
-        root_path / "pyproject.toml",
+        root / "codedna.toml",
+        root / ".codedna.toml",
+        root / "pyproject.toml",
     ]
 
     for candidate in candidates:
