@@ -39,8 +39,8 @@ SECRET_PATTERNS = {
 }
 
 VULN_PATTERNS = {
-    "Command Injection Risk": (re.compile(r"subprocess\.(?:call|Popen|run)\s*\([^)]*shell\s*=\s*True[^)]*\)", re.IGNORECASE), "shell=True"),
-    "Raw SQL String Injection": (re.compile(r'''f["']SELECT\s+.*WHERE\s+.*\{[^}]+\}''', re.IGNORECASE), "SELECT"),
+    "Command Injection Risk": (re.compile(r"subprocess\.(?:call|Popen|run)\s*\([^)]*?shell\s*=\s*True[^)]*\)", re.IGNORECASE), "shell=True"),
+    "Raw SQL String Injection": (re.compile(r'''f["']SELECT[^{}\n]+?WHERE[^{}\n]+?\{[^}]+\}''', re.IGNORECASE), "SELECT"),
 }
 
 SECRET_HINTS = {

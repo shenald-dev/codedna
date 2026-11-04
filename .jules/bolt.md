@@ -1,0 +1,4 @@
+## 2024-11-03 — Optimized Security Regex
+
+- **Learning:** Found a catastrophic backtracking issue in `VULN_PATTERNS` in `codedna/analyzers/security_detector.py`. Using greedy matches (`.*`) in `Raw SQL String Injection` regex can cause hangs over 400 seconds on large source files with padded spaces.
+- **Action:** Optimized the regexes to use non-greedy matching `[^{}\n]+?` and explicitly avoid catastrophic backtracking when searching for SQL/Command Injections. Future updates to `VULN_PATTERNS` should avoid `.*` and carefully consider backtracking vulnerabilities.
