@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 - **[Pruned]:** Audited codebase for dead code and verified existing test coverage.
+**[Pruned]:** Removed unused `details` field from `PolicyEvaluation` dataclass in `codedna/ci/gatekeeper.py`.
 
 ### Fixed
 - **Config Loader:** Support string path arguments in `load_config(root_path: Path | str)` seamlessly alongside `pathlib.Path`.
