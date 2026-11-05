@@ -21,6 +21,8 @@ class CodeDNAConfig:
     fail_on_circular: bool = False
     max_density: float | None = None
     max_drift: float = 20.0
+    max_cyclomatic_complexity: int | None = None
+    min_maintainability_index: float | None = None
 
     # Path exclusions
     ignore_paths: list[str] = field(default_factory=list)
@@ -103,6 +105,8 @@ def load_config(root_path: Path | str) -> CodeDNAConfig:
                     fail_on_circular=bool(gate_cfg.get("fail_on_circular", section.get("fail_on_circular", False))),
                     max_density=float(gate_cfg["max_density"]) if "max_density" in gate_cfg and gate_cfg["max_density"] is not None else None,
                     max_drift=float(gate_cfg.get("max_drift", section.get("max_drift", 20.0))),
+                    max_cyclomatic_complexity=int(gate_cfg["max_cyclomatic_complexity"]) if "max_cyclomatic_complexity" in gate_cfg and gate_cfg["max_cyclomatic_complexity"] is not None else None,
+                    min_maintainability_index=float(gate_cfg["min_maintainability_index"]) if "min_maintainability_index" in gate_cfg and gate_cfg["min_maintainability_index"] is not None else None,
                     ignore_paths=list(section.get("ignore_paths", [])),
                     whitelisted_secrets=list(section.get("whitelisted_secrets", [])),
                     max_file_lines=int(smell_cfg.get("max_file_lines", section.get("max_file_lines", 500))),

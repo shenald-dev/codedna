@@ -586,5 +586,134 @@ def check(
             cloner.cleanup()
 
 
+@main.command()
+def mcp():
+    """Start Model Context Protocol (MCP 2024-11-05) JSON-RPC 2.0 server on stdio.
+
+    Enables dynamic tool invocation from AI agents like Claude Desktop, Cursor,
+    and Antigravity.
+    """
+    from .mcp.server import CodeDNAMCPServer
+
+    server = CodeDNAMCPServer()
+    server.run_stdio()
+
+
+@main.command()
+@click.argument("directory", default=".")
+def audit(directory: str):
+    """Run an executive security and architectural compliance audit."""
+    from rich.console import Console
+    from rich.table import Table
+
+    from .analyzers.architecture_detector import ArchitectureDetector
+    from .analyzers.complexity_analyzer import ComplexityAnalyzer
+    from .analyzers.dependency_mapper import DependencyMapper
+    from .analyzers.security_detector import SecurityDetector
+    from .config import load_config
+
+    console = Console()
+    target_path = Path(directory).resolve()
+    console.print(f"\n[bold cyan]🔒 CodeDNA Executive Audit[/] [dim]v{__version__}[/]")
+    console.print(f"[dim]Auditing target:[/] [cyan]{target_path}[/]\n")
+
+    cfg = load_config(target_path)
+    arch = ArchitectureDetector().detect(target_path)
+    sec = SecurityDetector(config=cfg).detect(target_path)
+    cmp = ComplexityAnalyzer().analyze(target_path, config=cfg)
+    deps = DependencyMapper().map(target_path)
+
+    table = Table(title="Audit Scorecard", show_header=True, header_style="bold magenta")
+    table.add_column("Category", style="cyan", width=25)
+    table.add_column("Finding / Metric", style="white")
+    table.add_column("Status", justify="center", width=12)
+
+    pat = arch.get("primary_pattern", "Unknown")
+    table.add_row("Architecture Pattern", f"{pat} ({arch.get('coupling', 'Low')} Coupling)", "[green]PASS[/]")
+
+    mi = cmp.get("maintainability_index", 100.0)
+    mi_color = "green" if mi >= 30 else "yellow" if mi >= 15 else "red"
+    table.add_row("Maintainability Index", f"{mi}/100 (Rank {cmp.get('maintainability_rank', 'A')})", f"[{mi_color}]{'PASS' if mi >= 20 else 'WARN'}[/]")
+
+    avg_cc = cmp.get("average_cyclomatic_complexity", 1.0)
+    max_cc = cmp.get("max_cyclomatic_complexity", 1)
+    cc_status = "[green]PASS[/]" if max_cc <= 30 else "[red]FAIL[/]"
+    table.add_row("Complexity (McCabe)", f"Avg: {avg_cc} | Peak: {max_cc}", cc_status)
+
+    circ = deps.get("has_circular_deps", False)
+    circ_status = "[red]FAIL[/]" if circ else "[green]PASS[/]"
+    table.add_row("Circular Dependencies", f"{len(deps.get('cycles', []))} cycles detected", circ_status)
+
+    vulns = sec.get("vulnerabilities", [])
+    crit_vulns = sec.get("total_critical", 0)
+    sec_status = "[red]FAIL[/]" if crit_vulns > 0 else "[green]PASS[/]"
+    table.add_row("Security Vulnerabilities", f"{crit_vulns} critical | {len(vulns)} total findings", sec_status)
+
+    console.print(table)
+
+    if crit_vulns > 0:
+        console.print("\n[bold red]🚨 Critical Security Findings:[/]")
+        for v in vulns:
+            if v.get("severity") == "critical":
+                console.print(f"  • [red]{v.get('type')}:[/] {v.get('detail')} at [cyan]{v.get('file')}[/]")
+
+    complexity_ok = (max_cc <= (cfg.max_cyclomatic_complexity or 30)) and (mi >= (cfg.min_maintainability_index or 20.0))
+    passed = crit_vulns == 0 and not (cfg.fail_on_circular and circ) and complexity_ok
+    if passed:
+        console.print("\n[bold green]✓ Audit Completed: PASSED[/]\n")
+        sys.exit(0)
+    else:
+        console.print("\n[bold red]❌ Audit Completed: POLICY BREACH[/]\n")
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("directory", default=".")
+@click.option("--top", type=int, default=15, help="Number of complex functions to display")
+def complexity(directory: str, top: int):
+    """Analyze and report function-level Cyclomatic and Cognitive complexity."""
+    from rich.console import Console
+    from rich.table import Table
+
+    from .analyzers.complexity_analyzer import ComplexityAnalyzer
+    from .config import load_config
+
+    console = Console()
+    target_path = Path(directory).resolve()
+    console.print(f"\n[bold cyan]⚙️ CodeDNA Complexity & Maintainability Engine[/] [dim]v{__version__}[/]")
+    console.print(f"[dim]Analyzing:[/] [cyan]{target_path}[/]\n")
+
+    cfg = load_config(target_path)
+    res = ComplexityAnalyzer().analyze(target_path, config=cfg)
+
+    console.print(f"• Functions Analyzed: [bold]{res['total_functions_analyzed']}[/]")
+    console.print(f"• Maintainability Index: [bold cyan]{res['maintainability_index']}/100[/] (Rank [bold green]{res['maintainability_rank']}[/])")
+    console.print(f"• Average Cyclomatic Complexity: [bold]{res['average_cyclomatic_complexity']}[/]")
+    console.print(f"• Peak Cyclomatic Complexity: [bold]{res['max_cyclomatic_complexity']}[/]")
+    console.print(f"• Average Cognitive Complexity: [bold]{res['average_cognitive_complexity']}[/]\n")
+
+    complex_funcs = res.get("complex_functions", [])
+    if complex_funcs:
+        table = Table(title="Highest Complexity Functions", show_header=True, header_style="bold magenta")
+        table.add_column("Function", style="cyan")
+        table.add_column("File:Line", style="dim")
+        table.add_column("Cyclomatic", justify="right")
+        table.add_column("Cognitive", justify="right")
+        table.add_column("Severity", justify="center")
+
+        for fn in complex_funcs[:top]:
+            sev_color = "red" if fn["severity"] == "critical" else "yellow"
+            table.add_row(
+                fn["name"],
+                f"{fn['file']}:{fn['line']}",
+                str(fn["cyclomatic_complexity"]),
+                str(fn["cognitive_complexity"]),
+                f"[{sev_color}]{fn['severity'].upper()}[/]",
+            )
+        console.print(table)
+    else:
+        console.print("[green]✨ Clean codebase! No high-complexity functions detected above thresholds.[/]\n")
+
+
 if __name__ == "__main__":
     main()

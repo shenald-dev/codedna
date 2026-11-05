@@ -6,6 +6,8 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 
+from codedna import __version__
+
 
 @dataclass
 class PolicyEvaluation:
@@ -54,6 +56,8 @@ class Gatekeeper:
         fail_on_secrets: bool = True,
         fail_on_circular: bool = False,
         max_density: float | None = None,
+        max_cyclomatic_complexity: int | None = None,
+        min_maintainability_index: float | None = None,
     ):
         """Initialize the Gatekeeper with policy thresholds."""
         self.min_health = min_health
@@ -62,6 +66,8 @@ class Gatekeeper:
         self.fail_on_secrets = fail_on_secrets
         self.fail_on_circular = fail_on_circular
         self.max_density = max_density
+        self.max_cyclomatic_complexity = max_cyclomatic_complexity
+        self.min_maintainability_index = min_maintainability_index
 
     def evaluate(self, profile: dict) -> GatekeeperResult:
         """Evaluate a DNA profile against the configured policies.
@@ -192,6 +198,43 @@ class Gatekeeper:
                 )
             )
 
+        # 7. Complexity Ceiling Policy
+        complexity_info = profile.get("smells", {}).get("complexity", {}) or profile.get("complexity", {})
+        if self.max_cyclomatic_complexity is not None and complexity_info:
+            max_cc = complexity_info.get("max_cyclomatic_complexity", 1)
+            cc_pass = max_cc <= self.max_cyclomatic_complexity
+            evaluations.append(
+                PolicyEvaluation(
+                    rule_id="DNA-CMP-001",
+                    name="Cyclomatic Complexity Ceiling",
+                    passed=cc_pass,
+                    severity="error" if self.max_cyclomatic_complexity < 20 else "warning",
+                    message=(
+                        f"Peak cyclomatic complexity ({max_cc}) within limit ({self.max_cyclomatic_complexity})"
+                        if cc_pass
+                        else f"Peak cyclomatic complexity ({max_cc}) exceeds limit ({self.max_cyclomatic_complexity})"
+                    ),
+                )
+            )
+
+        # 8. Maintainability Index Floor Policy
+        if self.min_maintainability_index is not None and complexity_info:
+            current_mi = complexity_info.get("maintainability_index", 100.0)
+            mi_pass = current_mi >= self.min_maintainability_index
+            evaluations.append(
+                PolicyEvaluation(
+                    rule_id="DNA-CMP-002",
+                    name="Maintainability Index Floor",
+                    passed=mi_pass,
+                    severity="error" if self.min_maintainability_index > 65 else "warning",
+                    message=(
+                        f"Maintainability Index ({current_mi}) meets required floor ({self.min_maintainability_index})"
+                        if mi_pass
+                        else f"Maintainability Index ({current_mi}) below required floor ({self.min_maintainability_index})"
+                    ),
+                )
+            )
+
         # Final Verdict
         passed_count = sum(1 for e in evaluations if e.passed)
         failed_count = sum(1 for e in evaluations if not e.passed)
@@ -235,10 +278,38 @@ class Gatekeeper:
                 "defaultConfiguration": {"level": "error"},
             },
             {
+                "id": "DNA-SML-002",
+                "name": "TotalCodeSmellsThreshold",
+                "shortDescription": {"text": "Total Code Smells Limit Exceeded"},
+                "fullDescription": {"text": "Enforces that cumulative code smell findings remain within acceptable boundaries."},
+                "defaultConfiguration": {"level": "warning"},
+            },
+            {
                 "id": "DNA-DEP-001",
                 "name": "CircularDependencyDetected",
                 "shortDescription": {"text": "Circular Dependency Cycle"},
                 "fullDescription": {"text": "Architectural coupling cycle detected between modules."},
+                "defaultConfiguration": {"level": "error"},
+            },
+            {
+                "id": "DNA-DEP-002",
+                "name": "CouplingDensityLimit",
+                "shortDescription": {"text": "Coupling Density Limit Exceeded"},
+                "fullDescription": {"text": "Enforces that dependency density between modules stays below complexity limits."},
+                "defaultConfiguration": {"level": "warning"},
+            },
+            {
+                "id": "DNA-CMP-001",
+                "name": "CyclomaticComplexityCeiling",
+                "shortDescription": {"text": "Peak Cyclomatic Complexity Limit Exceeded"},
+                "fullDescription": {"text": "Enforces that peak function cyclomatic complexity does not exceed thresholds."},
+                "defaultConfiguration": {"level": "error"},
+            },
+            {
+                "id": "DNA-CMP-002",
+                "name": "MaintainabilityIndexFloor",
+                "shortDescription": {"text": "Maintainability Index Below Floor"},
+                "fullDescription": {"text": "Enforces that system maintainability index meets required rating."},
                 "defaultConfiguration": {"level": "error"},
             },
         ]
@@ -305,7 +376,7 @@ class Gatekeeper:
                     "tool": {
                         "driver": {
                             "name": "CodeDNA Gatekeeper",
-                            "semanticVersion": "1.2.0",
+                            "semanticVersion": __version__,
                             "informationUri": "https://github.com/shenald-dev/codedna",
                             "rules": rules,
                         }

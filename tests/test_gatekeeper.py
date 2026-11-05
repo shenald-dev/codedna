@@ -120,3 +120,17 @@ class TestGatekeeper:
         assert data["passed"] is True
         assert data["overall_health"] == "Healthy"
         assert "evaluations" in data
+
+    def test_sarif_rule_indices_align_exactly(self, clean_profile):
+        """Verify that every SARIF result.ruleId exactly matches driver.rules[ruleIndex].id."""
+        clean_profile["health"]["severity_counts"]["critical"] = 5
+        clean_profile["dependencies"]["density"] = 0.95
+        gatekeeper = Gatekeeper(max_smells=2, max_density=0.1)
+        result = gatekeeper.evaluate(clean_profile)
+
+        sarif = gatekeeper.to_sarif(result, clean_profile)
+        driver_rules = sarif["runs"][0]["tool"]["driver"]["rules"]
+        for res in sarif["runs"][0]["results"]:
+            rule_id = res["ruleId"]
+            rule_idx = res["ruleIndex"]
+            assert driver_rules[rule_idx]["id"] == rule_id

@@ -83,6 +83,7 @@ class DNAGenerator:
                 "last_commit": evolution.get("last_commit"),
                 "patterns": evolution.get("patterns", []),
             },
+            "complexity": smells.get("complexity", {}) if isinstance(smells, dict) else {},
             "security": security or {"vulnerabilities": [], "total_critical": 0, "has_secrets": False},  # noqa: E501
             "github": github or {},
             "mermaid_graph": mermaid_graph,
@@ -162,6 +163,16 @@ class DNAGenerator:
         lines.append(f"- 🟡 Warning: {counts.get('warning', 0)}")
         lines.append(f"- 🔵 Info: {counts.get('info', 0)}")
         lines.append("")
+
+        # Complexity & Maintainability
+        cmp = profile.get("complexity", {})
+        if cmp and cmp.get("total_functions_analyzed", 0) > 0:
+            lines.append("## ⚙️ Maintainability & Cognitive Complexity\n")
+            lines.append(f"- Maintainability Index: **{cmp.get('maintainability_index', 0.0)}/100 (Rank {cmp.get('maintainability_rank', 'N/A')})**")
+            lines.append(f"- Average Cyclomatic Complexity: **{cmp.get('average_cyclomatic_complexity', 1.0)}**")
+            lines.append(f"- Peak Cyclomatic Complexity: **{cmp.get('max_cyclomatic_complexity', 1)}**")
+            lines.append(f"- Average Cognitive Complexity: **{cmp.get('average_cognitive_complexity', 0.0)}**")
+            lines.append(f"- Functions Analyzed: **{cmp.get('total_functions_analyzed', 0)}**\n")
 
         # Risks
         if profile["risks"]:
