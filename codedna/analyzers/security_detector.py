@@ -121,73 +121,17 @@ class SecurityDetector:
                 continue
 
             # Check for secrets
-            for secret_type, pattern in SECRET_PATTERNS.items():
-                hints = SECRET_HINTS.get(secret_type)
-                if hints and not any(hint in content for hint in hints):
-                    continue
+            self._scan_secrets(content, relative, active_config, vulnerabilities)
 
-                last_idx = 0
-                current_line = 1
-                for match in pattern.finditer(content):
-                    matched_value = match.group(0)
-                    if active_config and active_config.is_secret_whitelisted(matched_value):
-                        continue
-
-                    # Mask secret value
-                    if len(matched_value) > 10:
-                        masked = f"{matched_value[:4]}***{matched_value[-4:]}"
-                    else:
-                        masked = "***"
-
-                    start_idx = match.start()
-                    current_line += content.count('\n', last_idx, start_idx)
-                    last_idx = start_idx
-
-                    vulnerabilities.append({
-                        "type": "Hardcoded Secret",
-                        "severity": "critical",
-                        "file": f"{relative}:{current_line}",
-                        "detail": f"Detected {secret_type} ({masked})",
-                    })
-
-            # Check for code injection vulnerabilities
-            for vuln_type, (v_pattern, v_hint) in VULN_PATTERNS.items():
-                if v_hint in content:
-                    last_idx = 0
-                    current_line = 1
-                    for match in v_pattern.finditer(content):
-                        start_idx = match.start()
-                        current_line += content.count('\n', last_idx, start_idx)
-                        last_idx = start_idx
-                        vulnerabilities.append({
-                            "type": vuln_type,
-                            "severity": "critical",
-                            "file": f"{relative}:{current_line}",
-                            "detail": f"Insecure dynamic execution vector: {vuln_type}",
-                        })
+            # Check for code injection vulnerabilities in source code files
+            source_code_exts = {".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".go", ".rs", ".rb", ".php", ".c", ".cpp"}
+            if file_path.suffix.lower() in source_code_exts:
+                self._scan_injections(content, relative, vulnerabilities)
 
             # Check for high-entropy secret candidates via Shannon entropy (skip lockfiles)
             is_lockfile = file_path.name in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "uv.lock", "poetry.lock")
             if not is_lockfile:
-                for match in QUOTED_TOKEN_PATTERN.finditer(content):
-                    candidate = match.group(1)
-                    if len(candidate) >= 28 and not candidate.startswith(("data:", "http", "sha256-", "sha512-", "file:", "assets/", "urn:", "git+")):
-                        entropy = calculate_shannon_entropy(candidate)
-                        if entropy >= 4.6:
-                            if active_config and active_config.is_secret_whitelisted(candidate):
-                                continue
-                            # Avoid duplicates if already flagged as a specific secret
-                            masked = f"{candidate[:4]}***{candidate[-4:]}"
-                            already_flagged = any(masked in v.get("detail", "") for v in vulnerabilities if v.get("file", "").startswith(relative))
-                            if not already_flagged:
-                                start_idx = match.start()
-                                line_num = content.count('\n', 0, start_idx) + 1
-                                vulnerabilities.append({
-                                    "type": "High-Entropy Secret Candidate",
-                                    "severity": "warning",
-                                    "file": f"{relative}:{line_num}",
-                                    "detail": f"High Shannon entropy token ({entropy:.2f} bits/char, {masked})",
-                                })
+                self._scan_entropy(content, relative, active_config, vulnerabilities)
 
             # Check dependency manifests for outdated or naive flags
             if file_path.name == "package.json":
@@ -200,6 +144,74 @@ class SecurityDetector:
             "total_critical": len([v for v in vulnerabilities if v["severity"] == "critical"]),
             "has_secrets": len([v for v in vulnerabilities if v["type"] == "Hardcoded Secret"]) > 0,
         }
+
+    def _scan_secrets(self, content: str, relative: str, active_config: CodeDNAConfig | None, vulnerabilities: list) -> None:
+        """Scan file content for predefined secret patterns."""
+        for secret_type, pattern in SECRET_PATTERNS.items():
+            hints = SECRET_HINTS.get(secret_type)
+            if hints and not any(hint in content for hint in hints):
+                continue
+
+            last_idx = 0
+            current_line = 1
+            for match in pattern.finditer(content):
+                matched_value = match.group(0)
+                if active_config and active_config.is_secret_whitelisted(matched_value):
+                    continue
+
+                if len(matched_value) > 10:
+                    masked = f"{matched_value[:4]}***{matched_value[-4:]}"
+                else:
+                    masked = "***"
+
+                start_idx = match.start()
+                current_line += content.count('\n', last_idx, start_idx)
+                last_idx = start_idx
+
+                vulnerabilities.append({
+                    "type": "Hardcoded Secret",
+                    "severity": "critical",
+                    "file": f"{relative}:{current_line}",
+                    "detail": f"Detected {secret_type} ({masked})",
+                })
+
+    def _scan_injections(self, content: str, relative: str, vulnerabilities: list) -> None:
+        """Scan source code for dangerous dynamic execution and injection patterns."""
+        for vuln_type, (v_pattern, v_hint) in VULN_PATTERNS.items():
+            if v_hint in content:
+                last_idx = 0
+                current_line = 1
+                for match in v_pattern.finditer(content):
+                    start_idx = match.start()
+                    current_line += content.count('\n', last_idx, start_idx)
+                    last_idx = start_idx
+                    vulnerabilities.append({
+                        "type": vuln_type,
+                        "severity": "critical",
+                        "file": f"{relative}:{current_line}",
+                        "detail": f"Insecure dynamic execution vector: {vuln_type}",
+                    })
+
+    def _scan_entropy(self, content: str, relative: str, active_config: CodeDNAConfig | None, vulnerabilities: list) -> None:
+        """Scan string literals for high Shannon entropy candidate tokens."""
+        for match in QUOTED_TOKEN_PATTERN.finditer(content):
+            candidate = match.group(1)
+            if len(candidate) >= 28 and not candidate.startswith(("data:", "http", "sha256-", "sha512-", "file:", "assets/", "urn:", "git+")):
+                entropy = calculate_shannon_entropy(candidate)
+                if entropy >= 4.6:
+                    if active_config and active_config.is_secret_whitelisted(candidate):
+                        continue
+                    masked = f"{candidate[:4]}***{candidate[-4:]}"
+                    already_flagged = any(masked in v.get("detail", "") for v in vulnerabilities if v.get("file", "").startswith(relative))
+                    if not already_flagged:
+                        start_idx = match.start()
+                        line_num = content.count('\n', 0, start_idx) + 1
+                        vulnerabilities.append({
+                            "type": "High-Entropy Secret Candidate",
+                            "severity": "warning",
+                            "file": f"{relative}:{line_num}",
+                            "detail": f"High Shannon entropy token ({entropy:.2f} bits/char, {masked})",
+                        })
 
     def _walk_source(self, root: Path):
         stack = [root]
