@@ -649,7 +649,21 @@ def audit(directory: str):
     sec_status = "[red]FAIL[/]" if crit_vulns > 0 else "[green]PASS[/]"
     table.add_row("Security Vulnerabilities", f"{crit_vulns} critical | {len(vulns)} total findings", sec_status)
 
+    from .compliance.sbom import SBOMGenerator
+    from .remediation.planner import RemediationPlanner
+
+    sbom_deps = SBOMGenerator(target_path).discover_dependencies()
+    remed_actions = RemediationPlanner(target_path).plan()
+    autofix_count = sum(1 for a in remed_actions if a.autofixable)
+
+    table.add_row("Supply Chain (SBOM)", f"{len(sbom_deps)} packages tracked across manifests", "[green]INFO[/]")
+    remed_status = "[yellow]ACTION[/]" if autofix_count > 0 else "[green]CLEAN[/]"
+    table.add_row("Remediation Potential", f"{autofix_count} auto-fixable patches available", remed_status)
+
     console.print(table)
+
+    if autofix_count > 0:
+        console.print(f"\n[bold cyan]💡 Quick Fix Available:[/] Run [bold white]'codedna fix'[/] to auto-remediate {autofix_count} code smells and security flaws.")
 
     if crit_vulns > 0:
         console.print("\n[bold red]🚨 Critical Security Findings:[/]")
@@ -713,6 +727,112 @@ def complexity(directory: str, top: int):
         console.print(table)
     else:
         console.print("[green]✨ Clean codebase! No high-complexity functions detected above thresholds.[/]\n")
+
+
+@main.command()
+@click.argument("directory", default=".")
+@click.option("--format", "-f", "fmt", type=click.Choice(["cyclonedx", "spdx"]), default="cyclonedx", help="SBOM specification format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path (e.g., sbom.json)")
+def sbom(directory: str, fmt: str, output: str | None):
+    """Generate CycloneDX 1.5 or SPDX 2.3 Software Bill of Materials (SBOM)."""
+    from rich.console import Console
+
+    from .compliance.sbom import SBOMGenerator
+
+    console = Console()
+    target_path = Path(directory).resolve()
+    generator = SBOMGenerator(target_path)
+
+    if fmt == "spdx":
+        doc = generator.generate_spdx_json()
+    else:
+        doc = generator.generate_cyclonedx_json()
+
+    output_str = json.dumps(doc, indent=2)
+
+    if output:
+        out_path = Path(output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(output_str, encoding="utf-8")
+        deps_count = len(doc.get("components", [])) if fmt == "cyclonedx" else len(doc.get("packages", [])) - 1
+        console.print(f"[bold green]✓ Successfully generated {fmt.upper()} SBOM:[/] [cyan]{out_path}[/] ({deps_count} dependencies)")
+    else:
+        console.print(output_str)
+
+
+@main.command(name="remediate")
+@click.argument("directory", default=".")
+@click.option("--rules", "-r", help="Comma-separated rule IDs to filter (e.g. SMELL-BARE-EXCEPT,SEC-HARDCODED-SECRET)")
+@click.option("--apply", "apply_fixes", is_flag=True, help="Apply autofixes directly to disk")
+@click.option("--dry-run", is_flag=True, help="Preview autofixes without modifying files")
+@click.option("--output", "-o", type=click.Path(), help="Output unified patch file")
+def remediate(directory: str, rules: str | None, apply_fixes: bool, dry_run: bool, output: str | None):
+    """Plan and apply automated remediation diffs for smells and vulnerabilities."""
+    from rich.console import Console
+    from rich.table import Table
+
+    from .remediation.planner import RemediationPlanner
+
+    console = Console()
+    target_path = Path(directory).resolve()
+    planner = RemediationPlanner(target_path)
+
+    rule_filter = [r.strip() for r in rules.split(",")] if rules else None
+    actions = planner.plan(rule_filter=rule_filter)
+
+    console.print(f"\n[bold cyan]🔧 CodeDNA Intelligent Remediation Engine[/] [dim]v{__version__}[/]")
+    console.print(f"[dim]Workspace:[/] [cyan]{target_path}[/]\n")
+
+    if not actions:
+        console.print("[bold green]✨ Clean codebase! No actionable remediation targets found.[/]\n")
+        return
+
+    table = Table(title=f"Remediation Proposals ({len(actions)} total)", show_header=True, header_style="bold magenta")
+    table.add_column("Rule ID", style="cyan")
+    table.add_column("Location", style="dim")
+    table.add_column("Severity", justify="center")
+    table.add_column("Description")
+    table.add_column("Autofixable", justify="center")
+
+    all_diffs = []
+    for a in actions:
+        sev_color = "red" if a.severity == "critical" else "yellow" if a.severity == "warning" else "blue"
+        fix_badge = "[bold green]YES[/]" if a.autofixable else "[dim]MANUAL[/]"
+        table.add_row(
+            a.rule_id,
+            f"{a.file_path}:{a.line_number}",
+            f"[{sev_color}]{a.severity.upper()}[/]",
+            a.description[:60] + "..." if len(a.description) > 60 else a.description,
+            fix_badge,
+        )
+        if a.unified_diff:
+            all_diffs.append(a.unified_diff)
+
+    console.print(table)
+
+    if output and all_diffs:
+        out_path = Path(output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text("\n".join(all_diffs), encoding="utf-8")
+        console.print(f"\n[cyan]Saved unified patch to:[/] [bold]{out_path}[/]")
+
+    if apply_fixes:
+        res = planner.apply(actions, dry_run=dry_run)
+        mode_str = "[yellow]DRY-RUN PREVIEW[/]" if dry_run else "[bold green]APPLIED[/]"
+        console.print(f"\n{mode_str}: Modified [bold cyan]{len(res['files_modified'])}[/] files across [bold cyan]{res['applied_count']}[/] safe patches.\n")
+    elif any(a.autofixable for a in actions):
+        console.print("\n[dim]Tip: Pass '--apply' to automatically patch safe findings on disk.[/]\n")
+
+
+@main.command(name="fix")
+@click.argument("directory", default=".")
+@click.option("--rules", "-r", help="Comma-separated rule IDs to filter")
+@click.option("--apply", "apply_fixes", is_flag=True, default=True, help="Apply autofixes directly (default)")
+@click.option("--dry-run", is_flag=True, help="Preview autofixes without modifying files")
+@click.pass_context
+def fix(ctx, directory: str, rules: str | None, apply_fixes: bool, dry_run: bool):
+    """Shortcut alias to remediate and apply autofixes directly."""
+    ctx.invoke(remediate, directory=directory, rules=rules, apply_fixes=apply_fixes, dry_run=dry_run, output=None)
 
 
 if __name__ == "__main__":
