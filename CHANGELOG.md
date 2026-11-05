@@ -2,12 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-- **[Pruned]:** Audited codebase for dead code and verified existing test coverage.
-**[Pruned]:** Removed unused `details` field from `PolicyEvaluation` dataclass in `codedna/ci/gatekeeper.py`.
+## [1.3.0] - 2026-11-06
 
-### Fixed
-- **Config Loader:** Support string path arguments in `load_config(root_path: Path | str)` seamlessly alongside `pathlib.Path`.
+### Added
+- **Model Context Protocol (MCP 2024-11-05 Specification) Gateway (`codedna mcp`):**
+  - Full JSON-RPC 2.0 stdio server implementation allowing external AI agents (Claude Desktop, Cursor, Antigravity) to query repository DNA, inspect dependency graphs, and verify CI quality gates dynamically.
+  - Exposes 7 standard MCP tools: `codedna_analyze`, `codedna_inspect_architecture`, `codedna_security_audit`, `codedna_complexity_metrics`, `codedna_dependency_graph`, `codedna_quality_gate`, and `codedna_drift_diff`.
+- **Cyclomatic & Cognitive Complexity Engine (`codedna complexity`):**
+  - AST-based McCabe Cyclomatic Complexity ($CC$) calculation for Python functions with decision point traversal (`if`, `while`, `for`, `except`, `assert`, boolean chains, comprehensions, pattern matching).
+  - Sonarsource standard Cognitive Complexity calculation with structural nesting penalties.
+  - Universal heuristic branch token stream scanner for JavaScript, TypeScript, Go, Java, and Rust.
+  - Maintainability Index ($MI$) calculation on a standardized 0–100 scale with letter grade rankings (A through F).
+  - Integrated high-complexity smells into `CodeSmellDetector` and CI Quality Gatekeeper (`DNA-CMP-001`, `DNA-CMP-002`).
+- **Enterprise Security Scanner & Shannon Entropy Engine (`codedna audit`):**
+  - Mathematical Shannon Entropy calculation ($H(S) = -\sum p(c) \log_2 p(c)$) to detect unformatted high-entropy credentials, hex tokens, and base64 private keys.
+  - Added detection for database connection URIs containing embedded passwords (`postgres://`, `mysql://`, `mongodb://`, `redis://`).
+  - Added vulnerability checks for insecure deserialization (`pickle.loads`, `yaml.unsafe_load`), path traversal risks, and weak hashing algorithms (`md5`, `sha1`).
+  - Extended AI credentials scanning for Google Gemini / AI Studio, Cohere, Mistral, Perplexity, DeepSeek, and Groq API keys.
+  - Dedicated `codedna audit` CLI command providing colorized Rich scorecard tables and CI exit codes.
+- **Modern Architecture Pattern Recognition:**
+  - Added pattern detectors for Clean Architecture / Hexagonal, CQRS / Event-Sourced, and Serverless.
+  - Added infrastructure traits for Cloud Native and Security Hardened repositories.
+
+### Changed
+- Bumped version to `1.3.0`.
+- Upgraded test suite from 137 to 155 automated tests (100% pass rate).
+- Updated HTML dashboard to dynamically display active version tag.
 
 ## [1.2.0] - 2026-11-02
 

@@ -43,7 +43,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
                     CodeDNA Profile
                 </h1>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-950/80 text-cyan-300 border border-cyan-800">v1.1.0</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-950/80 text-cyan-300 border border-cyan-800">{version_str}</span>
             </div>
             <p class="text-slate-400 text-base flex items-center gap-2 mt-2">
                 <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
@@ -345,7 +345,11 @@ class HTMLExporter:
         first_commit_raw = profile.get("evolution", {}).get("first_commit")
         first_commit = html_lib.escape(str(first_commit_raw[:10])) if first_commit_raw else "Unknown"
 
+        version_val = profile.get("metadata", {}).get("version", "1.3.0")
+        version_str = f"v{version_val}" if not str(version_val).startswith("v") else str(version_val)
+
         html = HTML_TEMPLATE.format(
+            version_str=html_lib.escape(version_str),
             source=html_lib.escape(str(profile["metadata"]["source"])),
             analyzed_at=html_lib.escape(str(profile["metadata"]["analyzed_at"][:10])),
             github_stats=github_stats,

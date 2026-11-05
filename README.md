@@ -11,7 +11,8 @@
 
   [![CI](https://github.com/shenald-dev/codedna/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/codedna/actions)
   [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
-  [![Version](https://img.shields.io/badge/Release-v1.2.0-cyan.svg)](https://github.com/shenald-dev/codedna/releases)
+  [![Version](https://img.shields.io/badge/Release-v1.3.0-cyan.svg)](https://github.com/shenald-dev/codedna/releases)
+  [![Tests: 155 passed](https://img.shields.io/badge/Tests-155%20passed%20(100%25)-success.svg)](https://github.com/shenald-dev/codedna)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
@@ -24,8 +25,11 @@
   - [2. 🛡️ Architectural Drift Regression Gating (`gate`)](#2-️-architectural-drift-regression-gating-gate)
   - [3. 🧬 Genetic Drift & Architecture Diff Engine (`diff`)](#3--genetic-drift--architecture-diff-engine-diff)
   - [4. 🛡️ CI/CD Quality Gatekeeper & SARIF / PR Markdown (`check`)](#4-️-cicd-quality-gatekeeper--sarif--pr-markdown-check)
-  - [5. 🔒 AI & Cloud Security Auditing](#5--ai--cloud-security-auditing)
+  - [5. 🔒 Enterprise Security & Shannon Entropy Scanner](#5--enterprise-security--shannon-entropy-scanner)
   - [6. 🎯 Interactive Executive Radar & HTML Dashboard](#6--interactive-executive-radar--html-dashboard)
+  - [7. 🔌 Model Context Protocol Gateway (`mcp`)](#7--model-context-protocol-gateway-mcp)
+  - [8. ⚙️ Cyclomatic & Cognitive Complexity Engine (`complexity`)](#8-️-cyclomatic--cognitive-complexity-engine-complexity)
+  - [9. 🔒 Executive Compliance Audit (`audit`)](#9--executive-compliance-audit-audit)
 - [🏗️ Analysis Pipeline](#️-analysis-pipeline)
 - [🛠️ Quick Start Guide](#️-quick-start-guide)
 - [💻 Comprehensive Usage](#-comprehensive-usage)
@@ -130,17 +134,44 @@ codedna check . --format markdown --output pr-comment.md
 codedna check . --format sarif --output codedna-results.sarif
 ```
 
-### 5. 🔒 AI & Cloud Security Auditing
-Built-in zero-dependency scanning for high-risk vulnerabilities and credentials:
-- **AI & Cloud API Tokens:** Detects exposed keys for OpenAI (`sk-...`), Anthropic (`sk-ant-...`), Hugging Face (`hf_...`), Pinecone (`pcsk_...`), AWS, GitHub, Stripe, and Slack.
-- **Command Injection:** Flags hazardous `subprocess.*(shell=True)` calls.
-- **SQL Injection:** Detects unescaped f-string SQL query executions.
+### 5. 🔒 Enterprise Security & Shannon Entropy Scanner
+Built-in zero-dependency scanning for high-risk vulnerabilities, high-entropy secrets, and cloud credentials:
+- **Shannon Entropy Secret Hunter:** Computes mathematical information density ($H(S) = -\sum p(c) \log_2 p(c)$) to surface unformatted API keys, hex secrets, and base64 private tokens without relying on brittle prefix guessing.
+- **AI & Cloud API Tokens:** Detects exposed keys for OpenAI (`sk-...`), Anthropic (`sk-ant-...`), Google Gemini (`AIzaSy...`), Cohere, Mistral, Perplexity, DeepSeek, Groq, Hugging Face (`hf_...`), Pinecone (`pcsk_...`), AWS, GitHub, Stripe, and Slack.
+- **Database Connection URIs:** Flags embedded passwords in database strings (`postgres://`, `mysql://`, `mongodb://`, `redis://`).
+- **Insecure Deserialization & Injection:** Catches dangerous `pickle.loads()`, `yaml.unsafe_load()`, `subprocess.*(shell=True)`, and SQL f-strings.
 
 ### 6. 🎯 Interactive Executive Radar & HTML Dashboard
 The generated HTML dashboard includes:
 - **Pure SVG Radar Chart:** Five-dimensional assessment (Health & Hygiene, Security Posture, Modularity & Coupling, Architecture Cohesion, Team Resilience) rendered with zero external CDN dependencies.
 - **Interactive Risk Filter:** Client-side instant filtering across code smells, god classes, and security warnings.
 - **Print / PDF Ready:** Fully styled `@media print` support for executive architecture reviews.
+
+### 7. 🔌 Model Context Protocol Gateway (`mcp`)
+Expose CodeDNA as an official **MCP (2024-11-05 Specification)** JSON-RPC 2.0 server over stdio for AI coding assistants:
+- Seamlessly integrates with **Claude Desktop**, **Cursor**, **Windsurf**, and **Antigravity**.
+- Provides 7 standard tools: `codedna_analyze`, `codedna_inspect_architecture`, `codedna_security_audit`, `codedna_complexity_metrics`, `codedna_dependency_graph`, `codedna_quality_gate`, and `codedna_drift_diff`.
+
+```json
+// claude_desktop_config.json
+{
+  "mcpServers": {
+    "codedna": {
+      "command": "codedna",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+### 8. ⚙️ Cyclomatic & Cognitive Complexity Engine (`complexity`)
+Comprehensive function-level structural analysis using Python AST and universal token streaming:
+- **McCabe Cyclomatic Complexity ($CC$):** Exact decision point counting (`if`, `while`, `for`, `except`, `assert`, boolean chains, comprehensions).
+- **Cognitive Complexity:** Standard Sonarsource nesting-penalized evaluation.
+- **Maintainability Index ($MI$):** Standard SEI maintainability scoring on a 0–100 scale with letter grade rankings (A through F).
+
+### 9. 🛡️ Executive Compliance Audit (`audit`)
+Fast, terminal-native security and architectural compliance audit with colorized Rich tables and strict exit codes (`0` for pass, `1` for policy breach).
 
 ---
 
