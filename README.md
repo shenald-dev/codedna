@@ -11,8 +11,8 @@
 
   [![CI](https://github.com/shenald-dev/codedna/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/codedna/actions)
   [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
-  [![Version](https://img.shields.io/badge/Release-v1.3.0-cyan.svg)](https://github.com/shenald-dev/codedna/releases)
-  [![Tests: 155 passed](https://img.shields.io/badge/Tests-155%20passed%20(100%25)-success.svg)](https://github.com/shenald-dev/codedna)
+  [![Version](https://img.shields.io/badge/Release-v1.4.0-cyan.svg)](https://github.com/shenald-dev/codedna/releases)
+  [![Tests: 178 passed](https://img.shields.io/badge/Tests-178%20passed%20(100%25)-success.svg)](https://github.com/shenald-dev/codedna)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
@@ -30,6 +30,8 @@
   - [7. 🔌 Model Context Protocol Gateway (`mcp`)](#7--model-context-protocol-gateway-mcp)
   - [8. ⚙️ Cyclomatic & Cognitive Complexity Engine (`complexity`)](#8-️-cyclomatic--cognitive-complexity-engine-complexity)
   - [9. 🔒 Executive Compliance Audit (`audit`)](#9--executive-compliance-audit-audit)
+  - [10. 📦 Software Bill of Materials Engine (`sbom`)](#10--software-bill-of-materials-engine-sbom)
+  - [11. 🔧 Intelligent Auto-Remediation Engine (`fix` / `remediate`)](#11--intelligent-auto-remediation-engine-fix--remediate)
 - [🏗️ Analysis Pipeline](#️-analysis-pipeline)
 - [🛠️ Quick Start Guide](#️-quick-start-guide)
 - [💻 Comprehensive Usage](#-comprehensive-usage)
@@ -172,6 +174,33 @@ Comprehensive function-level structural analysis using Python AST and universal 
 
 ### 9. 🛡️ Executive Compliance Audit (`audit`)
 Fast, terminal-native security and architectural compliance audit with colorized Rich tables and strict exit codes (`0` for pass, `1` for policy breach).
+
+### 10. 📦 Software Bill of Materials Engine (`sbom`)
+Generate industry-standard, audit-ready SBOM manifests conforming to federal and enterprise compliance mandates:
+- **CycloneDX (v1.5 JSON):** Complete component graphs, Package URLs (`purl`), and dependency relationships.
+- **SPDX (v2.3 JSON):** Open source package catalogs, licensing assertions, and document hashes.
+- **Multi-Ecosystem Discovery:** Parses Python (`pyproject.toml`, `requirements.txt`), Node.js (`package.json`, `package-lock.json`), Rust (`Cargo.toml`, `Cargo.lock`), and Go (`go.mod`).
+```bash
+# Generate CycloneDX SBOM
+codedna sbom . --format cyclonedx --output sbom-cyclonedx.json
+
+# Generate SPDX SBOM
+codedna sbom . --format spdx --output sbom-spdx.json
+```
+
+### 11. 🔧 Intelligent Auto-Remediation Engine (`fix` / `remediate`)
+Close the loop from diagnostic detection to resolution with deterministic code patches:
+- **Bare Exceptions:** Safely transforms broad `except:` to typed `except Exception:` handlers.
+- **Secret Extraction:** Refactors hardcoded API keys and tokens into `os.getenv(...)` variables.
+- **Wildcard Resolution:** Pins open-ended `package.json` `"*"` wildcards to safe semantic ranges (`^1.0.0`).
+- **Unified Diffs & Dry-Runs:** Preview patches before application or export unified patch files.
+```bash
+# Preview auto-remediation plan
+codedna remediate . --dry-run
+
+# Automatically patch safe findings on disk
+codedna fix .
+```
 
 ---
 

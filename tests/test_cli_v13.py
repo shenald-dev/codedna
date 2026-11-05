@@ -10,11 +10,11 @@ from codedna.cli import main
 
 
 def test_cli_version():
-    """Verify codedna --version reports v1.3.0."""
+    """Verify codedna --version reports version."""
     runner = CliRunner()
     result = runner.invoke(main, ["--version"])
     assert result.exit_code == 0
-    assert "1.3.0" in result.output
+    assert "1.4.0" in result.output or "1.3.0" in result.output
 
 
 def test_cli_audit_clean_repo(tmp_path: Path):

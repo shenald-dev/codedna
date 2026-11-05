@@ -68,7 +68,7 @@ def test_mcp_tools_list():
 
     tools = list_res["result"]["tools"]
     tool_names = [t["name"] for t in tools]
-    assert len(tools) == 7
+    assert len(tools) >= 7
     assert "codedna_analyze" in tool_names
     assert "codedna_inspect_architecture" in tool_names
     assert "codedna_security_audit" in tool_names
@@ -76,6 +76,8 @@ def test_mcp_tools_list():
     assert "codedna_dependency_graph" in tool_names
     assert "codedna_quality_gate" in tool_names
     assert "codedna_drift_diff" in tool_names
+    assert "codedna_generate_sbom" in tool_names
+    assert "codedna_plan_remediation" in tool_names
 
 
 def test_mcp_tools_call_execution(tmp_path: Path):
