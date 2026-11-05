@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import re
 from pathlib import Path
@@ -20,6 +21,20 @@ except ValueError:
     logging.getLogger(__name__).warning("Invalid CODEDNA_MAX_FILE_SIZE value. Using default 5MB.")
     MAX_FILE_SIZE = 5 * 1024 * 1024
 
+def calculate_shannon_entropy(text: str) -> float:
+    """Compute Shannon Entropy H(S) = -sum(p * log2(p)) for credential detection."""
+    if not text:
+        return 0.0
+    length = len(text)
+    counts: dict[str, int] = {}
+    for char in text:
+        counts[char] = counts.get(char, 0) + 1
+    entropy = 0.0
+    for count in counts.values():
+        p = count / length
+        entropy -= p * math.log2(p)
+    return round(entropy, 3)
+
 SECRET_PATTERNS = {
     "AWS Access Key": re.compile(r"((?:AKIA|ABIA|ACCA|ASIA)[0-9A-Z]{16})"),
     "Generic API Key / Token": re.compile(r"(?:[Kk]ey|[Tt]oken|[Ss]ecret|[Pp]assword|[Pp]w|[Aa]uth|KEY|TOKEN|SECRET|PASSWORD|PW|AUTH)[-\s_:=]+['\"]([0-9a-zA-Z\-_]{20,})['\"]"),  # noqa: E501
@@ -32,7 +47,14 @@ SECRET_PATTERNS = {
     "GitHub Token": re.compile(r"((?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36})"),
     "Stripe Secret Key": re.compile(r"(sk_" + r"live_[0-9a-zA-Z]{24})"),
     "Slack Token": re.compile(r"(xox[baprs]-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24})"),
-    "Google API Key": re.compile(r"(AIza[0-9A-Za-z\-_]{35})"),
+    "Google Gemini / AI Studio Key": re.compile(r"(AIzaSy[0-9A-Za-z\-_]{30,35})"),
+    "Google API Key": re.compile(r"(AIza(?!Sy)[0-9A-Za-z\-_]{35})"),
+    "Cohere API Key": re.compile(r"(co_[0-9a-zA-Z]{40})"),
+    "Mistral API Key": re.compile(r"(mis_[0-9a-zA-Z]{32})"),
+    "Perplexity API Key": re.compile(r"(pplx-[0-9a-zA-Z]{48})"),
+    "DeepSeek API Key": re.compile(r"(sk-[0-9a-f]{32})"),
+    "Groq API Key": re.compile(r"(gsk_[0-9a-zA-Z]{52})"),
+    "Database Credential URI": re.compile(r"""((?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp):\/\/[^:\s'"]+:([^@\s'"]+)@[^\s'"]+)""", re.IGNORECASE),
     "Discord Bot Token": re.compile(r"[MND][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}"),
     "SendGrid API Key": re.compile(r"SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}"),
     "MailChimp API Key": re.compile(r"[0-9a-f]{32}-us[0-9]{1,2}"),
@@ -41,6 +63,9 @@ SECRET_PATTERNS = {
 VULN_PATTERNS = {
     "Command Injection Risk": (re.compile(r"subprocess\.(?:call|Popen|run)\s*\([^)]*?shell\s*=\s*True[^)]*\)", re.IGNORECASE), "shell=True"),
     "Raw SQL String Injection": (re.compile(r'''f["']SELECT[^{}\n]+?WHERE[^{}\n]+?\{[^}]+\}''', re.IGNORECASE), "SELECT"),
+    "Insecure Deserialization": (re.compile(r"(?:pickle\.(?:loads|load)|_pickle\.(?:loads|load)|yaml\.load\([^)]*?Loader\s*=\s*(?:yaml\.)?Loader|marshal\.loads)"), "pickle"),
+    "Path Traversal Risk": (re.compile(r"(?:open|file)\s*\([^)]*?(?:request\.|params\[|req\.query|user_input)"), "open"),
+    "Weak Cryptographic Hash (MD5/SHA1)": (re.compile(r"hashlib\.(?:md5|sha1)\s*\(\s*(?!\s*usedforsecurity\s*=\s*False)"), "hashlib"),
 }
 
 SECRET_HINTS = {
@@ -56,9 +81,19 @@ SECRET_HINTS = {
     "Stripe Secret Key": ("sk_" + "live_",),
     "Slack Token": ("xox",),
     "Google API Key": ("AIza",),
+    "Google Gemini / AI Studio Key": ("AIzaSy",),
+    "Cohere API Key": ("co_",),
+    "Mistral API Key": ("mis_",),
+    "Perplexity API Key": ("pplx-",),
+    "DeepSeek API Key": ("sk-",),
+    "Groq API Key": ("gsk_",),
+    "Database Credential URI": ("://",),
     "SendGrid API Key": ("SG.",),
     "MailChimp API Key": ("-us",),
 }
+
+# String literal token pattern for entropy analysis
+QUOTED_TOKEN_PATTERN = re.compile(r"""['"]([A-Za-z0-9+/=_-]{24,100})['"]""")
 
 
 class SecurityDetector:
@@ -131,6 +166,29 @@ class SecurityDetector:
                             "detail": f"Insecure dynamic execution vector: {vuln_type}",
                         })
 
+            # Check for high-entropy secret candidates via Shannon entropy (skip lockfiles)
+            is_lockfile = file_path.name in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock", "uv.lock", "poetry.lock")
+            if not is_lockfile:
+                for match in QUOTED_TOKEN_PATTERN.finditer(content):
+                    candidate = match.group(1)
+                    if len(candidate) >= 28 and not candidate.startswith(("data:", "http", "sha256-", "sha512-", "file:", "assets/", "urn:", "git+")):
+                        entropy = calculate_shannon_entropy(candidate)
+                        if entropy >= 4.6:
+                            if active_config and active_config.is_secret_whitelisted(candidate):
+                                continue
+                            # Avoid duplicates if already flagged as a specific secret
+                            masked = f"{candidate[:4]}***{candidate[-4:]}"
+                            already_flagged = any(masked in v.get("detail", "") for v in vulnerabilities if v.get("file", "").startswith(relative))
+                            if not already_flagged:
+                                start_idx = match.start()
+                                line_num = content.count('\n', 0, start_idx) + 1
+                                vulnerabilities.append({
+                                    "type": "High-Entropy Secret Candidate",
+                                    "severity": "warning",
+                                    "file": f"{relative}:{line_num}",
+                                    "detail": f"High Shannon entropy token ({entropy:.2f} bits/char, {masked})",
+                                })
+
             # Check dependency manifests for outdated or naive flags
             if file_path.name == "package.json":
                 self._check_package_manifest(content, relative, vulnerabilities)
@@ -149,7 +207,7 @@ class SecurityDetector:
             current = stack.pop()
             try:
                 for item in current.iterdir():
-                    if item.name in IGNORE_DIRS or item.name.startswith(".git"):
+                    if item.name in IGNORE_DIRS or item.name.startswith(".git") or item.is_symlink():
                         continue
                     if item.is_dir():
                         stack.append(item)
