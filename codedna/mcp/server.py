@@ -114,6 +114,29 @@ class CodeDNAMCPServer:
                     "required": ["baseline", "target"],
                 },
             ),
+            "codedna_generate_sbom": MCPToolDefinition(
+                name="codedna_generate_sbom",
+                description="Generate CycloneDX 1.5 or SPDX 2.3 Software Bill of Materials (SBOM) across Python, Node.js, Rust, and Go dependencies.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "path": {"type": "string", "description": "Local codebase path", "default": "."},
+                        "format": {"type": "string", "enum": ["cyclonedx", "spdx"], "default": "cyclonedx"},
+                    },
+                },
+            ),
+            "codedna_plan_remediation": MCPToolDefinition(
+                name="codedna_plan_remediation",
+                description="Plan and optionally apply automated, deterministic code remediation diffs for security flaws, bare exceptions, and wildcard pins.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "path": {"type": "string", "description": "Local codebase path", "default": "."},
+                        "apply_fixes": {"type": "boolean", "description": "Apply autofixes directly to disk", "default": False},
+                        "rules": {"type": "array", "items": {"type": "string"}, "description": "Filter by rule IDs"},
+                    },
+                },
+            ),
         }
 
     def handle_message(self, message_str: str) -> str | None:
@@ -317,6 +340,36 @@ class CodeDNAMCPServer:
             prof_b = _get_profile(target_path_b)
             diff = DiffEngine().compare(prof_a, prof_b)
             return json.dumps(diff, indent=2)
+
+        elif name == "codedna_generate_sbom":
+            from codedna.compliance.sbom import SBOMGenerator
+
+            fmt = args.get("format", "cyclonedx").lower()
+            generator = SBOMGenerator(target_path)
+            if fmt == "spdx":
+                doc = generator.generate_spdx_json()
+            else:
+                doc = generator.generate_cyclonedx_json()
+            return json.dumps(doc, indent=2)
+
+        elif name == "codedna_plan_remediation":
+            from codedna.remediation.planner import RemediationPlanner
+
+            planner = RemediationPlanner(target_path)
+            rules = args.get("rules")
+            actions = planner.plan(rule_filter=rules)
+            apply_fixes = args.get("apply_fixes", False)
+            if apply_fixes:
+                apply_res = planner.apply(actions, dry_run=False)
+                return json.dumps({
+                    "plan": [a.to_dict() for a in actions],
+                    "application": apply_res,
+                }, indent=2)
+            return json.dumps({
+                "total_remediations": len(actions),
+                "autofixable_count": sum(1 for a in actions if a.autofixable),
+                "actions": [a.to_dict() for a in actions],
+            }, indent=2)
 
         return "{}"
 
