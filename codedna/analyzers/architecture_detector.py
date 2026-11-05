@@ -37,6 +37,18 @@ PATTERNS = {
         "indicators": ["cli", "commands", "bin"],
         "min_matches": 2,
     },
+    "Clean Architecture / Hexagonal": {
+        "indicators": ["domain", "core", "ports", "adapters", "usecases", "entities"],
+        "min_matches": 3,
+    },
+    "CQRS / Event-Sourced": {
+        "indicators": ["commands", "queries", "events", "handlers", "projections", "aggregates"],
+        "min_matches": 3,
+    },
+    "Serverless": {
+        "indicators": ["functions", "lambdas", "serverless.yml", "serverless.ts", "sam.yaml"],
+        "min_matches": 2,
+    },
 }
 
 # File/config indicators
@@ -46,6 +58,8 @@ CONFIG_PATTERNS = {
     "Tested": ["tests", "test", "__tests__", "spec", "pytest.ini", "jest.config"],
     "Documented": ["docs", "documentation", "wiki", "ARCHITECTURE.md"],
     "Type-Safe": ["tsconfig.json", "mypy.ini", ".mypy.ini", "pyproject.toml"],
+    "Cloud Native": ["k8s", "kubernetes", "helm", "terraform", "main.tf"],
+    "Security Hardened": [".snyk", "security.md", "trivy.yaml", ".gitleaks.toml"],
 }
 
 

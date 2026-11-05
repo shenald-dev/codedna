@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .complexity_analyzer import ComplexityAnalyzer
 from .language_detector import IGNORE_DIRS
 
 if TYPE_CHECKING:
@@ -62,7 +63,7 @@ class CodeSmellDetector:
             try:
                 file_count = 0
                 for item in current.iterdir():
-                    if item.name in IGNORE_DIRS:
+                    if item.name in IGNORE_DIRS or item.is_symlink():
                         continue
                     if item.is_dir():
                         stack.append(item)
@@ -100,6 +101,34 @@ class CodeSmellDetector:
             except PermissionError:
                 pass
 
+        # ── Complexity & Maintainability Analysis ──
+        complexity_data = {}
+        try:
+            complexity_data = ComplexityAnalyzer().analyze(repo_path, config=active_config)
+            for fn in complexity_data.get("complex_functions", []):
+                # High Cyclomatic Complexity
+                if fn.get("cyclomatic_complexity", 0) > 10:
+                    sev = "critical" if fn["cyclomatic_complexity"] > 20 else "warning"
+                    smells.append({
+                        "type": "High Cyclomatic Complexity",
+                        "severity": sev,
+                        "file": f"{fn['file']}:{fn['line']}",
+                        "line": fn["line"],
+                        "detail": f"Function '{fn['name']}' has Cyclomatic Complexity {fn['cyclomatic_complexity']} (threshold: 10)",
+                    })
+                # High Cognitive Complexity
+                if fn.get("cognitive_complexity", 0) > 15:
+                    sev = "critical" if fn["cognitive_complexity"] > 25 else "warning"
+                    smells.append({
+                        "type": "High Cognitive Complexity",
+                        "severity": sev,
+                        "file": f"{fn['file']}:{fn['line']}",
+                        "line": fn["line"],
+                        "detail": f"Function '{fn['name']}' has Cognitive Complexity {fn['cognitive_complexity']} (threshold: 15)",
+                    })
+        except Exception:
+            pass
+
         # Summary
         severity_counts = {"critical": 0, "warning": 0, "info": 0}
         for smell in smells:
@@ -110,6 +139,7 @@ class CodeSmellDetector:
             "total": len(smells),
             "severity_counts": severity_counts,
             "health_score": self._compute_health(severity_counts),
+            "complexity": complexity_data,
         }
 
     def _analyze_file(
