@@ -90,7 +90,7 @@ def test_ai_analyzer_success(monkeypatch):
             self.completions = MockCompletions()
 
     class MockClient:
-        def __init__(self, api_key):
+        def __init__(self, *args, **kwargs):
             self.chat = MockChat()
 
     class MockOpenAI:
@@ -121,7 +121,7 @@ def test_ai_analyzer_api_error(monkeypatch):
             self.completions = MockCompletions()
 
     class MockClient:
-        def __init__(self, api_key):
+        def __init__(self, *args, **kwargs):
             self.chat = MockChat()
 
     class MockOpenAI:

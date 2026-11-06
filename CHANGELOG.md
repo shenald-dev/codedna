@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- **[Pruned]:** Removed unused `api_key` arguments in `test_ai_analyzer.py` mocks.
 - **[Pruned]:** Audited codebase for dead code and verified existing test coverage.
 **[Pruned]:** Removed unused `details` field from `PolicyEvaluation` dataclass in `codedna/ci/gatekeeper.py`.
 
