@@ -94,5 +94,22 @@ class TestAnalyzerPerformance(unittest.TestCase):
         # Should finish very fast because massive files are skipped
         self.assertLess(end_time - start_time, 1.5, "DeveloperAnalyzer._detect_collaboration is too slow (O(M^2) blowup)")
 
+    def test_dependency_mapper_catastrophic_backtracking(self):
+        import time
+
+        from codedna.analyzers.dependency_mapper import IMPORT_PATTERNS
+        js_patterns = IMPORT_PATTERNS["JavaScript"]
+
+        # Create string that would trigger catastrophic backtracking in naive regex
+        content = "import " + " " * 100000 + " foo "
+
+        start_time = time.time()
+        for pattern in js_patterns:
+            pattern.findall(content)
+        end_time = time.time()
+
+        # Should finish very fast (O(N)) and not hang for minutes
+        self.assertLess(end_time - start_time, 0.5, "DependencyMapper regex has catastrophic backtracking")
+
 if __name__ == '__main__':
     unittest.main()
