@@ -7,3 +7,8 @@
 
 - **Learning:** Catastrophic backtracking in `dependency_mapper.py` caused O(2^N) hangs on large files when parsing JS/TS `import` regexes with `.*?`.
 - **Action:** Replaced `.*?` with a non-greedy bounded negation `(?:[^'"]){1,250}?` to safely limit matching scope and explicitly avoid backtracking in all future regexes.
+
+## 2024-11-06 — Optimized Text Parsing Memory Usage
+
+- **Learning:** Memory overhead from `content.splitlines()` on large source files introduces serious performance and garbage collection bottlenecks in iterative functions.
+- **Action:** Optimized core parsing operations to perform `pattern.finditer(content)` in C across the entire string and calculate line indices optimally using `content.count('\n', last_idx, start_idx)` to maintain precise bounds dynamically.
