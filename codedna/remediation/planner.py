@@ -97,7 +97,7 @@ class RemediationPlanner:
                     indent = bare_match.group(1)
                     orig_line = line
                     fixed_line = f"{indent}except Exception:\n" if line.endswith("\n") else f"{indent}except Exception:"
-                    diff = self._make_diff(orig_line, fixed_line, rel_path, idx + 1)
+                    diff = self._make_diff(orig_line, fixed_line, rel_path)
                     actions.append(RemediationAction(
                         rule_id="SMELL-BARE-EXCEPT",
                         title="Narrow Bare Exception Handler",
@@ -123,7 +123,7 @@ class RemediationPlanner:
                         description=f"Direct invocation of {line.strip()[:30]}... allows arbitrary code execution. Refactor to ast.literal_eval or structured parsers.",
                         original_text=line.strip(),
                         proposed_text="# TODO: Replace dynamic execution with safe ast.literal_eval or parser",
-                        unified_diff=self._make_diff(line, f"# Refactor dynamic exec: {line}", rel_path, idx + 1),
+                        unified_diff=self._make_diff(line, f"# Refactor dynamic exec: {line}", rel_path),
                         autofixable=False
                     ))
 
@@ -140,7 +140,7 @@ class RemediationPlanner:
                     env_var = var_name.upper()
                     orig_line = line
                     fixed_line = f"{indent}{var_name} = os.getenv('{env_var}', '')\n" if line.endswith("\n") else f"{indent}{var_name} = os.getenv('{env_var}', '')"
-                    diff = self._make_diff(orig_line, fixed_line, rel_path, idx + 1)
+                    diff = self._make_diff(orig_line, fixed_line, rel_path)
                     actions.append(RemediationAction(
                         rule_id="SEC-HARDCODED-SECRET",
                         title="Extract Hardcoded Secret to Environment Variable",
@@ -171,7 +171,7 @@ class RemediationPlanner:
                     comma = m.group(2)
                     orig_line = line
                     fixed_line = f'{prefix}"^1.0.0"{comma}\n' if line.endswith("\n") else f'{prefix}"^1.0.0"{comma}'
-                    diff = self._make_diff(orig_line, fixed_line, rel_path, idx + 1)
+                    diff = self._make_diff(orig_line, fixed_line, rel_path)
                     actions.append(RemediationAction(
                         rule_id="DEP-WILDCARD-PIN",
                         title="Pin Wildcard Dependency Version",
@@ -188,7 +188,7 @@ class RemediationPlanner:
             logger.debug("Failed scanning %s for remediation: %s", path, e)
         return actions
 
-    def _make_diff(self, original: str, proposed: str, file_path: str, line_no: int) -> str:
+    def _make_diff(self, original: str, proposed: str, file_path: str) -> str:
         orig_lines = [original if original.endswith("\n") else original + "\n"]
         prop_lines = [proposed if proposed.endswith("\n") else proposed + "\n"]
         diff = difflib.unified_diff(
