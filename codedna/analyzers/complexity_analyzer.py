@@ -181,39 +181,55 @@ class ComplexityAnalyzer:
     def _heuristic_analyze(self, content: str, relative_path: str, ext: str) -> list[FunctionComplexity]:
         """Heuristic complexity scanner for non-Python source files."""
         pattern = FUNC_PATTERNS[ext]
-        lines = content.splitlines()
         results: list[FunctionComplexity] = []
 
-        for idx, line in enumerate(lines, 1):
-            match = pattern.search(line)
-            if match:
-                # Extract first non-empty capture group
-                func_name = next((g for g in match.groups() if g), f"function_L{idx}")
+        last_idx = 0
+        current_line = 1
 
-                # Approximate function scope: scan until matching closing brace or next 50 lines
-                sub_lines = lines[idx - 1: min(len(lines), idx + 80)]
-                block_text = "\n".join(sub_lines)
-                branches = len(BRANCH_TOKEN_PATTERN.findall(block_text))
-                cc = max(1, branches + 1)
-                cognitive = max(0, int(branches * 1.2))
+        for match in pattern.finditer(content):
+            start_idx = match.start()
+            current_line += content.count('\n', last_idx, start_idx)
+            last_idx = start_idx
 
-                severity = "normal"
-                if cc > 20 or cognitive > 25:
-                    severity = "critical"
-                elif cc > 10 or cognitive > 15:
-                    severity = "warning"
+            # Extract first non-empty capture group
+            func_name = next((g for g in match.groups() if g), f"function_L{current_line}")
 
-                results.append(
-                    FunctionComplexity(
-                        name=func_name,
-                        file=relative_path,
-                        line=idx,
-                        lines_of_code=len(sub_lines),
-                        cyclomatic_complexity=cc,
-                        cognitive_complexity=cognitive,
-                        severity=severity,
-                    )
+            # Approximate function scope: scan until matching closing brace or next 80 lines
+            end_idx = start_idx
+            line_count = 0
+            while line_count < 80 and end_idx != -1:
+                end_idx = content.find('\n', end_idx + 1)
+                line_count += 1
+
+            if end_idx == -1:
+                end_idx = len(content)
+
+            block_text = content[start_idx:end_idx]
+            branches = len(BRANCH_TOKEN_PATTERN.findall(block_text))
+            cc = max(1, branches + 1)
+            cognitive = max(0, int(branches * 1.2))
+
+            severity = "normal"
+            if cc > 20 or cognitive > 25:
+                severity = "critical"
+            elif cc > 10 or cognitive > 15:
+                severity = "warning"
+
+            loc = content.count('\n', start_idx, end_idx) + 1
+            if content[start_idx:end_idx].endswith('\n'):
+                loc -= 1
+
+            results.append(
+                FunctionComplexity(
+                    name=func_name,
+                    file=relative_path,
+                    line=current_line,
+                    lines_of_code=max(1, loc),
+                    cyclomatic_complexity=cc,
+                    cognitive_complexity=cognitive,
+                    severity=severity,
                 )
+            )
 
         return results
 

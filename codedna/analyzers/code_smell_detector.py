@@ -206,15 +206,27 @@ class CodeSmellDetector:
 
         # ── TODO/FIXME/HACK markers ──
         if MARKER_PATTERN.search(content):
-            for i, line in enumerate(content.splitlines(), 1):
-                for match in MARKER_PATTERN.finditer(line):
-                    smells.append({
-                        "type": "Code Marker",
-                        "severity": "info",
-                        "file": f"{relative}:{i}",
-                        "line": i,
-                        "detail": f"{match.group(1).upper()} found: {line.strip()[:80]}",
-                    })
+            last_idx = 0
+            current_line = 1
+            for match in MARKER_PATTERN.finditer(content):
+                start_idx = match.start()
+                current_line += content.count('\n', last_idx, start_idx)
+                last_idx = start_idx
+
+                # Extract up to 80 chars of the line containing the marker
+                line_start = content.rfind('\n', 0, start_idx) + 1
+                line_end = content.find('\n', start_idx)
+                if line_end == -1:
+                    line_end = len(content)
+                line_text = content[line_start:line_end].strip()[:80]
+
+                smells.append({
+                    "type": "Code Marker",
+                    "severity": "info",
+                    "file": f"{relative}:{current_line}",
+                    "line": current_line,
+                    "detail": f"{match.group(1).upper()} found: {line_text}",
+                })
 
     def _count_methods(self, content: str, ext: str) -> int:
         """Count method/function definitions in a file."""
