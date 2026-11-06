@@ -24,12 +24,12 @@ IMPORT_PATTERNS: dict[str, list[re.Pattern]] = {
         re.compile(r"^[ \t]*from\s+([\w.]+)\s+import", re.MULTILINE),
     ],
     "JavaScript": [
-        re.compile(r"""import\s+.*?\s+from\s+['"]([^'"]+)['"]""", re.MULTILINE),
-        re.compile(r"""require\s*\(\s*['"]([^'"]+)['"]\s*\)""", re.MULTILINE),
+        re.compile(r"""\bimport\b(?:[^'"]){1,250}?\bfrom\s+['"]([^'"]+)['"]""", re.DOTALL),
+        re.compile(r"""\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)""", re.MULTILINE),
     ],
     "TypeScript": [
-        re.compile(r"""import\s+.*?\s+from\s+['"]([^'"]+)['"]""", re.MULTILINE),
-        re.compile(r"""require\s*\(\s*['"]([^'"]+)['"]\s*\)""", re.MULTILINE),
+        re.compile(r"""\bimport\b(?:[^'"]){1,250}?\bfrom\s+['"]([^'"]+)['"]""", re.DOTALL),
+        re.compile(r"""\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)""", re.MULTILINE),
     ],
     "Go": [
         re.compile(r'"([^"]+)"', re.MULTILINE),
