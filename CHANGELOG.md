@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
+### Removed
+- Prune orphaned `package-lock.json` root artifact left over from earlier project templating.
+
 ### Pruned
 - **[Pruned]:** Removed unused error constants (`PARSE_ERROR`, `INVALID_REQUEST`, `INVALID_PARAMS`, `INTERNAL_ERROR`) in `codedna/mcp/protocol.py` and unused `line_no` parameter in `_make_diff` within `codedna/remediation/planner.py`.
 
