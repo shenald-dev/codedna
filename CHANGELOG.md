@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
-### Pruned
+- **[Optimized]:** Replaced `content.splitlines()` with `pattern.finditer(content)` in core parsing operations to mitigate memory and performance overhead during large file scans, reducing garbage collection bottlenecks.
 - **[Pruned]:** Removed unused error constants (`PARSE_ERROR`, `INVALID_REQUEST`, `INVALID_PARAMS`, `INTERNAL_ERROR`) in `codedna/mcp/protocol.py` and unused `line_no` parameter in `_make_diff` within `codedna/remediation/planner.py`.
 
 
