@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
+### Security
+- Upgrade anyio to 4.16.0 in uv.lock to remediate CVEs PYSEC-2026-4024 and PYSEC-2026-4025.
+
 ### Removed
 - Prune orphaned `package-lock.json` root artifact left over from earlier project templating.
 
