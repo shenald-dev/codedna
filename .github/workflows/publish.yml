@@ -1,0 +1,76 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Build, Verify & Publish to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools & dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine pytest
+          pip install -e .
+
+      - name: Run test suite
+        run: pytest
+
+      - name: Build distribution packages
+        run: python -m build
+
+      - name: Validate package integrity
+        run: twine check dist/*
+
+      - name: Check version against PyPI registry
+        id: check_version
+        run: |
+          python -c "
+          import urllib.request, json, tomllib, os
+
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+          pkg_name = data['project']['name']
+          local_ver = data['project']['version']
+
+          try:
+              req = urllib.request.Request(f'https://pypi.org/pypi/{pkg_name}/json', headers={'User-Agent': 'GitHubActions'})
+              with urllib.request.urlopen(req) as resp:
+                  pypi_data = json.loads(resp.read().decode())
+                  pypi_ver = pypi_data['info']['version']
+          except Exception:
+              pypi_ver = '0.0.0'
+
+          print(f'Package: {pkg_name} | Local: {local_ver} | PyPI: {pypi_ver}')
+          is_manual = '${{ github.event_name }}' in ['workflow_dispatch', 'release']
+          should_publish = (local_ver != pypi_ver) or is_manual
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              if should_publish:
+                  print('should_publish=true', file=out)
+              else:
+                  print(f'Version {local_ver} is already published on PyPI. Skipping publish.')
+                  print('should_publish=false', file=out)
+          "
+
+      - name: Publish to PyPI
+        if: steps.check_version.outputs.should_publish == 'true'
+        run: twine upload -u __token__ -p "${{ secrets.PYPI_API_TOKEN }}" dist/* --skip-existing
