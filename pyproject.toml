@@ -3,23 +3,29 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "codedna"
+name = "codedna-analyzer"
 version = "1.4.0"
 description = "🧬 A genetic analyzer for software — reverse-engineer any codebase into a DNA profile."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [
+    {name = "Shenal Diluksha", email = "shenald@users.noreply.github.com"}
+]
+maintainers = [
     {name = "shenald-dev", email = "shenald@users.noreply.github.com"}
 ]
-keywords = ["code-analysis", "architecture", "dependency-graph", "software-intelligence", "dna"]
+keywords = ["code-analysis", "architecture", "dependency-graph", "software-intelligence", "dna", "cli"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Utilities"
 ]
 dependencies = [
     "click>=8.0.0",
@@ -41,6 +47,13 @@ ai = [
 
 [project.scripts]
 codedna = "codedna.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/shenald-dev/codedna"
+Documentation = "https://github.com/shenald-dev/codedna#readme"
+Repository = "https://github.com/shenald-dev/codedna"
+Issues = "https://github.com/shenald-dev/codedna/issues"
+Changelog = "https://github.com/shenald-dev/codedna/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["codedna*"]

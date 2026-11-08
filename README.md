@@ -9,10 +9,10 @@
 
   <br/>
 
+  [![PyPI version](https://img.shields.io/pypi/v/codedna-analyzer.svg)](https://pypi.org/project/codedna-analyzer/)
   [![CI](https://github.com/shenald-dev/codedna/actions/workflows/ci.yml/badge.svg)](https://github.com/shenald-dev/codedna/actions)
   [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
   [![Version](https://img.shields.io/badge/Release-v1.4.0-cyan.svg)](https://github.com/shenald-dev/codedna/releases)
-  [![Tests: 178 passed](https://img.shields.io/badge/Tests-178%20passed%20(100%25)-success.svg)](https://github.com/shenald-dev/codedna)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
@@ -232,15 +232,20 @@ graph TD
 
 ### Installation
 ```bash
-git clone https://github.com/shenald-dev/codedna.git
-cd codedna
-pip install -e ".[dev]"
+pip install codedna-analyzer
+```
+
+Or install via `pipx` or `uv`:
+```bash
+pipx install codedna-analyzer
+# or
+uv tool install codedna-analyzer
 ```
 
 Verify installation:
 ```bash
 codedna --version
-# codedna, version 1.2.0
+# codedna, version 1.4.0
 ```
 
 ---
